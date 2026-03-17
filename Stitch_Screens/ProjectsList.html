@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Modern SaaS Project Management - Projects List</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;family=Figtree:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#4F46E5",
+                        "background-light": "#F8FAFC",
+                        "background-dark": "#0F172A",
+                        "surface-light": "#FFFFFF",
+                        "surface-dark": "#1E293B",
+                        "text-light": "#0F172A",
+                        "text-dark": "#F8FAFC",
+                        "muted-light": "#64748B",
+                        "muted-dark": "#94A3B8",
+                        "border-light": "#E2E8F0",
+                        "border-dark": "#334155",
+                        "accent": "#10B981",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "sans-serif"],
+                        "body": ["Figtree", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "md": "0.5rem",
+                        "lg": "0.75rem",
+                        "xl": "1rem",
+                        "full": "9999px"
+                    },
+                    boxShadow: {
+                        "soft": "0 4px 20px rgba(15, 23, 42, 0.03)",
+                        "hover": "0 10px 25px rgba(15, 23, 42, 0.05)"
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Figtree', sans-serif;
+        }
+        h1, h2, h3, h4, h5, h6, .font-display {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: #475569;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark h-screen overflow-hidden flex antialiased">
+<!-- Sidebar -->
+<aside class="hidden md:flex flex-col w-[250px] min-w-[250px] bg-surface-light dark:bg-surface-dark border-r border-border-light dark:border-border-dark h-full z-20">
+<div class="flex h-16 items-center px-6 border-b border-border-light dark:border-border-dark">
+<div class="flex items-center gap-3 w-full">
+<div class="bg-primary/10 rounded-lg p-2 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-xl">view_kanban</span>
+</div>
+<div class="flex flex-col">
+<h1 class="font-display font-bold text-base leading-tight">Velocity</h1>
+<span class="text-xs text-muted-light dark:text-muted-dark font-medium">Product Team</span>
+</div>
+</div>
+</div>
+<nav class="flex flex-col flex-1 py-6 px-4 gap-1 overflow-y-auto">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-muted-light dark:text-muted-dark hover:bg-background-light dark:hover:bg-border-dark hover:text-text-light dark:hover:text-text-dark font-display font-semibold text-sm transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">dashboard</span>
+                Dashboard
+            </a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary/10 text-primary font-display font-semibold text-sm transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">folder_open</span>
+                Projects
+            </a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-muted-light dark:text-muted-dark hover:bg-background-light dark:hover:bg-border-dark hover:text-text-light dark:hover:text-text-dark font-display font-semibold text-sm transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">task_alt</span>
+                Tasks
+                <span class="ml-auto bg-border-light dark:bg-border-dark text-xs py-0.5 px-2 rounded-full">12</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-muted-light dark:text-muted-dark hover:bg-background-light dark:hover:bg-border-dark hover:text-text-light dark:hover:text-text-dark font-display font-semibold text-sm transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">monitoring</span>
+                Activity
+            </a>
+<div class="mt-8 mb-2 px-3">
+<p class="text-xs font-semibold text-muted-light dark:text-muted-dark uppercase tracking-wider">Teams</p>
+</div>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-muted-light dark:text-muted-dark hover:bg-background-light dark:hover:bg-border-dark hover:text-text-light dark:hover:text-text-dark text-sm transition-colors" href="#">
+<span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                Design Squad
+            </a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-muted-light dark:text-muted-dark hover:bg-background-light dark:hover:bg-border-dark hover:text-text-light dark:hover:text-text-dark text-sm transition-colors" href="#">
+<span class="w-2 h-2 rounded-full bg-purple-500"></span>
+                Engineering
+            </a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-muted-light dark:text-muted-dark hover:bg-background-light dark:hover:bg-border-dark hover:text-text-light dark:hover:text-text-dark text-sm transition-colors" href="#">
+<span class="w-2 h-2 rounded-full bg-accent"></span>
+                Marketing
+            </a>
+</nav>
+<div class="p-4 border-t border-border-light dark:border-border-dark">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-muted-light dark:text-muted-dark hover:bg-background-light dark:hover:bg-border-dark hover:text-text-light dark:hover:text-text-dark font-display font-semibold text-sm transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">settings</span>
+                Settings
+            </a>
+</div>
+</aside>
+<!-- Main Content -->
+<div class="flex flex-col flex-1 w-full h-full overflow-hidden">
+<!-- Top Navbar -->
+<header class="h-16 flex items-center justify-between px-4 sm:px-8 bg-surface-light dark:bg-surface-dark border-b border-border-light dark:border-border-dark z-10 sticky top-0">
+<div class="flex items-center gap-4">
+<button class="md:hidden text-muted-light dark:text-muted-dark p-2 -ml-2 rounded-md hover:bg-background-light dark:hover:bg-border-dark">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<div class="hidden sm:flex relative w-64">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-muted-light dark:text-muted-dark text-[20px]">search</span>
+<input class="w-full h-10 pl-10 pr-4 rounded-lg bg-background-light dark:bg-border-dark border-none focus:ring-2 focus:ring-primary text-sm text-text-light dark:text-text-dark placeholder:text-muted-light dark:placeholder:text-muted-dark transition-shadow" placeholder="Search projects..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-3 sm:gap-4">
+<button class="flex items-center gap-2 h-10 px-4 rounded-lg bg-primary hover:bg-primary/90 text-white font-display font-semibold text-sm transition-colors shadow-sm">
+<span class="material-symbols-outlined text-[18px]">add</span>
+<span class="hidden sm:inline">New Project</span>
+</button>
+<div class="w-px h-6 bg-border-light dark:bg-border-dark mx-1 hidden sm:block"></div>
+<button class="relative p-2 text-muted-light dark:text-muted-dark hover:text-text-light dark:hover:text-text-dark hover:bg-background-light dark:hover:bg-border-dark rounded-full transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-red-500 border border-surface-light dark:border-surface-dark"></span>
+</button>
+<div class="w-8 h-8 rounded-full bg-cover bg-center border-2 border-surface-light dark:border-surface-dark shadow-sm cursor-pointer ml-1" data-alt="User profile avatar" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBfanUbcrhevPueAU9SDuQ2k-054rYQd_P0AQg_N81Iv-G5sSgoZVyABcYvPM6hsbxwh2oxfU7DwnCkDlAjmkQ7U0bY2cxXmyTFZBpxOtRRvAlnsDaijhIjPzDKbYcZVXgv-MnNd7IiS6YC5z5ijuxF-twMZfroLXJ-KP2un4YRyN0WnOCuQOwXaQnIThJvkVspYsfHCbhLDauR1sGtMeKcM8fDYb6Mxh_ifn_jCEwtrWjxzDt-kGtuGqMEm6k1eRV41xx1eIHsW6Jb");'></div>
+</div>
+</header>
+<!-- Page Content -->
+<main class="flex-1 overflow-y-auto p-4 sm:p-8 bg-background-light dark:bg-background-dark">
+<div class="max-w-[1200px] mx-auto space-y-8 pb-12">
+<!-- Page Header & Actions -->
+<div class="flex items-center justify-between">
+<h2 class="font-display text-2xl font-bold text-text-light dark:text-text-dark tracking-tight">Projects</h2>
+</div>
+<!-- Projects Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+<!-- Card 1 (In Progress) -->
+<div class="bg-surface-light dark:bg-surface-dark rounded-lg p-5 border border-border-light dark:border-border-dark shadow-soft hover:shadow-hover hover:border-primary/50 transition-all duration-200 cursor-pointer flex flex-col h-[200px]">
+<div class="flex justify-between items-start mb-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400">Marketing</span>
+<button class="text-muted-light dark:text-muted-dark hover:text-text-light dark:hover:text-text-dark"><span class="material-symbols-outlined text-[20px]">more_horiz</span></button>
+</div>
+<h3 class="font-display font-semibold text-base mb-1 truncate text-text-light dark:text-text-dark">Q3 Brand Campaign Launch</h3>
+<p class="text-sm text-muted-light dark:text-muted-dark line-clamp-2 mb-auto">Finalizing assets and media buying for the upcoming quarter.</p>
+<div class="mt-4 flex items-center justify-between">
+<div class="flex -space-x-2">
+<img alt="" class="w-7 h-7 rounded-full border-2 border-surface-light dark:border-surface-dark object-cover" data-alt="Team member avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBDI8Otatlhrq-S3NzcqvlHGTyU7Vpg6ny8VIY4hNel-CawJ0EUMXuje5jwoLllZ6GSYTXMhPl0on8oIIEV3SQmd0BNA7FInF-hcLklcJo7yFGwqAyWRlZ3cypkYv__IBCfQMuOo4NlYO8AP5w9VdMEmrz144Ii59322OzElljZA3q44mQ_nOj97OqcQYeos_Ox1CbaSwWL5Iq2A4SsmtvIYEgAheTMec3AsFQqnZRrynQw0Nt-Wpp5kfXY1z7_050qqEYK0Z8FyWVg"/>
+<img alt="" class="w-7 h-7 rounded-full border-2 border-surface-light dark:border-surface-dark object-cover" data-alt="Team member avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAWTNPuLKiIke9OKQVtaLFFI5phyoVn0OwFQ27cEpQWf4fs3-bEnF_W1APn2JnTzSazRiPjGMnMGI6vvr-FQju7fvOfhDy7FaLHpo57y8RYGiMg0nCw-g4mvAah3G3M3aB6oyPQpX3OHBn3xCrGDhMpHI4pTU7LfuFkQrHHSpIylUZA10Afous13ThnJREKJcSU6wL_ClCfJiwfujpQPskPExOPOS5fxmcniGpTtxpgct-N39QfIkmFFRppsOSTiQvnDMysthuW8qiz"/>
+<div class="w-7 h-7 rounded-full border-2 border-surface-light dark:border-surface-dark bg-background-light dark:bg-border-dark flex items-center justify-center text-[10px] font-bold text-muted-light dark:text-muted-dark">+2</div>
+</div>
+<div class="flex flex-col items-end gap-1.5 w-1/2">
+<span class="text-[12px] font-medium text-text-light dark:text-text-dark">75%</span>
+<div class="w-full h-1.5 bg-border-light dark:bg-border-dark rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full" style="width: 75%"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 2 (Completed) -->
+<div class="bg-surface-light dark:bg-surface-dark rounded-lg p-5 border border-border-light dark:border-border-dark shadow-soft hover:shadow-hover hover:border-primary/50 transition-all duration-200 cursor-pointer flex flex-col h-[200px]">
+<div class="flex justify-between items-start mb-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-purple-50 text-purple-700 dark:bg-purple-900/20 dark:text-purple-400">Engineering</span>
+<button class="text-muted-light dark:text-muted-dark hover:text-text-light dark:hover:text-text-dark"><span class="material-symbols-outlined text-[20px]">more_horiz</span></button>
+</div>
+<h3 class="font-display font-semibold text-base mb-1 truncate text-text-light dark:text-text-dark">V2 API Migration</h3>
+<p class="text-sm text-muted-light dark:text-muted-dark line-clamp-2 mb-auto">Migrating legacy endpoints to the new GraphQL architecture.</p>
+<div class="mt-4 flex items-center justify-between">
+<div class="flex -space-x-2">
+<img alt="" class="w-7 h-7 rounded-full border-2 border-surface-light dark:border-surface-dark object-cover" data-alt="Team member avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCKwMrecpaMkXmd6YqaXJpWExEQXgoswydcWn5Tv5b6XjvXR6NvTGxNFQyfoVLx4t7xI1H2ebRgPjam4t82FyGPm4TAKl5Pts_OF4qV2UsH1tr7Kq-pIZHK9wQkFHQyXGqBiLJohBtUejmwq4LV6YMR1Ej7M9BPXZpGFAfarSwAwa8H_eEIuHTNQgW6ajxUV2DKGThCfMAs_jN6ydkvv2MjwlvMy04AVV-f-7P1lb5c_ovUx1wKI8cmw1_Ycx-9hFzy_supXHLBFD-p"/>
+<img alt="" class="w-7 h-7 rounded-full border-2 border-surface-light dark:border-surface-dark object-cover" data-alt="Team member avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB03VYmpxpu1rcHrBBV4dnsW5Lu8gY7TPFVT4DNd_ZGgeuTf6tnM_UBmdqGZnxbP3Rx5m8n95PvP1Pt7oygy85oSksXFWr7Rg218pzQn0naxjjwXjJB9Heavn_mDWI8Nc_o3QvExVCrKkGV-8wYVS9X0CN7t2W7sRqO2fusMw9MOaILijavda3oqfS91Es0lBQe14LbhDqwRJCGecTYeTNTWcgMLXnzahCtmCYh4k6br38_XbLIoFAqeCLBiGErH5QPu3gTnJnsV9hI"/>
+</div>
+<div class="flex flex-col items-end gap-1.5 w-1/2">
+<span class="text-[12px] font-medium text-accent flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">check_circle</span> 100%</span>
+<div class="w-full h-1.5 bg-border-light dark:bg-border-dark rounded-full overflow-hidden">
+<div class="h-full bg-accent rounded-full" style="width: 100%"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 3 (Low Progress) -->
+<div class="bg-surface-light dark:bg-surface-dark rounded-lg p-5 border border-border-light dark:border-border-dark shadow-soft hover:shadow-hover hover:border-primary/50 transition-all duration-200 cursor-pointer flex flex-col h-[200px]">
+<div class="flex justify-between items-start mb-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-orange-50 text-orange-700 dark:bg-orange-900/20 dark:text-orange-400">Design</span>
+<button class="text-muted-light dark:text-muted-dark hover:text-text-light dark:hover:text-text-dark"><span class="material-symbols-outlined text-[20px]">more_horiz</span></button>
+</div>
+<h3 class="font-display font-semibold text-base mb-1 truncate text-text-light dark:text-text-dark">Mobile App Redesign</h3>
+<p class="text-sm text-muted-light dark:text-muted-dark line-clamp-2 mb-auto">Overhauling the iOS and Android applications for better UX.</p>
+<div class="mt-4 flex items-center justify-between">
+<div class="flex -space-x-2">
+<img alt="" class="w-7 h-7 rounded-full border-2 border-surface-light dark:border-surface-dark object-cover" data-alt="Team member avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC0GVSNxdX8hQoz6NmKBPRnG3QCLUC2-1-wzLTUVVAG3AqSF_gsb2tK-i7M1U-NzKLo3dLbod2Qc4EOcn1wBgqV4mYGR7VBulgFS-d6InVSjRqsDhm0XltrvDRLL-vtLo8gQjDJSr_YA-kkzmv0aVcYefekVVgIpmHWcLaA22tcnSLESstyrdGFv9mqZRwoZDXwK0W6flGmEskXQI3e3KWE0LBE2W-IKiLqIsq9MpCMvm52UPvy13ED80G-_YeltD9bGah2918wbVUW"/>
+</div>
+<div class="flex flex-col items-end gap-1.5 w-1/2">
+<span class="text-[12px] font-medium text-text-light dark:text-text-dark">15%</span>
+<div class="w-full h-1.5 bg-border-light dark:bg-border-dark rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full" style="width: 15%"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 4 (Halfway) -->
+<div class="bg-surface-light dark:bg-surface-dark rounded-lg p-5 border border-border-light dark:border-border-dark shadow-soft hover:shadow-hover hover:border-primary/50 transition-all duration-200 cursor-pointer flex flex-col h-[200px]">
+<div class="flex justify-between items-start mb-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400">Operations</span>
+<button class="text-muted-light dark:text-muted-dark hover:text-text-light dark:hover:text-text-dark"><span class="material-symbols-outlined text-[20px]">more_horiz</span></button>
+</div>
+<h3 class="font-display font-semibold text-base mb-1 truncate text-text-light dark:text-text-dark">Q4 Offsite Planning</h3>
+<p class="text-sm text-muted-light dark:text-muted-dark line-clamp-2 mb-auto">Logistics and venue booking for the annual company retreat.</p>
+<div class="mt-4 flex items-center justify-between">
+<div class="flex -space-x-2">
+<img alt="" class="w-7 h-7 rounded-full border-2 border-surface-light dark:border-surface-dark object-cover" data-alt="Team member avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAq9jlthmfmUJSxCIqm1TPnk_rjfWDmwViPgTfPV9fUBaWXbn9iTRGrCkpP__DixI9w_iDENzJAtjL4CuGMdtzI1X2Ds49Pb984DmTjnkQoXhkf2gCIY0-cL5ZWD5CnfHoyYsZJETb02vG6jvn5fo5uvEV7SkDxH7nAh9sIHdp_vtn1KQFEXadEV0oMwyxqBNVYu4MM4jg-vSFiSif_J7gKlNAz9HdSnF8RF9F59wZYsEgaIhHmJBNVEekE-eRbKCU8LI5-_QHWZzhU"/>
+<img alt="" class="w-7 h-7 rounded-full border-2 border-surface-light dark:border-surface-dark object-cover" data-alt="Team member avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAvPZKg9J5drvedlmLydCEiX_ghfecPR2ZuU1z1SrNR_jRys9j6rLvxYwjGNomd0Yry1WWvhXYt-D7Przye4mOA8Wg5SfEvmls1olM2EiBm91iEIQJJFqhJNAxaSl_57PVRqvYZv9lRfBQey2Gov7L0UqLAthQazwZ3jqWO8ME4jsoG8jsDnxqVTojz2vSjg70T93mmuvcXuKrTCiXCYcJj8AnvBVdJrxkFDoXzHNx3xkn_XKu1DQnrF4tAepWEQWO_wmxyhgX3gjwg"/>
+<img alt="" class="w-7 h-7 rounded-full border-2 border-surface-light dark:border-surface-dark object-cover" data-alt="Team member avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC7JD6fdRYNu3fx-tyqYuQrrlwIZc11-Q3T1T1-dvM5198ZrgXU843IXnFZV1lk3aTtl8dHsVVsofBvDYHhHcx9v6MENc4RsTA9c6sYgYn0BgEFIkVzbPvOJsvApYqaKZ2PqgzFTLrrJbgl5G_yz3nWmdsbUmnw0Yhibu_xk71rX5ynYS61Kn0eUg_np8MTw2cbCsl5qT4sC3uXWdnnm7zg8uLC9o3DxTXQv8OgRQ3tsIfRbZRMiVKALEzk9xdaChaeOv2xlaZ23ghC"/>
+</div>
+<div class="flex flex-col items-end gap-1.5 w-1/2">
+<span class="text-[12px] font-medium text-text-light dark:text-text-dark">50%</span>
+<div class="w-full h-1.5 bg-border-light dark:bg-border-dark rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full" style="width: 50%"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

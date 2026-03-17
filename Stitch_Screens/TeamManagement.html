@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Velocity - Team Management</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500&amp;family=Plus+Jakarta+Sans:wght@600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#4F46E5",
+                        "background-light": "#F8FAFC",
+                        "background-dark": "#0F172A",
+                        "surface-light": "#FFFFFF",
+                        "surface-dark": "#1E293B",
+                        "text-light": "#0F172A",
+                        "text-dark": "#F8FAFC",
+                        "muted-light": "#64748B",
+                        "muted-dark": "#94A3B8",
+                        "border-light": "#E2E8F0",
+                        "border-dark": "#334155",
+                        "accent": "#10B981",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "sans-serif"],
+                        "body": ["Figtree", "sans-serif"],
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "md": "0.5rem",
+                        "lg": "0.75rem",
+                        "xl": "1rem",
+                        "full": "9999px"
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 20px rgba(15, 23, 42, 0.03)',
+                        'hover': '0 10px 25px rgba(15, 23, 42, 0.05)',
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Figtree', sans-serif;
+        }
+        h1, h2, h3, h4, h5, h6, .font-display {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        .member-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .member-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(15, 23, 42, 0.05);
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: #475569;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark antialiased">
+<div class="relative flex h-screen w-full flex-row overflow-hidden">
+<!-- Sidebar -->
+<aside class="hidden md:flex flex-col w-[250px] min-w-[250px] bg-surface-light dark:bg-surface-dark border-r border-border-light dark:border-border-dark h-full z-20">
+<div class="flex h-16 items-center px-6 border-b border-border-light dark:border-border-dark">
+<div class="flex items-center gap-3 w-full">
+<div class="bg-primary/10 rounded-lg p-2 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-xl">view_kanban</span>
+</div>
+<div class="flex flex-col">
+<h1 class="font-display font-bold text-base leading-tight">Velocity</h1>
+<span class="text-xs text-muted-light dark:text-muted-dark font-medium">Product Team</span>
+</div>
+</div>
+</div>
+<div class="flex flex-col flex-1 py-6 px-4 gap-1 overflow-y-auto">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-muted-light dark:text-muted-dark hover:bg-background-light dark:hover:bg-border-dark hover:text-text-light dark:hover:text-text-dark font-display font-semibold text-sm transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">dashboard</span>
+                    Dashboard
+                </a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-muted-light dark:text-muted-dark hover:bg-background-light dark:hover:bg-border-dark hover:text-text-light dark:hover:text-text-dark font-display font-semibold text-sm transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">folder_open</span>
+                    Projects
+                </a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-muted-light dark:text-muted-dark hover:bg-background-light dark:hover:bg-border-dark hover:text-text-light dark:hover:text-text-dark font-display font-semibold text-sm transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">task_alt</span>
+                    Tasks
+                </a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary/10 text-primary font-display font-semibold text-sm transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">group</span>
+                    Team
+                </a>
+<div class="mt-8 mb-2 px-3">
+<p class="text-xs font-semibold text-muted-light dark:text-muted-dark uppercase tracking-wider">Teams</p>
+</div>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-muted-light dark:text-muted-dark hover:bg-background-light dark:hover:bg-border-dark hover:text-text-light dark:hover:text-text-dark text-sm transition-colors" href="#">
+<span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                    Design Squad
+                </a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-muted-light dark:text-muted-dark hover:bg-background-light dark:hover:bg-border-dark hover:text-text-light dark:hover:text-text-dark text-sm transition-colors" href="#">
+<span class="w-2 h-2 rounded-full bg-purple-500"></span>
+                    Engineering
+                </a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-muted-light dark:text-muted-dark hover:bg-background-light dark:hover:bg-border-dark hover:text-text-light dark:hover:text-text-dark text-sm transition-colors" href="#">
+<span class="w-2 h-2 rounded-full bg-accent"></span>
+                    Marketing
+                </a>
+</div>
+<div class="p-4 border-t border-border-light dark:border-border-dark">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-muted-light dark:text-muted-dark hover:bg-background-light dark:hover:bg-border-dark hover:text-text-light dark:hover:text-text-dark font-display font-semibold text-sm transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">settings</span>
+                    Settings
+                </a>
+</div>
+</aside>
+<!-- Main Content Wrapper -->
+<div class="flex flex-col flex-1 w-full h-full overflow-hidden">
+<!-- Top Navbar -->
+<header class="h-16 flex items-center justify-between px-4 sm:px-8 bg-surface-light dark:bg-surface-dark border-b border-border-light dark:border-border-dark z-10 sticky top-0">
+<div class="flex items-center gap-4">
+<button class="md:hidden text-muted-light dark:text-muted-dark p-2 -ml-2 rounded-md hover:bg-background-light dark:hover:bg-border-dark">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<div class="hidden sm:flex relative w-64">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-muted-light dark:text-muted-dark text-[20px]">search</span>
+<input class="w-full h-10 pl-10 pr-4 rounded-lg bg-background-light dark:bg-border-dark border-none focus:ring-2 focus:ring-primary text-sm text-text-light dark:text-text-dark placeholder:text-muted-light dark:placeholder:text-muted-dark transition-shadow" placeholder="Search tasks, members, or projects..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-3 sm:gap-4">
+<button class="flex items-center gap-2 h-10 px-4 rounded-lg bg-primary hover:bg-primary/90 text-white font-display font-semibold text-sm transition-colors shadow-sm">
+<span class="material-symbols-outlined text-[18px]">person_add</span>
+<span class="hidden sm:inline">Invite Member</span>
+</button>
+<div class="w-px h-6 bg-border-light dark:bg-border-dark mx-1 hidden sm:block"></div>
+<button class="relative p-2 text-muted-light dark:text-muted-dark hover:text-text-light dark:hover:text-text-dark hover:bg-background-light dark:hover:bg-border-dark rounded-full transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-red-500 border border-surface-light dark:border-surface-dark"></span>
+</button>
+<div class="w-8 h-8 rounded-full bg-cover bg-center border-2 border-surface-light dark:border-surface-dark shadow-sm cursor-pointer ml-1" data-alt="User profile avatar" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBfanUbcrhevPueAU9SDuQ2k-054rYQd_P0AQg_N81Iv-G5sSgoZVyABcYvPM6hsbxwh2oxfU7DwnCkDlAjmkQ7U0bY2cxXmyTFZBpxOtRRvAlnsDaijhIjPzDKbYcZVXgv-MnNd7IiS6YC5z5ijuxF-twMZfroLXJ-KP2un4YRyN0WnOCuQOwXaQnIThJvkVspYsfHCbhLDauR1sGtMeKcM8fDYb6Mxh_ifn_jCEwtrWjxzDt-kGtuGqMEm6k1eRV41xx1eIHsW6Jb");'></div>
+</div>
+</header>
+<!-- Main Scrollable Area -->
+<main class="flex-1 overflow-y-auto p-4 sm:p-8 bg-background-light dark:bg-background-dark">
+<div class="max-w-[1200px] mx-auto flex flex-col gap-8 pb-12">
+<!-- Title and Filters -->
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+<div>
+<h2 class="font-display text-2xl font-bold text-text-light dark:text-text-dark">Team Management</h2>
+<p class="text-muted-light dark:text-muted-dark mt-1 text-sm">Manage your team members, workspace permissions, and invites.</p>
+</div>
+<div class="flex items-center gap-2">
+<div class="flex bg-surface-light dark:bg-surface-dark p-1 rounded-lg border border-border-light dark:border-border-dark shadow-soft">
+<button class="px-4 py-1.5 bg-background-light dark:bg-border-dark rounded-md text-xs font-bold text-primary">All Members</button>
+<button class="px-4 py-1.5 text-xs font-semibold text-muted-light dark:text-muted-dark hover:text-text-light">Design</button>
+<button class="px-4 py-1.5 text-xs font-semibold text-muted-light dark:text-muted-dark hover:text-text-light">Engineering</button>
+</div>
+</div>
+</div>
+<!-- Member Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+<!-- Member Card 1 -->
+<div class="member-card bg-surface-light dark:bg-surface-dark p-6 rounded-xl border border-border-light dark:border-border-dark shadow-soft relative group text-center">
+<button class="absolute top-4 right-4 text-muted-light hover:text-text-light transition-colors">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+<div class="relative w-20 h-20 mx-auto">
+<img alt="Jordan Smith" class="w-full h-full rounded-full border-4 border-background-light dark:border-border-dark shadow-inner object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCMgMaTH0VO4C6HfIGsy5FLZKasoNS4z4odAf3ZKhoLnes0BwvEP7Byna_8a9EDkwZ8mXyHrY14aLDo09u_apMBAK1enukzDcaKDcb1fwRDe35GWLkXeJkkBhUb3SOw4YM5d7lAuFZJff1lJlJyCj36HSvr9I6vNYq_pW-iwUgg3rwwW_JS3ioeze4W3UKhPjR9K-60gnBuvUkXekRNKeqiXlCNhWqVPoKf3JJM_-bZLO5vL-x-SwmRgxuHN_7dboS5NmKkKb4OH1jE"/>
+<span class="absolute bottom-1 right-1 w-4 h-4 bg-accent rounded-full border-2 border-surface-light dark:border-surface-dark" title="Active"></span>
+</div>
+<h3 class="mt-4 font-display font-bold text-text-light dark:text-text-dark">Jordan Smith</h3>
+<p class="text-xs text-primary font-semibold">Senior Product Designer</p>
+<div class="mt-4 flex items-center justify-between text-[10px] font-bold uppercase tracking-wider">
+<span class="bg-background-light dark:bg-border-dark text-muted-light px-2 py-1 rounded">Design</span>
+<span class="text-accent flex items-center gap-1">Active</span>
+</div>
+</div>
+<!-- Member Card 2 -->
+<div class="member-card bg-surface-light dark:bg-surface-dark p-6 rounded-xl border border-border-light dark:border-border-dark shadow-soft relative group text-center">
+<button class="absolute top-4 right-4 text-muted-light hover:text-text-light transition-colors">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+<div class="relative w-20 h-20 mx-auto">
+<img alt="Sarah Chen" class="w-full h-full rounded-full border-4 border-background-light dark:border-border-dark shadow-inner object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBI7gkpqCLx5Uy3JRXA9ctlbZsDRX82KZBrUmopJXAK4hPi2bTr_Rk4CnIRH_v1u1OHyO-sQLhLxpmFMOkLMt7F7Kb7tyJITtD_Y54jQG42tztH-LNEHBNmj2a5_BpBVgjSWuloI01QRgm-UBA6mbJe1hp62M0AQho3KD6mPSdXmjHNFsFt0Z0L_4lInBjwSogwPSftI5s_4b9tXZN4CwIONWrITDF33xl0cM34GhlU7i33RV-0b-dJ795EOj5-HXvLMnJzGyg9C72k"/>
+<span class="absolute bottom-1 right-1 w-4 h-4 bg-amber-500 rounded-full border-2 border-surface-light dark:border-surface-dark" title="Away"></span>
+</div>
+<h3 class="mt-4 font-display font-bold text-text-light dark:text-text-dark">Sarah Chen</h3>
+<p class="text-xs text-primary font-semibold">Backend Engineer</p>
+<div class="mt-4 flex items-center justify-between text-[10px] font-bold uppercase tracking-wider">
+<span class="bg-background-light dark:bg-border-dark text-muted-light px-2 py-1 rounded">Engineering</span>
+<span class="text-amber-600 flex items-center gap-1">Away</span>
+</div>
+</div>
+<!-- Member Card 3 -->
+<div class="member-card bg-surface-light dark:bg-surface-dark p-6 rounded-xl border border-border-light dark:border-border-dark shadow-soft relative group text-center">
+<button class="absolute top-4 right-4 text-muted-light hover:text-text-light transition-colors">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+<div class="relative w-20 h-20 mx-auto">
+<img alt="Marcus Vane" class="w-full h-full rounded-full border-4 border-background-light dark:border-border-dark shadow-inner object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAaRsY1CDSdywncv-CUruFJ_Ie-qyalyD2EcsnsmLqATpkKAh3DDdpM19w69kwChGD4GA0NtsyEVHhPBi96D8-hiCxkxdduu5eTUUzqNDMmyVcI6f9y9j9gYbyatzNj3n1otg6bkd6xDmFhK0qR53-x9tDshqPRAGL3HRlpTlwfj3hSEbfI7WL8v5EbzNUC7KHNPiTnCuddHtCNy9Rzc0u3D3x1WjJVTVgiXVu5jpd_E3EitmMdatPbkwdx7HgH4t0m-QABZhwV56AH"/>
+<span class="absolute bottom-1 right-1 w-4 h-4 bg-slate-400 rounded-full border-2 border-surface-light dark:border-surface-dark" title="Offline"></span>
+</div>
+<h3 class="mt-4 font-display font-bold text-text-light dark:text-text-dark">Marcus Vane</h3>
+<p class="text-xs text-primary font-semibold">Growth Lead</p>
+<div class="mt-4 flex items-center justify-between text-[10px] font-bold uppercase tracking-wider">
+<span class="bg-background-light dark:bg-border-dark text-muted-light px-2 py-1 rounded">Marketing</span>
+<span class="text-slate-400 flex items-center gap-1">Offline</span>
+</div>
+</div>
+<!-- Member Card 4 -->
+<div class="member-card bg-surface-light dark:bg-surface-dark p-6 rounded-xl border border-border-light dark:border-border-dark shadow-soft relative group text-center">
+<button class="absolute top-4 right-4 text-muted-light hover:text-text-light transition-colors">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+<div class="relative w-20 h-20 mx-auto">
+<img alt="Elena Rodriguez" class="w-full h-full rounded-full border-4 border-background-light dark:border-border-dark shadow-inner object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuABoc_hXTqOqDkJSAnfwyNfwGUoRKIY8Nwk8s5BJMtRIhXN5KpnYrNOntZQC0AAsNfv6EKKcHvHe5pLetX765g7mNp2Lnatd3RAVGIOk5wHc4ucgcuEw45Zik4-9jF8_m_WdK5QTZLQDfcg1ql3V4Rq-NaaT1j9SQZPJd3std-xiuLO_ouLApm7CSVwnoc8_krgA_t5qC_Q7bhSy744ZW3a4yD8wfayuNp0j8M29UI4DwJD7dAQhRDR8lHS176vPpy4e2eQ2BjH89J1"/>
+<span class="absolute bottom-1 right-1 w-4 h-4 bg-accent rounded-full border-2 border-surface-light dark:border-surface-dark" title="Active"></span>
+</div>
+<h3 class="mt-4 font-display font-bold text-text-light dark:text-text-dark">Elena Rodriguez</h3>
+<p class="text-xs text-primary font-semibold">QA Automation</p>
+<div class="mt-4 flex items-center justify-between text-[10px] font-bold uppercase tracking-wider">
+<span class="bg-background-light dark:bg-border-dark text-muted-light px-2 py-1 rounded">Engineering</span>
+<span class="text-accent flex items-center gap-1">Active</span>
+</div>
+</div>
+</div>
+<!-- Pending Invitations -->
+<div class="space-y-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[20px]">schedule_send</span>
+<h3 class="font-display font-bold text-lg text-text-light dark:text-text-dark">Pending Invitations</h3>
+<span class="bg-primary/10 text-primary text-[10px] font-bold px-2 py-0.5 rounded-full">2</span>
+</div>
+<div class="bg-surface-light dark:bg-surface-dark rounded-xl border border-border-light dark:border-border-dark overflow-hidden shadow-soft">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-background-light dark:bg-border-dark/50">
+<th class="px-6 py-4 text-[10px] font-bold text-muted-light uppercase tracking-wider">Email Address</th>
+<th class="px-6 py-4 text-[10px] font-bold text-muted-light uppercase tracking-wider">Role</th>
+<th class="px-6 py-4 text-[10px] font-bold text-muted-light uppercase tracking-wider">Sent Date</th>
+<th class="px-6 py-4 text-right text-[10px] font-bold text-muted-light uppercase tracking-wider">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-border-light dark:divide-border-dark">
+<tr class="hover:bg-background-light/50 dark:hover:bg-border-dark/30 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-background-light dark:bg-border-dark flex items-center justify-center">
+<span class="material-symbols-outlined text-[16px] text-muted-light">mail</span>
+</div>
+<span class="text-sm font-medium">leo.k@company.com</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="text-[10px] font-bold px-2 py-1 rounded bg-primary/10 text-primary">Editor</span>
+</td>
+<td class="px-6 py-4">
+<span class="text-xs text-muted-light font-medium">Oct 12, 2023</span>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-xs font-bold text-primary hover:underline">Resend</button>
+<button class="ml-4 text-xs font-bold text-red-500 hover:underline">Revoke</button>
+</td>
+</tr>
+<tr class="hover:bg-background-light/50 dark:hover:bg-border-dark/30 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-background-light dark:bg-border-dark flex items-center justify-center">
+<span class="material-symbols-outlined text-[16px] text-muted-light">mail</span>
+</div>
+<span class="text-sm font-medium">amanda.w@agency.net</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="text-[10px] font-bold px-2 py-1 rounded bg-primary/10 text-primary">Viewer</span>
+</td>
+<td class="px-6 py-4">
+<span class="text-xs text-muted-light font-medium">Oct 14, 2023</span>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-xs font-bold text-primary hover:underline">Resend</button>
+<button class="ml-4 text-xs font-bold text-red-500 hover:underline">Revoke</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</div>
+</body></html>

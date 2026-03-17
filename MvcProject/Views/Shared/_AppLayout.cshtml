@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Velocity Dashboard</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body class="d-flex flex-row vh-100 overflow-hidden">
+
+    
+    <aside class="sidebar-width bg-surface-light border-end border-border-light d-flex flex-column z-index-20">
+        <div class="d-flex align-items-center px-4 border-bottom border-border-light" style="height: 64px;">
+            <div class="d-flex align-items-center gap-3 w-100">
+                <div class="rounded p-2 d-flex align-items-center justify-content-center" style="background-color: rgba(79, 70, 229, 0.1);">
+                    <span class="material-symbols-outlined text-primary fs-5">view_kanban</span>
+                </div>
+                <div class="d-flex flex-column">
+                    <h1 class="font-display fw-bold mb-0 text-dark" style="font-size: 1rem; line-height: 1.2;">Velocity</h1>
+                    <span class="text-muted-light fw-medium" style="font-size: 0.75rem;">Product Team</span>
+                </div>
+            </div>
+        </div>
+        
+        <nav class="d-flex flex-column flex-grow-1 py-4 px-3 gap-1 overflow-auto">
+            <a class="nav-link-custom d-flex align-items-center gap-3 px-3 py-2 rounded font-display fw-semibold text-decoration-none shadow-none @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Home" ? "active" : "")" asp-controller="Home" asp-action="Dashboard">
+                <span class="material-symbols-outlined fs-5">dashboard</span>
+                <span class="fs-6">Dashboard</span>
+            </a>
+            <a class="nav-link-custom d-flex align-items-center gap-3 px-3 py-2 rounded font-display fw-semibold text-decoration-none shadow-none @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Projects" ? "active" : "")" asp-controller="Projects" asp-action="Index">
+                <span class="material-symbols-outlined fs-5">folder_open</span>
+                <span class="fs-6">Projects</span>
+            </a>
+            <a class="nav-link-custom d-flex align-items-center gap-3 px-3 py-2 rounded font-display fw-semibold text-decoration-none shadow-none" href="#">
+                <span class="material-symbols-outlined fs-5">task_alt</span>
+                <span class="fs-6">Tasks</span>
+                <span class="ms-auto bg-light border border-border-light text-dark fw-bold rounded-pill text-center d-inline-block" style="font-size: 0.75rem; padding: 0.1rem 0.5rem;">12</span>
+            </a>
+            <a class="nav-link-custom d-flex align-items-center gap-3 px-3 py-2 rounded font-display fw-semibold text-decoration-none shadow-none @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Team" ? "active" : "")" asp-controller="Team" asp-action="Index">
+                <span class="material-symbols-outlined fs-5">group</span>
+                <span class="fs-6">Team</span>
+            </a>
+
+            <div class="mt-4 mb-2 px-3">
+                <p class="text-uppercase fw-semibold text-muted-light mb-0" style="font-size: 0.75rem; letter-spacing: 0.05em;">Teams</p>
+            </div>
+            
+            <a class="nav-link-custom d-flex align-items-center gap-3 px-3 py-2 rounded text-decoration-none shadow-none" href="#">
+                <span class="status-dot blue"></span>
+                <span class="fs-6 fw-medium">Design Squad</span>
+            </a>
+            <a class="nav-link-custom d-flex align-items-center gap-3 px-3 py-2 rounded text-decoration-none shadow-none" href="#">
+                <span class="status-dot purple"></span>
+                <span class="fs-6 fw-medium">Engineering</span>
+            </a>
+            <a class="nav-link-custom d-flex align-items-center gap-3 px-3 py-2 rounded text-decoration-none shadow-none" href="#">
+                <span class="status-dot green"></span>
+                <span class="fs-6 fw-medium">Marketing</span>
+            </a>
+        </nav>
+
+        <div class="p-3 border-top border-border-light">
+            <a class="nav-link-custom d-flex align-items-center gap-3 px-3 py-2 rounded font-display fw-semibold text-decoration-none shadow-none" href="#">
+                <span class="material-symbols-outlined fs-5">settings</span>
+                <span class="fs-6">Settings</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="d-flex flex-column flex-grow-1 w-100 h-100 overflow-hidden">
+        
+        <!-- Top Navbar -->
+        <header class="d-flex align-items-center justify-content-between px-3 px-sm-4 bg-surface-light border-bottom border-border-light sticky-top z-index-10" style="height: 64px;">
+            <div class="d-flex align-items-center gap-3">
+                <button class="btn btn-link text-muted-light d-md-none p-1 text-decoration-none border-0 shadow-none">
+                    <span class="material-symbols-outlined">menu</span>
+                </button>
+                <div class="position-relative d-none d-sm-flex" style="width: 250px;">
+                    <span class="material-symbols-outlined position-absolute top-50 translate-middle-y text-muted-light fs-5" style="left: 12px;">search</span>
+                    <input type="text" class="form-control bg-light border-0 rounded-3 shadow-none text-dark" style="padding-left: 40px; font-size: 0.875rem;" placeholder="Search everywhere..." />
+                </div>
+            </div>
+
+            <div class="d-flex align-items-center gap-2 gap-sm-3">
+                <button class="btn btn-primary d-flex align-items-center gap-2 rounded-3 font-display fw-semibold border-0 shadow-sm" style="font-size: 0.875rem; padding: 0.4rem 1rem;">
+                    <span class="material-symbols-outlined fs-6" style="vertical-align: middle;">add</span>
+                    <span class="d-none d-sm-inline">Quick Add</span>
+                </button>
+                <div class="vr bg-border-light mx-1 d-none d-sm-block" style="height: 24px; opacity: 1;"></div>
+                <button class="btn btn-link p-2 text-muted-light position-relative rounded-circle d-flex align-items-center justify-content-center text-decoration-none border-0 shadow-none hover-bg-light">
+                    <span class="material-symbols-outlined">notifications</span>
+                    <span class="position-absolute rounded-circle bg-danger border border-white" style="width: 8px; height: 8px; top: 6px; right: 6px;"></span>
+                </button>
+                <div class="ms-1 border border-2 border-white shadow-sm overflow-hidden" style="width: 32px; height: 32px; border-radius: 50%; cursor: pointer;">
+                    <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuBfanUbcrhevPueAU9SDuQ2k-054rYQd_P0AQg_N81Iv-G5sSgoZVyABcYvPM6hsbxwh2oxfU7DwnCkDlAjmkQ7U0bY2cxXmyTFZBpxOtRRvAlnsDaijhIjPzDKbYcZVXgv-MnNd7IiS6YC5z5ijuxF-twMZfroLXJ-KP2un4YRyN0WnOCuQOwXaQnIThJvkVspYsfHCbhLDauR1sGtMeKcM8fDYb6Mxh_ifn_jCEwtrWjxzDt-kGtuGqMEm6k1eRV41xx1eIHsW6Jb" alt="User profile" style="width: 100%; height: 100%; object-fit: cover;" />
+                </div>
+            </div>
+        </header>
+
+        <!-- Page Content -->
+        <main class="flex-grow-1 overflow-auto p-3 p-sm-4 bg-background-light">
+            @RenderBody()
+        </main>
+    </div>
+
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
