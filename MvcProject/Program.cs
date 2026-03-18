@@ -1,3 +1,8 @@
+using Microsoft.EntityFrameworkCore;
+using MvcProject.Data;
+using MvcProject.Repositories.Interfaces;
+using MvcProject.Repositories.Implementations;
+
 namespace MvcProject
 {
     public class Program
@@ -8,6 +13,11 @@ namespace MvcProject
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+
+            builder.Services.AddDbContext<ApplicationDbContext>(options =>
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             var app = builder.Build();
 
@@ -22,6 +32,7 @@ namespace MvcProject
             app.UseHttpsRedirection();
             app.UseRouting();
             
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapStaticAssets();
