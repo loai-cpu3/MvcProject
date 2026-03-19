@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 using MvcProject.Data;
+using MvcProject.Models.Domain;
 using MvcProject.Repositories.Interfaces;
 using MvcProject.Repositories.Implementations;
 using MvcProject.Authorization.Requirements;
@@ -14,9 +16,15 @@ namespace MvcProject
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
-
+             
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+            builder.Services
+                .AddIdentity<ApplicationUser, IdentityRole>()
+                .AddEntityFrameworkStores<ApplicationDbContext>();
+                
+
             builder.Services.AddAuthorization(options =>
             {
                 options.AddPolicy("RequireProjectAdmin", policy =>
@@ -33,7 +41,7 @@ namespace MvcProject
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
+            
             if (!app.Environment.IsDevelopment())
             {
                 app.UseExceptionHandler("/Home/Error");

@@ -1,11 +1,11 @@
+using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
 
 namespace MvcProject.Models.Domain
 {
-    public class ApplicationUser
+    public class ApplicationUser : IdentityUser
     {
-        [Key]
-        public string Id { get; set; } 
+       
         [Required]
         [MinLength(2)]
         [MaxLength(100)]
@@ -14,12 +14,6 @@ namespace MvcProject.Models.Domain
         [MinLength(2)]
         [MaxLength(100)]
         public string LastName { get; set; }
-        [Required]
-        [EmailAddress]
-        [MaxLength(500)]
-        public string Email { get; set; }
-        [Required]
-        public string Password { get; set; } 
         public string? ProfilePictureUrl { get; set; }
 
 

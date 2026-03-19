@@ -1,12 +1,14 @@
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using MvcProject.Models.Domain;
 
 namespace MvcProject.Data
 {
-    public class ApplicationDbContext: DbContext
+    public class ApplicationDbContext: IdentityDbContext<ApplicationUser>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
-            : base(options) { }
+            : base(options) { 
+        }
 
         public DbSet<Project> Projects { get; set; }
         public DbSet<ProjectTask> ProjectTasks { get; set; }
@@ -14,7 +16,7 @@ namespace MvcProject.Data
         public DbSet<AuditLog> AuditLogs { get; set; }
         public DbSet<ProjectUser> ProjectUsers { get; set; }
         public DbSet<Notification> Notifications { get; set; }
-        public DbSet<ApplicationUser> ApplicationUsers { get; set; }
+       
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
