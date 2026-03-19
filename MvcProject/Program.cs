@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using MvcProject.Data;
 using MvcProject.Repositories.Interfaces;
 using MvcProject.Repositories.Implementations;
+using MvcProject.Authorization.Requirements;
 
 namespace MvcProject
 {
@@ -16,6 +17,17 @@ namespace MvcProject
 
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+            builder.Services.AddAuthorization(options =>
+            {
+                options.AddPolicy("RequireProjectAdmin", policy =>
+                    policy.Requirements.Add(new ProjectRequirement(ProjectRole.Admin)));
+
+                options.AddPolicy("RequireProjectManager", policy =>
+                    policy.Requirements.Add(new ProjectRequirement(ProjectRole.Manager)));
+
+                options.AddPolicy("RequireProjectMember", policy =>
+                    policy.Requirements.Add(new ProjectRequirement(ProjectRole.Member)));
+            });
 
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
