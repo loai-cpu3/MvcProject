@@ -3,15 +3,12 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MvcProject.Models.Domain
 {
-    public class AuditLog
+    public class AuditLog : BaseEntity
     {
-        [Key]
-        public int Id { get; set; }
 
         [Required]
         public AuditActionType ActionType { get; set; }
         public string? Description { get; set; }
-        public DateTime Timestamp { get; set; } = DateTime.UtcNow;
         public string? UserId { get; set; }
         [Required]
         public int TaskId { get; set; }

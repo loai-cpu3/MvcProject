@@ -5,7 +5,7 @@ using System.Linq.Expressions;
 
 namespace MvcProject.Repositories.Implementations
 {
-    public class Repository<T> : IRepository<T> where T : class
+    public class Repository<T> : IRepository<T> where T : BaseEntity
     {
         protected readonly ApplicationDbContext _context;
         protected readonly DbSet<T> _dbSet;

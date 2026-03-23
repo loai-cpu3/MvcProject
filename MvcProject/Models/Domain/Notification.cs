@@ -3,10 +3,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MvcProject.Models.Domain
 {
-    public class Notification
+    public class Notification : BaseEntity
     {
-        [Key]
-        public int Id { get; set; }
         [Required]
         public string UserId { get; set; }
         public string? SenderUserId { get; set; }
@@ -17,7 +15,6 @@ namespace MvcProject.Models.Domain
         public string? RelatedEntityType { get; set; }
         public int? RelatedEntityId { get; set; }
         public bool IsRead { get; set; } = false;
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
 
 

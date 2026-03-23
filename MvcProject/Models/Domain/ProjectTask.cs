@@ -3,10 +3,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MvcProject.Models.Domain
 {
-    public class ProjectTask
+    public class ProjectTask : BaseEntity
     {
-        [Key]
-        public int Id { get; set; }
         [Required, MaxLength(300)]
         public string Title { get; set; }
         public string? Description { get; set; }
@@ -15,7 +13,6 @@ namespace MvcProject.Models.Domain
         [Required]
         public TaskPriority Priority { get; set; }
         public DateTime? Deadline { get; set; }
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public int ProjectId { get; set; }
         public string? AssigneeId { get; set; }
   

@@ -3,15 +3,12 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MvcProject.Models.Domain
 {
-    public class Project
+    public class Project : BaseEntity
     {
-        [Key]
-        public int Id { get; set; }
         [Required, MaxLength(300)]
         public string Title { get; set; }
         public string? Description { get; set; }
 
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         [Required]
         public string CreatedById { get; set; }
 
