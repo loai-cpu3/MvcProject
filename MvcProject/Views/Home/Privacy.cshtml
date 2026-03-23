@@ -1,6 +1,21 @@
-﻿@{
+﻿@using Microsoft.AspNetCore.Authorization
+@{
     ViewData["Title"] = "Privacy Policy";
+    int projectId = 1213124;
 }
 <h1>@ViewData["Title"]</h1>
 
 <p>Use this page to detail your site's privacy policy.</p>
+@inject IAuthorizationService authorizationService
+
+@{
+    var authorizationResult = await authorizationService.AuthorizeAsync(User, projectId, "RequireProjectMember");
+    if (authorizationResult.Succeeded)
+    {
+        // اى حاجة 
+    }
+    else
+    {
+        // اى حاجة تانية
+    }
+}
