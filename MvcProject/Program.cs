@@ -4,7 +4,9 @@ using MvcProject.Data;
 using MvcProject.Models.Domain;
 using MvcProject.Repositories.Interfaces;
 using MvcProject.Repositories.Implementations;
+using MvcProject.Authorization.Handlers;
 using MvcProject.Authorization.Requirements;
+using Microsoft.AspNetCore.Authorization;
 
 namespace MvcProject
 {
@@ -36,6 +38,8 @@ namespace MvcProject
                 options.AddPolicy("RequireProjectMember", policy =>
                     policy.Requirements.Add(new ProjectRequirement(ProjectRole.Member)));
             });
+
+            builder.Services.AddScoped<IAuthorizationHandler, ProjectRoleHandler>();
 
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
