@@ -45,6 +45,10 @@ namespace MvcProject
 
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped<IDashboardService, DashboardService>();
+            builder.Services.AddScoped<IProjectService, ProjectService>();
+
+            builder.Services.AddScoped<IAttachmentService, AttachmentService>();
+
 
             var app = builder.Build();
 

@@ -12,5 +12,23 @@ namespace MvcProject.Repositories.Implementations
         {
             return await _dbSet.CountAsync();
         }
+
+        public async Task<List<Project>> GetProjectsForUserAsync(string userId)
+        {
+            return await _dbSet
+                .AsNoTracking()
+                .Include(p => p.Tasks)
+                .Where(p => p.Members.Any(m => m.UserId == userId))
+                .OrderByDescending(p => p.CreatedAt)
+                .ToListAsync();
+        }
+
+        public async Task<Project?> GetProjectWithTasksAsync(int projectId)
+        {
+            return await _dbSet
+                .AsNoTracking()
+                .Include(p => p.Tasks)
+                .FirstOrDefaultAsync(p => p.Id == projectId);
+        }
     }
 }

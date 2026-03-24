@@ -19,6 +19,7 @@ namespace MvcProject.Models.Domain
 
         public ICollection<TaskComment> Comments { get; set; } = new List<TaskComment>();
         public ICollection<AuditLog> AuditLogs { get; set; } = new List<AuditLog>();
+        public ICollection<Attachment> Attachments { get; set; } = new List<Attachment>();
 
 
         [ForeignKey("ProjectId")]
