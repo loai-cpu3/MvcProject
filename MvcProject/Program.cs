@@ -7,6 +7,7 @@ using MvcProject.Repositories.Implementations;
 using MvcProject.Authorization.Handlers;
 using MvcProject.Authorization.Requirements;
 using Microsoft.AspNetCore.Authorization;
+using MvcProject.Services;
 
 namespace MvcProject
 {
@@ -42,6 +43,9 @@ namespace MvcProject
             builder.Services.AddScoped<IAuthorizationHandler, ProjectRoleHandler>();
 
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+            builder.Services.AddScoped<IAttachmentService, AttachmentService>();
+
 
             var app = builder.Build();
 
