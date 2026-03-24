@@ -3,11 +3,24 @@ using MvcProject.Attributes;
 using MvcProject.ViewModels.ProjectTask;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.SignalR;
+using MvcProject.Hubs;
+using MvcProject.Repositories.Interfaces;
 
 namespace MvcProject.Controllers
 {
     public class ProjectTaskController : Controller
     {
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly IHubContext<TaskHub> _taskHub;
+
+        public ProjectTaskController(IUnitOfWork unitOfWork, IHubContext<TaskHub> taskHub)
+        {
+            _unitOfWork = unitOfWork;
+            _taskHub = taskHub;
+        }
+
         public IActionResult Index()
         {
             return View();
@@ -37,6 +50,23 @@ namespace MvcProject.Controllers
         public IActionResult Assign(int id, string userId)
         {
             return View();
+        }
+
+        [HttpPost]
+        [ProjectAuthorize(ProjectRole.Admin, ProjectRole.Manager)]
+        public async Task<IActionResult> AssignPost(int id, string userId)
+        {
+            var task = await _unitOfWork.Tasks.GetByIdAsync(id);
+            if (task == null) return NotFound("Task not found");
+
+            task.AssigneeId = userId;
+            _unitOfWork.Tasks.Update(task);
+            await _unitOfWork.SaveAsync();
+
+            var message = $"You have been assigned to task: {task.Title}";
+            await _taskHub.Clients.User(userId).SendAsync("ReceiveTaskAssignment", new { TaskId = task.Id, task.Title, Message = message });
+
+            return Ok(new { success = true, message = "Task assigned successfully" });
         }
 
 
