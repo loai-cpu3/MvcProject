@@ -9,6 +9,7 @@ using MvcProject.Authorization.Requirements;
 using Microsoft.AspNetCore.Authorization;
 using MvcProject.Services;
 using MvcProject.Services.Interfaces;
+using MvcProject.Hubs;
 
 namespace MvcProject
 {
@@ -20,6 +21,7 @@ namespace MvcProject
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+            builder.Services.AddSignalR();
              
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -71,6 +73,9 @@ namespace MvcProject
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}")
                 .WithStaticAssets();
+
+            app.MapHub<TaskHub>("/hubs/task");
+            app.MapHub<CommentHub>("/hubs/comment");
 
             app.Run();
         }
