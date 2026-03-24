@@ -1,0 +1,107 @@
+/* Font imports */
+@import url('https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap');
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css');
+
+:root {
+    /* Color Variables */
+    --bs-primary: #4F46E5;
+    --bs-primary-rgb: 79, 70, 229;
+    --velocity-bg-light: #F8FAFC;
+    --velocity-surface-light: #FFFFFF;
+    --velocity-text-light: #0F172A;
+    --velocity-muted-light: #64748B;
+    --velocity-border-light: #E2E8F0;
+    --velocity-accent: #10B981;
+    
+    /* Font Variables */
+    --font-display: 'Plus Jakarta Sans', sans-serif;
+    --font-body: 'Figtree', sans-serif;
+    --font-auth-body: 'Inter', sans-serif;
+
+    /* Shadows */
+    --shadow-soft: 0 4px 20px rgba(15, 23, 42, 0.03);
+    --shadow-hover: 0 10px 25px rgba(15, 23, 42, 0.05);
+}
+
+body {
+    font-family: var(--font-body);
+    background-color: var(--velocity-bg-light);
+    color: var(--velocity-text-light);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6, .font-display {
+    font-family: var(--font-display);
+}
+
+/* Custom Utilities */
+.bg-primary { background-color: var(--bs-primary) !important; }
+.text-primary { color: var(--bs-primary) !important; }
+.bg-surface-light { background-color: var(--velocity-surface-light); }
+.bg-background-light { background-color: var(--velocity-bg-light); }
+.text-text-light { color: var(--velocity-text-light); }
+.text-muted-light { color: var(--velocity-muted-light); }
+.border-border-light { border-color: var(--velocity-border-light) !important; }
+
+.shadow-soft { box-shadow: var(--shadow-soft); }
+.shadow-hover:hover { box-shadow: var(--shadow-hover); }
+
+/* Sidebar fixed width */
+.sidebar-width {
+    width: 250px;
+    min-width: 250px;
+}
+@media (max-width: 767.98px) {
+    .sidebar-width { display: none !important; }
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+    width: 6px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+
+/* Nav Link Hover States */
+.nav-link-custom {
+    color: var(--velocity-muted-light);
+    transition: all 0.2s ease;
+}
+.nav-link-custom:hover, .nav-link-custom.active {
+    background-color: var(--velocity-bg-light);
+    color: var(--velocity-text-light);
+}
+.nav-link-custom.active {
+    background-color: rgba(79, 70, 229, 0.1);
+    color: var(--bs-primary);
+}
+
+/* Status dots */
+.status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block;}
+.status-dot.blue { background-color: #3b82f6; }
+.status-dot.purple { background-color: #a855f7; }
+.status-dot.green { background-color: var(--velocity-accent); }
+.status-dot.slate { background-color: #94a3b8; }
+.status-dot.primary { background-color: var(--bs-primary); }
+
+.material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+
+/* Custom Overrides for forms */
+.form-control:focus {
+    border-color: var(--bs-primary);
+    box-shadow: 0 0 0 0.25rem rgba(79, 70, 229, 0.25);
+}
+
+.auth-body { font-family: var(--font-auth-body); background-color: #f8f9fa; }
+.left-bg-gradient { background: #5b50ed; }
+.glass-shape-1 { position: absolute; top: -30%; left: -10%; width: 90%; height: 90%; border-radius: 50%; background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 70%); pointer-events: none; }
+.glass-shape-2 { position: absolute; bottom: -20%; right: -10%; width: 70%; height: 70%; border-radius: 50%; background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%); pointer-events: none; }
+.input-auth-field { background-color: #f3f4f6; border: 1px solid transparent; transition: all 0.2s ease-in-out; }
+.input-auth-field:focus-within { border-color: #6366f1; background-color: #ffffff; box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2); }

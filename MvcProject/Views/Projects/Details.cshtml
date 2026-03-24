@@ -1,0 +1,143 @@
+@{
+    ViewData["Title"] = "Project Details";
+}
+
+<div class="mx-auto pb-5" style="max-width: 1200px;">
+    <!-- Project Header -->
+    <div class="d-flex flex-column flex-sm-row align-items-sm-start justify-content-between gap-3 mb-4">
+        <div>
+            <div class="d-flex align-items-center gap-3 mb-2">
+                <h1 class="fs-3 fs-sm-2 font-display fw-bold text-dark mb-0 tracking-tight">Q3 Marketing Launch</h1>
+                <span class="badge rounded-pill fw-semibold" style="background-color: #FEF3C7; color: #92400E;">In Progress</span>
+            </div>
+            <p class="text-muted-light small mb-0" style="max-width: 42rem;">
+                Comprehensive campaign rollout across digital channels including social, email, and paid search targeting North American markets.
+            </p>
+        </div>
+        
+        <div class="d-flex align-items-center gap-3 align-self-start">
+            <div class="d-none d-sm-flex align-items-center me-2">
+                <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuAx4DjjP-gqLBNa_JyURjDJdEaWBCnmTVrk76upE7cD3pRhNHMdSLWKkH60D5Erd0vToZddqm88_BIl1cYR4HbbdWA6f2HaOAGC70mXape7LJmx_yNiBVQkhjX8-uLQpAsmNgSoRFUKOm0hGjTd633nvrqpKDo6H-PZzuzMljkXIVOZwZunhclSz8z2KI21XHfSnejud2O9M0P_yCFszN0LFq_opAqj8LQuy2SAFCxFtyhIF7S7mmi9ZF0uOtC6TXLheEgodEBV7v2j" alt="Team member" class="rounded-circle border border-2 border-white object-fit-cover" style="width: 32px; height: 32px; z-index: 3;">
+                <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuCU_4K8R15USDca_tYDCPrOylUfjUhpDzSxOdwqdhCw-GSEjFTof9E0ADecoAvM90ktMwrmZQLjTrORgHIWHHnZ6Lxi4nVy_Kzk8jwxVwI9WTy27byfKKhe5snFSHf9xBGAx-N_VDp8bmoDj41GI_eINdpnOQVowaQ26nn6XmaF3ccm25-W-V2EJ1CtVGQJigX1fdADGPrADwZnActTpLC9PZbxNN6DfN3qqL0YBhXkRj1qjVwbbrBShh4wLSrWl0-BZryJvwf-Jpmw" alt="Team member" class="rounded-circle border border-2 border-white object-fit-cover" style="width: 32px; height: 32px; margin-left: -8px; z-index: 2;">
+                <div class="rounded-circle border border-2 border-white bg-light d-flex align-items-center justify-content-center text-muted fw-medium" style="width: 32px; height: 32px; margin-left: -8px; font-size: 12px; z-index: 1;">+3</div>
+            </div>
+            <button class="btn btn-light bg-surface-light border-border-light text-dark fw-semibold font-display shadow-sm" style="font-size: 0.875rem;">
+                Edit Project
+            </button>
+        </div>
+    </div>
+
+    <!-- Tab Navigation -->
+    <div class="border-bottom border-border-light mb-4">
+        <ul class="nav nav-tabs border-bottom-0 flex-nowrap overflow-auto pb-0" style="gap: 2rem;">
+            <li class="nav-item">
+                <a class="nav-link active rounded-0 border-top-0 border-start-0 border-end-0 border-bottom border-2 border-primary text-primary fw-semibold font-display px-1 py-3" href="#">Tasks</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link rounded-0 border-top-0 border-start-0 border-end-0 border-bottom border-2 border-transparent text-muted-light fw-medium font-display px-1 py-3 hover-text-dark" href="#">Board</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link rounded-0 border-top-0 border-start-0 border-end-0 border-bottom border-2 border-transparent text-muted-light fw-medium font-display px-1 py-3 hover-text-dark d-flex align-items-center" href="#">
+                    Files
+                    <span class="badge bg-light text-muted-light ms-2 rounded-pill fw-normal">4</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link rounded-0 border-top-0 border-start-0 border-end-0 border-bottom border-2 border-transparent text-muted-light fw-medium font-display px-1 py-3 hover-text-dark" href="#">Settings</a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Tab Content: Tasks -->
+    <div class="d-flex flex-column gap-4">
+        
+        <!-- Task Group: To Do -->
+        <div class="d-flex flex-column gap-3">
+            <div class="d-flex align-items-center justify-content-between">
+                <h3 class="font-display fw-semibold text-dark fs-6 mb-0 d-flex align-items-center gap-2">
+                    <span class="rounded-circle bg-secondary" style="width: 8px; height: 8px;"></span>
+                    To Do
+                    <span class="text-muted-light fw-normal small ms-1">3</span>
+                </h3>
+                <button class="btn btn-link p-0 text-muted-light"><span class="material-symbols-outlined fs-6">add</span></button>
+            </div>
+            
+            <div class="bg-surface-light rounded-3 shadow-soft border border-border-light overflow-hidden">
+                <!-- Task Row 1 -->
+                <div class="task-row d-flex align-items-center justify-content-between p-3 border-bottom border-border-light" style="cursor: pointer;">
+                    <div class="d-flex align-items-center gap-3 min-w-0">
+                        <div class="rounded border border-border-light bg-white shadow-sm d-flex align-items-center justify-content-center" style="width: 20px; height: 20px;">
+                            <span class="material-symbols-outlined text-transparent" style="font-size: 14px;">check</span>
+                        </div>
+                        <div class="min-w-0">
+                            <p class="fw-medium small text-dark mb-0 text-truncate transition-colors">Draft landing page copy</p>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center gap-3 flex-shrink-0 ms-3">
+                        <div class="d-none d-sm-flex align-items-center gap-1 small text-muted-light">
+                            <span class="material-symbols-outlined" style="font-size: 14px;">calendar_today</span>
+                            Oct 12
+                        </div>
+                        <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuCq4FcOh3fQBIGd91foqvNylM45Tn8RACrLxaJzS3dTOMZsNMQIvKrGvNg8kwUFHxcW7Dv_Y1cFEEOwx0qMZH_HVDKtjjkofPeIjp7zM5YpegtHkglTyxnpFAvMUc2jq0VnoNnSY8pAisxFb8oCSNBYEqn-C8ESQfJ7TOpk_74gromeJhtATKx4QxjXMBpgt_ntY6l54Urm8EOAH-24rmODvpqhpToH1XNcEIEYjQQ5OCSVmhzA9kZ3cpRw4Fc-Y3M-KmJzPZJ4ox4y" alt="Assignee" class="rounded-circle border border-border-light" style="width: 24px; height: 24px; object-fit: cover;">
+                    </div>
+                </div>
+                
+                <!-- Task Row 2 -->
+                <div class="task-row d-flex align-items-center justify-content-between p-3 border-bottom border-border-light" style="cursor: pointer;">
+                    <div class="d-flex align-items-center gap-3 min-w-0">
+                        <div class="rounded border border-border-light bg-white shadow-sm d-flex align-items-center justify-content-center" style="width: 20px; height: 20px;">
+                            <span class="material-symbols-outlined text-transparent" style="font-size: 14px;">check</span>
+                        </div>
+                        <div class="min-w-0 d-flex align-items-center gap-2">
+                            <p class="fw-medium small text-dark mb-0 text-truncate transition-colors">Finalize ad creative assets</p>
+                            <span class="badge fw-medium d-none d-sm-inline-block" style="background-color: #FEE2E2; color: #991B1B; font-size: 10px;">High</span>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center gap-3 flex-shrink-0 ms-3">
+                        <div class="d-none d-sm-flex align-items-center gap-1 small text-muted-light">
+                            <span class="material-symbols-outlined" style="font-size: 14px;">calendar_today</span>
+                            Oct 14
+                        </div>
+                        <div class="rounded-circle bg-light border border-border-light border-dashed d-flex align-items-center justify-content-center text-muted-light" style="width: 24px; height: 24px;">
+                            <span class="material-symbols-outlined" style="font-size: 12px;">person_add</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Task Group: In Progress -->
+        <div class="d-flex flex-column gap-3">
+            <div class="d-flex align-items-center justify-content-between">
+                <h3 class="font-display fw-semibold text-dark fs-6 mb-0 d-flex align-items-center gap-2">
+                    <span class="rounded-circle bg-primary" style="width: 8px; height: 8px;"></span>
+                    In Progress
+                    <span class="text-muted-light fw-normal small ms-1">2</span>
+                </h3>
+                <button class="btn btn-link p-0 text-muted-light"><span class="material-symbols-outlined fs-6">add</span></button>
+            </div>
+            
+            <div class="bg-surface-light rounded-3 shadow-soft border border-border-light overflow-hidden">
+                <!-- Task Row 3 -->
+                <div class="task-row d-flex align-items-center justify-content-between p-3 border-start border-4 border-primary" style="cursor: pointer;">
+                    <div class="d-flex align-items-center gap-3 min-w-0">
+                        <div class="rounded border border-border-light bg-white shadow-sm d-flex align-items-center justify-content-center" style="width: 20px; height: 20px;">
+                            <span class="material-symbols-outlined text-transparent" style="font-size: 14px;">check</span>
+                        </div>
+                        <div class="min-w-0">
+                            <p class="fw-medium small text-dark mb-0 text-truncate transition-colors">Set up Google Analytics tracking</p>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center gap-3 flex-shrink-0 ms-3">
+                        <div class="d-none d-sm-flex align-items-center gap-1 small text-danger fw-medium">
+                            <span class="material-symbols-outlined" style="font-size: 14px;">error</span>
+                            Today
+                        </div>
+                        <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuBruWTOwvwZ6K5VCnYYxSPrr8t8FqEcCHT2eKuSEb4WWsAs2kcWIwWv75tCxnQjTSI0Fh7JhPbiT7LYh3xTBg-YGt84ocXAIMJfVaYxzan58d2JBkcPkaSBtdMgOxvU6qPPeEbRUho5kDmgO5-Eb6tkoBetZXXwlknOoQkqCfY6O70TbeOFgSDDZcJvb64TKe5Ivm1MqKn9M_5vAGUgWAVN-94vrU9nrtVQ0KU2R7TeK1SU-ZFijv78p0MzKRS76-h50ibQLVYjFshE" alt="Assignee" class="rounded-circle border border-border-light" style="width: 24px; height: 24px; object-fit: cover;">
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</div>

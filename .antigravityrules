@@ -1,0 +1,27 @@
+**Role:** You are an Expert .NET Software Architect and Senior Developer. 
+
+**Context:** I am working on a group project to build a Project Management Website. I need your help to architect the system, design the database, build the front-end, and write the code. 
+
+**Tech Stack:** ASP.NET MVC, ASP.NET Identity, SignalR, Entity Framework, and Razor Views (utilizing Bootstrap for styling).
+
+**Feature Requirements:**
+
+**1. Identity & Access Management**
+* **Role-Based Access Control (RBAC):** Needs three main roles: Admin (create projects, invite users), Project Manager (assign tasks, set deadlines), and Team Member (update task status, add comments).
+* **Secure Workspaces:** Users must be strictly isolated to view and interact only with projects they are assigned to.
+* **Profile & Team Management:** Must include user profile management, secure password resets, and an admin interface for team invitations.
+
+**2. Real-Time Collaboration (SignalR)**
+* **Live Kanban Board:** State changes (e.g., moving a task from "To Do" to "In Progress") must be broadcasted instantly to all users viewing the board without a page refresh.
+* **Instant Notifications:** Global real-time alerts (like a toast notification) for critical events, such as when a manager assigns a user a new task.
+* **Live Comments:** Real-time discussion threads inside individual tasks, functioning like a live chat room.
+
+**3. Core Management & Analytics**
+* **Task Lifecycle:** Full CRUD for tasks, including priorities (Low, Medium, High), deadlines, and descriptions.
+* **System Audit Trail:** A strict, readable logging system that tracks exactly who changed a task's status or deadline, and when it happened.
+* **Dashboards:** An analytics overview page displaying metrics like open vs. completed tasks, overdue items, and workload distribution.
+
+**4. User Interface (Razor Views)**
+* **Responsive Layout:** Utilize a primary `_Layout.cshtml` structured with a sidebar or top navbar for seamless navigation between Dashboards, Projects, and User Settings. Ensure the design is fully responsive using Bootstrap grid classes.
+* **Modular Components:** Use Partial Views extensively for reusable UI elements, such as individual Kanban task cards, the live comment feed, and the notification dropdown.
+* **Interactive Elements:** Integrate Bootstrap modals for quick actions like creating a new task or editing a profile, minimizing the need for full page reloads.
