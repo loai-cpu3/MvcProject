@@ -361,3 +361,8 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/.agents/skills
+/DESIGN.md
+/skills-lock.json
+/.stitch
+/.vscode

@@ -1,3 +1,4 @@
+@model MvcProject.ViewModels.Projects.CreateProjectViewModel
 @{
     ViewData["Title"] = "Projects";
 }
@@ -6,6 +7,10 @@
     <!-- Page Header & Actions -->
     <div class="d-flex align-items-center justify-content-between mb-4">
         <h2 class="font-display fw-bold fs-4 text-dark tracking-tight mb-0">Projects</h2>
+        <button type="button" class="btn btn-primary d-flex align-items-center gap-2 rounded-3 border-0 shadow-sm" data-bs-toggle="modal" data-bs-target="#createProjectModal">
+            <span class="material-symbols-outlined fs-6">add</span>
+            New Project
+        </button>
     </div>
 
     <!-- Projects Grid -->
@@ -32,6 +37,38 @@
                             <div class="progress-bar bg-primary rounded-pill" role="progressbar" style="width: 75%;" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
                         </div>
                     </div>
+
+<div class="modal fade" id="createProjectModal" tabindex="-1" aria-labelledby="createProjectModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-soft rounded-4">
+            <div class="modal-header border-bottom border-border-light">
+                <h5 class="modal-title font-display fw-bold text-dark" id="createProjectModalLabel">Create New Project</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form asp-controller="Projects" asp-action="CreateProject" method="post">
+                <div class="modal-body d-flex flex-column gap-3">
+                    <div asp-validation-summary="ModelOnly" class="text-danger small"></div>
+
+                    <div>
+                        <label asp-for="Title" class="form-label fw-semibold text-dark"></label>
+                        <input asp-for="Title" class="form-control" />
+                        <span asp-validation-for="Title" class="text-danger small"></span>
+                    </div>
+
+                    <div>
+                        <label asp-for="Description" class="form-label fw-semibold text-dark"></label>
+                        <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+                        <span asp-validation-for="Description" class="text-danger small"></span>
+                    </div>
+                </div>
+                <div class="modal-footer border-top border-border-light">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create Project</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
                 </div>
             </div>
         </div>

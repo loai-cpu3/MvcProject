@@ -24,6 +24,6 @@ namespace MvcProject.Models.Domain
         [ForeignKey("ProjectId")]
         public Project Project { get; set; }
         [ForeignKey("AssigneeId")]
-        public ApplicationUser Assignee { get; set; }
+        public ApplicationUser? Assignee { get; set; }
     }
 }
