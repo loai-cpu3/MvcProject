@@ -1,29 +1,15 @@
-<<<<<<< HEAD
-@using Microsoft.AspNetCore.Identity
-@{
-    ViewData["Title"] = "Dashboard";
-=======
 @using MvcProject.ViewModels.Home
 @model DashboardViewModel
 @{
     ViewData["Title"] = "Dashboard";
     var dashboard = Model ?? new DashboardViewModel();
     var today = DateOnly.FromDateTime(DateTime.UtcNow);
->>>>>>> 8ede1be8af9ec82583cabefb08c524b5a2f670d2
 }
 
 <div class="mx-auto d-flex flex-column gap-4 pb-5" style="max-width: 1280px;">
     <!-- Header -->
     <div>
-<<<<<<< HEAD
-        @inject UserManager<MvcProject.Models.Domain.ApplicationUser> UserManager
-        @{
-            var currentUser = await UserManager.GetUserAsync(User);
-        }
-        <h2 class="font-display fw-bold text-dark tracking-tight mb-2" style="font-size: 2rem;">Good morning, @currentUser?.FirstName @currentUser?.LastName</h2>
-=======
         <h2 class="font-display fw-bold text-dark tracking-tight mb-2" style="font-size: 2rem;">Good morning, Alex</h2>
->>>>>>> 8ede1be8af9ec82583cabefb08c524b5a2f670d2
         <p class="text-muted-light fw-medium mb-0">Here's what's happening with your projects today.</p>
     </div>
 
@@ -37,14 +23,7 @@
                     <span class="material-symbols-outlined text-primary opacity-75 fs-4">folder</span>
                 </div>
                 <div class="d-flex align-items-baseline gap-2">
-<<<<<<< HEAD
-                    <span class="font-display fw-bold text-primary mb-0" style="font-size: 2.75rem; line-height: 1;">12</span>
-                    <span class="badge bg-success bg-opacity-10 text-success d-flex align-items-center gap-1 rounded-2">
-                        <span class="material-symbols-outlined" style="font-size: 14px;">arrow_upward</span> 2
-                    </span>
-=======
                     <span class="font-display fw-bold text-primary mb-0" style="font-size: 2.75rem; line-height: 1;">@dashboard.TotalProjects</span>
->>>>>>> 8ede1be8af9ec82583cabefb08c524b5a2f670d2
                 </div>
             </div>
         </div>
@@ -57,23 +36,14 @@
                     <span class="material-symbols-outlined text-primary opacity-75 fs-4">assignment</span>
                 </div>
                 <div class="d-flex align-items-baseline gap-2">
-<<<<<<< HEAD
-                    <span class="font-display fw-bold text-dark mb-0" style="font-size: 2.75rem; line-height: 1;">48</span>
-                    <span class="small fw-bold text-muted-light">14 due today</span>
-=======
                     <span class="font-display fw-bold text-dark mb-0" style="font-size: 2.75rem; line-height: 1;">@dashboard.TotalPendingTasks</span>
                     <span class="small fw-bold text-muted-light">Open items</span>
->>>>>>> 8ede1be8af9ec82583cabefb08c524b5a2f670d2
                 </div>
             </div>
         </div>
         
         <!-- Stat Card 3 -->
-<<<<<<< HEAD
-        <div class="col-12 col-sm-6 col-lg-3">
-=======
         @* <div class="col-12 col-sm-6 col-lg-3">
->>>>>>> 8ede1be8af9ec82583cabefb08c524b5a2f670d2
             <div class="bg-surface-light rounded-4 p-4 shadow-soft border border-border-light d-flex flex-column justify-content-between h-100" style="min-height: 150px;">
                 <div class="d-flex align-items-center justify-content-between mb-3">
                     <span class="small fw-bold text-muted-light text-uppercase tracking-wide" style="letter-spacing: 0.05em;">Team Online</span>
@@ -89,11 +59,7 @@
                     </div>
                 </div>
             </div>
-<<<<<<< HEAD
-        </div>
-=======
         </div> *@
->>>>>>> 8ede1be8af9ec82583cabefb08c524b5a2f670d2
         
         <!-- Stat Card 4 -->
         <div class="col-12 col-sm-6 col-lg-3">
@@ -103,11 +69,7 @@
                     <span class="material-symbols-outlined text-primary opacity-75 fs-4">trending_up</span>
                 </div>
                 <div class="d-flex align-items-baseline gap-2">
-<<<<<<< HEAD
-                    <span class="font-display fw-bold text-dark mb-0" style="font-size: 2.75rem; line-height: 1;">85%</span>
-=======
                     <span class="font-display fw-bold text-dark mb-0" style="font-size: 2.75rem; line-height: 1;">@dashboard.CompletionRate.ToString("0.#")%</span>
->>>>>>> 8ede1be8af9ec82583cabefb08c524b5a2f670d2
                     <span class="small fw-bold text-muted-light">This week</span>
                 </div>
             </div>
@@ -124,76 +86,6 @@
                     <button class="btn btn-link text-primary fw-bold text-decoration-none shadow-none small">View All</button>
                 </div>
                 <div class="p-3 d-flex flex-column gap-2 overflow-auto">
-<<<<<<< HEAD
-                    
-                    <!-- Task Row 1 -->
-                    <div class="d-flex align-items-center justify-content-between p-3 rounded-3 border-start border-4 border-danger shadow-sm bg-surface-light" style="cursor: pointer;">
-                        <div class="d-flex align-items-center gap-3 overflow-hidden w-100">
-                            <div class="rounded-circle border d-flex align-items-center justify-content-center text-white flex-shrink-0" style="width: 24px; height: 24px;">
-                                <span class="material-symbols-outlined" style="font-size: 16px;">check</span>
-                            </div>
-                            <div class="d-flex flex-column min-w-0 flex-grow-1">
-                                <p class="fw-bold text-dark mb-0 text-truncate" style="font-size: 0.95rem;">Finalize Q3 Marketing Campaign Assets</p>
-                                <p class="small text-muted-light mb-0 text-truncate">Marketing Launch &bull; In Progress</p>
-                            </div>
-                        </div>
-                        <div class="d-flex align-items-center gap-3 ps-3 flex-shrink-0">
-                            <span class="badge bg-danger bg-opacity-10 text-danger text-uppercase tracking-wider fw-bold">Today</span>
-                            <div class="rounded-circle border border-white shadow-sm" style="width: 32px; height: 32px; background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDw7hwvYhhKyfBjmIqhxcjctQR-nFm7KsYBDVwdDu3t-1SaRCDAA4rdvzBMA_E-Hj0DTCHZwoidO8CEW4x3j5piqdBIHSXQiUUx7cEvLf6zl-vJfwtPz_MLqPPs98EnQe31G--0jqrbMSo94co1PFANJrcbuBzZxsTnQpiSF9UJ3akl3mKkBUxmC3nZ63wrXvQ8toLTbo1NICDDPMhNh8zj1ZDUXpz_JrGJyqhqLcN23Czn7sWusp5kMcjuMg1ng8tmiMNeKwHszbKJ'); background-size: cover; background-position: center;"></div>
-                        </div>
-                    </div>
-
-                    <!-- Task Row 2 -->
-                    <div class="d-flex align-items-center justify-content-between p-3 rounded-3 border-start border-4 border-warning shadow-sm bg-surface-light" style="cursor: pointer;">
-                        <div class="d-flex align-items-center gap-3 overflow-hidden w-100">
-                            <div class="rounded-circle border d-flex align-items-center justify-content-center text-white flex-shrink-0" style="width: 24px; height: 24px;">
-                                <span class="material-symbols-outlined" style="font-size: 16px;">check</span>
-                            </div>
-                            <div class="d-flex flex-column min-w-0 flex-grow-1">
-                                <p class="fw-bold text-dark mb-0 text-truncate" style="font-size: 0.95rem;">Review API Documentation Draft</p>
-                                <p class="small text-muted-light mb-0 text-truncate">Engineering Platform &bull; To Do</p>
-                            </div>
-                        </div>
-                        <div class="d-flex align-items-center gap-3 ps-3 flex-shrink-0">
-                            <span class="badge bg-warning bg-opacity-10 text-warning text-uppercase tracking-wider fw-bold">Tomorrow</span>
-                            <div class="rounded-circle border border-white shadow-sm" style="width: 32px; height: 32px; background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDNKokdS5z5IDVgNAs8HtuRM2mGcoU6kXWH3ufMOXRwPBup8HvM8Hg0AwCW-jPUl0rikvOYR7I3f8Vg3QQ1BjTjMXEbjM3q-VhK1V79RpjsCFRs0bZC5nPbbpYxmf0taaLj6Wtbk05t4hNuaD_SyklDrQMhJaU1KYdWHU15Cdapf_253oqgk-G6MVqIgqa7MEnS29gjOwE2sIYwIeNtfQtsHoVOg5foDlSiPCXEazKWjnBNJWh2y6RRFFDtOKrFpUVV8puTSHaTIkTo'); background-size: cover; background-position: center;"></div>
-                        </div>
-                    </div>
-
-                    <!-- Task Row 3 -->
-                    <div class="d-flex align-items-center justify-content-between p-3 rounded-3 border-start border-4 border-info shadow-sm bg-surface-light" style="cursor: pointer;">
-                        <div class="d-flex align-items-center gap-3 overflow-hidden w-100">
-                            <div class="rounded-circle border d-flex align-items-center justify-content-center text-white flex-shrink-0" style="width: 24px; height: 24px;">
-                                <span class="material-symbols-outlined" style="font-size: 16px;">check</span>
-                            </div>
-                            <div class="d-flex flex-column min-w-0 flex-grow-1">
-                                <p class="fw-bold text-dark mb-0 text-truncate" style="font-size: 0.95rem;">Update Design System Typography Tokens</p>
-                                <p class="small text-muted-light mb-0 text-truncate">Design Squad &bull; In Progress</p>
-                            </div>
-                        </div>
-                        <div class="d-flex align-items-center gap-3 ps-3 flex-shrink-0">
-                            <span class="small fw-bold text-muted-light text-uppercase tracking-wider">Oct 24</span>
-                            <div class="rounded-circle border border-white shadow-sm" style="width: 32px; height: 32px; background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDsQOV_Z3r_kXtNbBXF9YkvKe2UoJxGiKzGpIrkcXGX-Qc_yJU3A7Cajk97lcW1EnL9r-nWznecCLO-7aIBOXg3W8xfEyu7GVTLX0B5IeuJ-luedtt4ZPzZTMOHYGOJq2TEthNM2PnHQIkbh_xiD-SPqYgWJoDC2XCP2gYbWuVUR9sHkPbJA6AKBFKunmk6RiqgLzOaiwdVkz1hiUScohXrgd-dBSk_GQMylIyRoCeeM_VnC8SOu-gNkt2e_wDq62G8EF3aDS8_DFee'); background-size: cover; background-position: center;"></div>
-                        </div>
-                    </div>
-
-                    <!-- Task Row 4 -->
-                    <div class="d-flex align-items-center justify-content-between p-3 rounded-3 border-start border-4 border-secondary shadow-sm bg-surface-light" style="cursor: pointer;">
-                        <div class="d-flex align-items-center gap-3 overflow-hidden w-100">
-                            <div class="rounded-circle border d-flex align-items-center justify-content-center text-white flex-shrink-0" style="width: 24px; height: 24px;">
-                                <span class="material-symbols-outlined" style="font-size: 16px;">check</span>
-                            </div>
-                            <div class="d-flex flex-column min-w-0 flex-grow-1">
-                                <p class="fw-bold text-dark mb-0 text-truncate" style="font-size: 0.95rem;">Client Feedback Sync</p>
-                                <p class="small text-muted-light mb-0 text-truncate">Website Redesign &bull; To Do</p>
-                            </div>
-                        </div>
-                        <div class="d-flex align-items-center gap-3 ps-3 flex-shrink-0">
-                            <span class="small fw-bold text-muted-light text-uppercase tracking-wider">Oct 26</span>
-                            <div class="rounded-circle bg-light border border-secondary border-dashed d-flex align-items-center justify-content-center text-muted fw-bold shadow-sm" style="width: 32px; height: 32px; font-size: 12px;">?</div>
-                        </div>
-                    </div>
-=======
                     @if (dashboard.RecentTasks.Any())
                     {
                         @foreach (var task in dashboard.RecentTasks)
@@ -235,7 +127,6 @@
                             No tasks available.
                         </div>
                     }
->>>>>>> 8ede1be8af9ec82583cabefb08c524b5a2f670d2
                 </div>
             </div>
         </div>

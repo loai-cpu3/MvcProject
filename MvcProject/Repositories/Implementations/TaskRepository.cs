@@ -1,9 +1,6 @@
-<<<<<<< HEAD
-=======
 using Microsoft.EntityFrameworkCore;
 using TaskStatus = MvcProject.Models.Enums.TaskStatus;
 
->>>>>>> 8ede1be8af9ec82583cabefb08c524b5a2f670d2
 namespace MvcProject.Repositories.Implementations
 {
     public class TaskRepository: Repository<ProjectTask>, ITaskRepository
@@ -11,8 +8,6 @@ namespace MvcProject.Repositories.Implementations
         public TaskRepository(ApplicationDbContext context) : base(context)
         {
         }
-<<<<<<< HEAD
-=======
 
         public async Task<double> GetUserWeeklyCompletionRateAsync(int projectId, string userId)
         {
@@ -54,6 +49,5 @@ namespace MvcProject.Repositories.Implementations
                 .Take(count)
                 .ToListAsync();
         }
->>>>>>> 8ede1be8af9ec82583cabefb08c524b5a2f670d2
     }
 }

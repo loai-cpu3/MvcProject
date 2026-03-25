@@ -1,11 +1,3 @@
-<<<<<<< HEAD
-namespace MvcProject.Repositories.Implementations
-{
-    public class ApplicationUserRepository : Repository<ApplicationUser>, IApplicationUserRepository
-    {
-        public ApplicationUserRepository(ApplicationDbContext context) : base(context)
-        {
-=======
 using Microsoft.EntityFrameworkCore;
 using MvcProject.Data;
 using MvcProject.Models.Domain;
@@ -49,7 +41,6 @@ namespace MvcProject.Repositories.Implementations
         public void Delete(ApplicationUser entity)
         {
             _dbSet.Remove(entity);
->>>>>>> 8ede1be8af9ec82583cabefb08c524b5a2f670d2
         }
     }
 }

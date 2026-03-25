@@ -1,19 +1,3 @@
-<<<<<<< HEAD
-using Microsoft.AspNetCore.Mvc;
-
-namespace MvcProject.Controllers
-{
-    public class ProjectsController : Controller
-    {
-        public IActionResult Index()
-        {
-            return View();
-        }
-
-        public IActionResult Details()
-        {
-            return View();
-=======
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MvcProject.Attributes;
@@ -157,7 +141,6 @@ namespace MvcProject.Controllers
         {
             await _projectService.RemoveUserFromProjectAsync(projectId, userId);
             return RedirectToAction("Details", new { projectId });
->>>>>>> 8ede1be8af9ec82583cabefb08c524b5a2f670d2
         }
     }
 }

@@ -1,18 +1,12 @@
-<<<<<<< HEAD
-﻿namespace MvcProject.Repositories.Implementations
-=======
 ﻿using Microsoft.EntityFrameworkCore;
 
 namespace MvcProject.Repositories.Implementations
->>>>>>> 8ede1be8af9ec82583cabefb08c524b5a2f670d2
 {
     public class ProjectRepository : Repository<Project>, IProjectRepository
     {
         public ProjectRepository(ApplicationDbContext context) : base(context)
         {
         }
-<<<<<<< HEAD
-=======
 
         public async Task<int> GetTotalProjectsCountAsync()
         {
@@ -36,6 +30,5 @@ namespace MvcProject.Repositories.Implementations
                 .Include(p => p.Tasks)
                 .FirstOrDefaultAsync(p => p.Id == projectId);
         }
->>>>>>> 8ede1be8af9ec82583cabefb08c524b5a2f670d2
     }
 }
