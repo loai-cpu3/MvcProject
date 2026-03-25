@@ -8,6 +8,7 @@ namespace MvcProject.ViewModels.Projects
         public int TotalTasks { get; set; }
         public int CompletedTasks { get; set; }
         public int CompletionPercentage { get; set; }
+        public List<ProjectTaskItemViewModel> Tasks { get; set; } = new();
         public EditProjectViewModel EditProject { get; set; } = new EditProjectViewModel();
     }
 }

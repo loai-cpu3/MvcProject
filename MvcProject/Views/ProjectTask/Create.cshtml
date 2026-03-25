@@ -1,0 +1,89 @@
+@model MvcProject.ViewModels.ProjectTask.ProjectTaskCreateViewModel
+@using MvcProject.Models.Enums
+
+@{
+    ViewData["Title"] = "Create Task";
+}
+
+<div class="row mb-4">
+    <div class="col-12 d-flex justify-content-between align-items-center">
+        <h2>Create New Task</h2>
+        <a asp-controller="Projects" asp-action="Detail" asp-route-id="@Model.ProjectId" class="btn btn-outline-secondary">
+            Back to Project
+        </a>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <form asp-action="Create" asp-controller="ProjectTask" method="post" enctype="multipart/form-data">
+            <input type="hidden" asp-for="ProjectId" />
+            <div asp-validation-summary="All" class="text-danger"></div>
+
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="mb-3">
+                        <label asp-for="Title" class="form-label fw-bold"></label>
+                        <input asp-for="Title" class="form-control" />
+                        <span asp-validation-for="Title" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Description" class="form-label fw-bold"></label>
+                        <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Attachments" class="form-label fw-bold"></label>
+                        <input asp-for="Attachments" type="file" class="form-control" multiple />
+                        <span asp-validation-for="Attachments" class="text-danger"></span>
+                        <small class="form-text text-muted">You can upload multiple files. Allowed types: pdf, docx, xlsx, png, jpg, txt.</small>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label asp-for="Status" class="form-label fw-bold"></label>
+                        <select asp-for="Status" asp-items="Html.GetEnumSelectList<MvcProject.Models.Enums.TaskStatus>()" class="form-select">
+                            <option value="">-- Select Status --</option>
+                        </select>
+                        <span asp-validation-for="Status" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Priority" class="form-label fw-bold"></label>
+                        <select asp-for="Priority" asp-items="Html.GetEnumSelectList<TaskPriority>()" class="form-select">
+                            <option value="">-- Select Priority --</option>
+                        </select>
+                        <span asp-validation-for="Priority" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Deadline" class="form-label fw-bold"></label>
+                        <input asp-for="Deadline" type="date" class="form-control" />
+                        <span asp-validation-for="Deadline" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="AssigneeId" class="form-label fw-bold"></label>
+                        <select asp-for="AssigneeId" asp-items="Model.UsersList" class="form-select">
+                            <option value="">-- Unassigned --</option>
+                        </select>
+                        <span asp-validation-for="AssigneeId" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+
+            <hr />
+
+            <div class="d-flex justify-content-end">
+                <button type="submit" class="btn btn-primary px-4">Create Task</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

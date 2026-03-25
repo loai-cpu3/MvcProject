@@ -67,6 +67,16 @@ namespace MvcProject.Services
                 TotalTasks = totalTasks,
                 CompletedTasks = completedTasks,
                 CompletionPercentage = completionPercentage,
+                Tasks = project.Tasks.Select(task => new ProjectTaskItemViewModel
+                {
+                    Id = task.Id,
+                    Title = task.Title,
+                    Deadline = task.Deadline,
+                    Status = task.Status,
+                    Priority = task.Priority,
+                    AssigneeName = task.Assignee != null ? $"{task.Assignee.FirstName} {task.Assignee.LastName}" : "Unassigned",
+                    AssigneePhotoUrl = task.Assignee?.ProfilePictureUrl
+                }).ToList(),
                 EditProject = new EditProjectViewModel
                 {
                     Id = project.Id,

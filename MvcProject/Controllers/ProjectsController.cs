@@ -57,7 +57,7 @@ namespace MvcProject.Controllers
         [ProjectAuthorize(ProjectRole.Admin)]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditProject(int projectId, EditProjectViewModel model)
+        public async Task<IActionResult> EditProject(int projectId, [Bind(Prefix = "EditProject")] EditProjectViewModel model)
         {
             if (projectId != model.Id)
             {
@@ -87,7 +87,7 @@ namespace MvcProject.Controllers
         
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateProject(CreateProjectViewModel model)
+        public async Task<IActionResult> CreateProject([Bind(Prefix = "CreateProject")] CreateProjectViewModel model)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (!ModelState.IsValid)

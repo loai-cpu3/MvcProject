@@ -1,193 +1,203 @@
-@model MvcProject.ViewModels.ProjectTask.TaskDetailViewModel
+@model MvcProject.ViewModels.ProjectTask.ProjectTaskDetailViewModel
+@using MvcProject.Models.Enums
+
 @{
-    ViewData["Title"] = "Task Details";
-    Layout = "~/Views/Shared/_AppLayout.cshtml";
+    ViewData["Title"] = $"Task: {Model.Title}";
+    
+    var statusClass = Model.Status switch
+    {
+        MvcProject.Models.Enums.TaskStatus.ToDo => "bg-secondary",
+        MvcProject.Models.Enums.TaskStatus.InProgress => "bg-primary",
+        MvcProject.Models.Enums.TaskStatus.Review => "bg-info",
+        MvcProject.Models.Enums.TaskStatus.Done => "bg-success",
+        _ => "bg-secondary"
+    };
+
+    var priorityClass = Model.Priority switch
+    {
+        TaskPriority.Low => "bg-info-light text-info",
+        TaskPriority.Medium => "bg-warning-light text-warning-dark",
+        TaskPriority.High => "bg-danger-light text-danger",
+        _ => "bg-light text-muted"
+    };
 }
 
-<div class="mx-auto pb-5" style="max-width: 1200px;">
-    <!-- Breadcrumbs & Actions -->
-    <nav class="d-flex align-items-center justify-content-between mb-4">
-        <div class="d-flex align-items-center gap-2 small text-muted-light fw-medium">
-            <a class="text-decoration-none text-muted-light hover-text-primary transition-colors" asp-controller="Projects" asp-action="Index">Projects</a>
-            <span class="material-symbols-outlined text-base" style="font-size: 16px;">chevron_right</span>
-            <a class="text-decoration-none text-muted-light hover-text-primary transition-colors" href="#">@Model.ProjectName</a>
-            <span class="material-symbols-outlined text-base" style="font-size: 16px;">chevron_right</span>
-            <span class="text-dark fw-bold">@Model.Title</span>
+<div class="container-fluid py-4 h-100 overflow-auto">
+    <!-- Header -->
+    <div class="row align-items-center mb-4">
+        <div class="col-auto">
+            <a asp-controller="Projects" asp-action="Details" asp-route-projectId="@Model.ProjectId" class="btn btn-icon btn-light rounded-circle shadow-sm">
+                <span class="material-symbols-outlined">arrow_back</span>
+            </a>
         </div>
-        <div class="d-flex align-items-center gap-3">
-            <button class="btn btn-light d-flex align-items-center gap-2 px-3 py-2 small fw-semibold text-muted-light rounded-3 transition-colors">
-                <span class="material-symbols-outlined fs-6">share</span>
-                Share
-            </button>
-            <button class="btn btn-primary d-flex align-items-center gap-2 px-4 py-2 small fw-semibold text-white rounded-3 shadow-sm transition-all border-0">
-                <span class="material-symbols-outlined fs-6">done_all</span>
-                Mark Complete
-            </button>
+        <div class="col ms-2">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-1">
+                    <li class="breadcrumb-item"><a asp-controller="Projects" asp-action="Index" class="text-decoration-none text-muted">Projects</a></li>
+                    <li class="breadcrumb-item"><a asp-controller="Projects" asp-action="Details" asp-route-projectId="@Model.ProjectId" class="text-decoration-none text-muted">@Model.ProjectTitle</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Task Detail</li>
+                </ol>
+            </nav>
+            <h1 class="h3 font-display fw-bold text-dark mb-0">@Model.Title</h1>
         </div>
-    </nav>
-    
-    <!-- Task Main Title Section -->
-    <div class="mb-5">
-        <div class="d-flex align-items-center gap-3 mb-3">
-            <span class="px-2 py-1 bg-light text-primary rounded-2 text-uppercase fw-bold tracking-wide" style="font-size: 11px;">@Model.Status</span>
-            <span class="d-flex align-items-center gap-1 px-2 py-1 bg-danger bg-opacity-10 text-danger rounded-2 text-uppercase fw-bold tracking-wide" style="font-size: 11px;">
-                <span class="material-symbols-outlined" style="font-size: 14px;">priority_high</span>
-                @Model.Priority
-            </span>
-        </div>
-        <h1 class="font-display fw-bold text-dark mb-2" style="font-size: 2.25rem; letter-spacing: -0.02em;">@Model.Title</h1>
-        <p class="text-muted-light fs-6 w-75 lh-base">@Model.Description</p>
+        @if (Model.CanEditDelete)
+        {
+            <div class="col-auto d-flex gap-2">
+                <a asp-action="Edit" asp-route-id="@Model.Id" asp-route-projectId="@Model.ProjectId" class="btn btn-outline-primary d-flex align-items-center gap-2">
+                    <span class="material-symbols-outlined fs-5">edit</span>
+                    Edit
+                </a>
+                <button type="button" class="btn btn-outline-danger d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                    <span class="material-symbols-outlined fs-5">delete</span>
+                    Delete
+                </button>
+            </div>
+        }
     </div>
 
-    <!-- Bento Layout Content -->
     <div class="row g-4">
-        <!-- Main Column -->
-        <div class="col-12 col-lg-8 d-flex flex-column gap-4">
-            
-            <!-- Details Card -->
-            <div class="bg-surface-light p-4 p-md-5 rounded-4 shadow-soft border border-border-light">
-                <div class="row g-4 mb-5 pb-5 border-bottom border-border-light">
-                    <div class="col-12 col-sm-4">
-                        <p class="small fw-bold text-muted-light text-uppercase tracking-widest mb-3" style="font-size: 10px;">Assignee</p>
-                        <div class="d-flex align-items-center gap-3">
-                            <img class="rounded-circle bg-light border" style="width: 40px; height: 40px; object-fit: cover;" src="@Model.AssigneeAvatarUrl" alt="@Model.AssigneeName"/>
-                            <div>
-                                <p class="small fw-bold text-dark mb-0">@Model.AssigneeName</p>
-                                <p class="small text-muted-light mb-0" style="font-size: 0.75rem;">@Model.AssigneeRole</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-12 col-sm-4">
-                        <p class="small fw-bold text-muted-light text-uppercase tracking-widest mb-3" style="font-size: 10px;">Due Date</p>
-                        <div class="d-flex align-items-center gap-3">
-                            <div class="rounded-3 bg-light d-flex align-items-center justify-content-center text-primary" style="width: 40px; height: 40px;">
-                                <span class="material-symbols-outlined fs-5">calendar_today</span>
-                            </div>
-                            <div>
-                                <p class="small fw-bold text-dark mb-0">@Model.DueDate.ToString("MMM dd, yyyy")</p>
-                                @if (Model.DueDate > DateTime.Today)
-                                {
-                                    <p class="small text-danger fw-semibold mb-0" style="font-size: 0.75rem;">@((Model.DueDate - DateTime.Today).Days) Days Left</p>
-                                }
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-12 col-sm-4">
-                        <p class="small fw-bold text-muted-light text-uppercase tracking-widest mb-3" style="font-size: 10px;">Tags</p>
-                        <div class="d-flex flex-wrap gap-2">
-                            @foreach (var tag in Model.Tags)
-                            {
-                                <span class="px-3 py-1 bg-light text-primary fw-bold rounded-pill border border-border-light" style="font-size: 10px;">@tag</span>
-                            }
-                        </div>
+        <!-- Main Content -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-4 mb-4">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold text-dark mb-3">Description</h5>
+                    <div class="text-muted lh-lg">
+                        @if (string.IsNullOrWhiteSpace(Model.Description))
+                        {
+                            <em class="text-muted-light">No description provided for this task.</em>
+                        }
+                        else
+                        {
+                            @Html.Raw(Model.Description.Replace("\n", "<br/>"))
+                        }
                     </div>
                 </div>
-                
             </div>
 
-            <!-- Comments Section -->
-            <section class="bg-surface-light p-4 p-md-5 rounded-4 shadow-soft border border-border-light">
-                <div class="d-flex align-items-center justify-content-between mb-4 pb-2">
-                    <h3 class="font-display fs-4 fw-bold text-dark mb-0">Comments <span class="text-muted-light fs-6 fw-normal ms-2">(@Model.Comments.Count)</span></h3>
-                    <button class="btn btn-link text-primary fw-bold text-decoration-none shadow-none small p-0 align-middle">Newest First</button>
+            <!-- Attachments -->
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-header bg-white border-0 pt-4 px-4 pb-0 d-flex align-items-center justify-content-between">
+                    <h5 class="fw-bold text-dark mb-0">Attachments</h5>
+                    <span class="badge bg-light text-muted fw-normal">@Model.Attachments.Count Files</span>
                 </div>
-                
-                <div class="d-flex flex-column gap-4 mb-5">
-                    @foreach (var comment in Model.Comments)
+                <div class="card-body p-4">
+                    @if (!Model.Attachments.Any())
                     {
-                        <div class="d-flex gap-3">
-                            <img class="rounded-circle bg-light flex-shrink-0" style="width: 40px; height: 40px; object-fit: cover;" src="@comment.AuthorAvatarUrl" alt="@comment.AuthorName"/>
-                            <div class="flex-grow-1">
-                                <div class="d-flex align-items-center gap-2 mb-1">
-                                    <span class="fw-bold fs-6 text-dark">@comment.AuthorName</span>
-                                    @{
-                                        var timeSince = DateTime.Now - comment.CreatedAt;
-                                        string timeDisplay = timeSince.TotalHours < 1 ? $"{(int)timeSince.TotalMinutes}m ago" : $"{(int)timeSince.TotalHours}h ago";
-                                    }
-                                    <span class="fw-bold text-muted-light text-uppercase tracking-widest" style="font-size: 10px;">@timeDisplay</span>
-                                </div>
-                                <p class="small text-muted-light lh-base mb-2">@comment.Content</p>
-                                <div class="d-flex align-items-center gap-3 fw-bold text-muted-light" style="font-size: 12px;">
-                                    <button class="btn btn-link p-0 text-muted-light text-decoration-none d-flex align-items-center gap-1"><span class="material-symbols-outlined fs-6">reply</span> Reply</button>
-                                    @if (comment.Likes > 0)
-                                    {
-                                        <button class="btn btn-link p-0 text-muted-light text-decoration-none d-flex align-items-center gap-1"><span class="material-symbols-outlined fs-6">thumb_up</span> @comment.Likes</button>
-                                    }
-                                </div>
-                            </div>
+                        <div class="text-center py-4 bg-light rounded-3 border border-dashed">
+                            <span class="material-symbols-outlined fs-1 text-muted-light mb-2">attachment</span>
+                            <p class="text-muted small mb-0">No attachments found</p>
                         </div>
-
-                        @foreach (var reply in comment.Replies)
-                        {
-                            <div class="d-flex gap-3 ms-sm-5 ms-4 border-start border-border-light border-2 ps-4">
-                                <img class="rounded-circle bg-light flex-shrink-0" style="width: 40px; height: 40px; object-fit: cover;" src="@reply.AuthorAvatarUrl" alt="@reply.AuthorName"/>
-                                <div class="flex-grow-1">
-                                    <div class="d-flex align-items-center gap-2 mb-1">
-                                        <span class="fw-bold fs-6 text-dark">@reply.AuthorName</span>
-                                        <span class="fw-bold text-muted-light text-uppercase tracking-widest" style="font-size: 10px;">1h ago</span>
+                    }
+                    else
+                    {
+                        <div class="list-group list-group-flush border-top">
+                            @foreach (var file in Model.Attachments)
+                            {
+                                <div class="list-group-item px-0 py-3 d-flex align-items-center justify-content-between border-border-light">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="bg-primary-light rounded-3 p-2 d-flex align-items-center justify-content-center">
+                                            <span class="material-symbols-outlined text-primary">description</span>
+                                        </div>
+                                        <div>
+                                            <p class="fw-semibold text-dark mb-0 small">@file.FileName</p>
+                                            <span class="text-muted-light small">@((file.Size / 1024d / 1024d).ToString("F2")) MB • @file.UploadedAt.ToString("MMM dd, yyyy")</span>
+                                        </div>
                                     </div>
-                                    <p class="small text-muted-light lh-base mb-2">@reply.Content</p>
-                                    <div class="d-flex align-items-center gap-3 fw-bold text-muted-light" style="font-size: 12px;">
-                                        <button class="btn btn-link p-0 text-muted-light text-decoration-none d-flex align-items-center gap-1"><span class="material-symbols-outlined fs-6">reply</span> Reply</button>
-                                    </div>
+                                    <a asp-action="DownloadAttachment" asp-route-id="@file.Id" asp-route-projectId="@Model.ProjectId" class="btn btn-icon btn-light rounded-circle shadow-sm" title="Download">
+                                        <span class="material-symbols-outlined">download</span>
+                                    </a>
                                 </div>
-                            </div>
-                        }
+                            }
+                        </div>
                     }
                 </div>
-
-                <!-- Comment Input -->
-                <div class="bg-light rounded-4 p-3 border border-border-light transition-all">
-                    <textarea class="form-control bg-transparent border-0 shadow-none small mb-3 p-1" style="min-height: 80px; resize: none;" placeholder="Write a comment..."></textarea>
-                    <div class="d-flex align-items-center justify-content-between pt-3 border-top border-border-light">
-                        <div class="d-flex align-items-center gap-1 text-muted-light">
-                            <button class="btn btn-sm btn-light p-1 d-flex align-items-center justify-content-center text-muted-light border-0 shadow-none hover-bg-white transition-colors" style="width: 32px; height: 32px;"><span class="material-symbols-outlined" style="font-size: 18px;">format_bold</span></button>
-                            <button class="btn btn-sm btn-light p-1 d-flex align-items-center justify-content-center text-muted-light border-0 shadow-none hover-bg-white transition-colors" style="width: 32px; height: 32px;"><span class="material-symbols-outlined" style="font-size: 18px;">format_italic</span></button>
-                            <button class="btn btn-sm btn-light p-1 d-flex align-items-center justify-content-center text-muted-light border-0 shadow-none hover-bg-white transition-colors" style="width: 32px; height: 32px;"><span class="material-symbols-outlined" style="font-size: 18px;">link</span></button>
-                        </div>
-                        <button class="btn btn-primary px-4 py-2 small fw-bold rounded-3 shadow-sm transition-all border-0">Send</button>
-                    </div>
-                </div>
-            </section>
+            </div>
         </div>
 
-        <!-- Sidebar Column -->
-        <div class="col-12 col-lg-4 d-flex flex-column gap-4">
-            
-            <!-- Attachments -->
-            <section class="bg-surface-light p-4 p-md-5 rounded-4 shadow-soft border border-border-light h-100">
-                <div class="d-flex align-items-center justify-content-between mb-4">
-                    <h3 class="font-display fs-5 fw-bold text-dark mb-0">Attachments</h3>
-                    <span class="bg-primary bg-opacity-10 text-primary px-2 py-1 rounded-pill text-uppercase fw-bold" style="font-size: 10px;">@Model.Attachments.Count Files</span>
-                </div>
-                
-                <div class="d-flex flex-column gap-3 mb-4">
-                    @foreach (var attachment in Model.Attachments)
-                    {
-                        <div class="d-flex align-items-center gap-3 p-3 bg-light rounded-4 transition-all text-decoration-none text-dark" style="cursor: pointer;">
-                            <div class="rounded-3 @attachment.BgColorClass bg-opacity-10 d-flex align-items-center justify-content-center @attachment.AccentColorClass flex-shrink-0" style="width: 40px; height: 40px;">
-                                <span class="material-symbols-outlined">@attachment.IconCode</span>
-                            </div>
-                            <div class="flex-grow-1 overflow-hidden">
-                                <p class="small fw-bold mb-0 text-truncate text-dark">@attachment.FileName</p>
-                                <p class="text-muted-light fw-medium mb-0" style="font-size: 10px;">@attachment.SizeDisplay &bull; Updated @((DateTime.Now - attachment.UploadedAt).Hours)h ago</p>
-                            </div>
-                            <button class="btn btn-link p-1 text-muted-light shadow-none border-0 transition-opacity opacity-75">
-                                <span class="material-symbols-outlined">download</span>
-                            </button>
-                        </div>
-                    }
-                </div>
+        <!-- Sidebar Details -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm rounded-4 mb-4">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold text-dark mb-4">Attributes</h5>
+                    
+                    <div class="mb-4">
+                        <label class="text-muted small fw-bold text-uppercase mb-2 d-block">Status</label>
+                        <span class="badge @statusClass py-2 px-3 rounded-pill fw-medium fs-7">@Model.Status</span>
+                    </div>
 
-                <!-- Drag and drop zone -->
-                <div class="border border-2 border-dashed border-border-light rounded-4 p-4 d-flex flex-column align-items-center justify-content-center gap-2 transition-all text-center" style="cursor: pointer; min-height: 150px; background-color: transparent;">
-                    <span class="material-symbols-outlined text-muted-light fs-1 transition-colors">upload_file</span>
+                    <div class="mb-4">
+                        <label class="text-muted small fw-bold text-uppercase mb-2 d-block">Priority</label>
+                        <span class="badge @priorityClass py-2 px-3 rounded-pill fw-medium fs-7">@Model.Priority</span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="text-muted small fw-bold text-uppercase mb-2 d-block">Deadline</label>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="material-symbols-outlined text-muted fs-5">calendar_today</span>
+                            <span class="@(Model.Deadline < DateTime.Now && Model.Status != MvcProject.Models.Enums.TaskStatus.Done ? "text-danger fw-bold" : "text-dark")">
+                                @(Model.Deadline?.ToString("MMM dd, yyyy") ?? "No Deadline")
+                            </span>
+                        </div>
+                    </div>
+
+                    <hr class="my-4 border-border-light" />
+
                     <div>
-                        <p class="small fw-bold text-dark mb-0">Click or drag to upload</p>
-                        <p class="text-muted-light mb-0" style="font-size: 10px;">Max size 50MB</p>
+                        <label class="text-muted small fw-bold text-uppercase mb-3 d-block">Assignee</label>
+                        <div class="d-flex align-items-center gap-3">
+                            @if (!string.IsNullOrEmpty(Model.AssigneePhotoUrl))
+                            {
+                                <img src="@Model.AssigneePhotoUrl" alt="@Model.AssigneeName" class="rounded-circle border border-2 border-primary-light" style="width: 48px; height: 48px; object-fit: cover;">
+                            }
+                            else
+                            {
+                                <div class="rounded-circle bg-light border border-2 border-dashed d-flex align-items-center justify-content-center text-muted" style="width: 48px; height: 48px;">
+                                    <span class="material-symbols-outlined">person</span>
+                                </div>
+                            }
+                            <div>
+                                <h6 class="fw-bold text-dark mb-0">@Model.AssigneeName</h6>
+                                <span class="text-muted small">Assigned Member</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </section>
+            </div>
         </div>
     </div>
 </div>
+
+@if (Model.CanEditDelete)
+{
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg rounded-4">
+                <div class="modal-header border-0 pt-4 px-4">
+                    <h5 class="modal-title fw-bold text-dark" id="deleteModalLabel">Confirm Delete</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <p class="text-muted mb-0">Are you sure you want to delete the task <strong>"@Model.Title"</strong>? This action cannot be undone and will also delete all attachments.</p>
+                </div>
+                <div class="modal-footer border-0 pb-4 px-4 pt-0">
+                    <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">Cancel</button>
+                    <form asp-action="Delete" asp-route-id="@Model.Id" asp-route-projectId="@Model.ProjectId" method="post">
+                        <button type="submit" class="btn btn-danger px-4">Delete Task</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<style>
+    .bg-info-light { background-color: #E0F2FE; }
+    .bg-warning-light { background-color: #FEF3C7; }
+    .bg-danger-light { background-color: #FEE2E2; }
+    .bg-primary-light { background-color: #E0E7FF; }
+    .bg-success-light { background-color: #DCFCE7; }
+    .text-warning-dark { color: #92400E; }
+    .fs-7 { font-size: 0.85rem; }
+    .btn-icon { width: 38px; height: 38px; padding: 0; display: inline-flex; align-items: center; justify-content: center; }
+</style>

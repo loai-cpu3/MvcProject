@@ -1,0 +1,223 @@
+@model MvcProject.ViewModels.ProjectTask.ProjectTaskEditViewModel
+@using MvcProject.Models.Enums
+
+@{
+    ViewData["Title"] = "Edit Task";
+}
+
+<div class="container-fluid py-4 h-100 overflow-auto">
+    <!-- Header -->
+    <div class="row align-items-center mb-4">
+        <div class="col-auto">
+            <a asp-action="Detail" asp-route-id="@Model.Id" asp-route-projectId="@Model.ProjectId" class="btn btn-icon btn-light rounded-circle shadow-sm">
+                <span class="material-symbols-outlined">arrow_back</span>
+            </a>
+        </div>
+        <div class="col ms-2">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-1">
+                    <li class="breadcrumb-item"><a asp-controller="Projects" asp-action="Details" asp-route-projectId="@Model.ProjectId" class="text-decoration-none text-muted">Project</a></li>
+                    <li class="breadcrumb-item"><a asp-action="Detail" asp-route-id="@Model.Id" asp-route-projectId="@Model.ProjectId" class="text-decoration-none text-muted">Task Detail</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Edit Task</li>
+                </ol>
+            </nav>
+            <h1 class="h3 font-display fw-bold text-dark mb-0">Edit Task</h1>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <form asp-action="Edit" method="post" enctype="multipart/form-data">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="Id" />
+                <input type="hidden" asp-for="ProjectId" />
+
+                <div class="card border-0 shadow-sm rounded-4 mb-4">
+                    <div class="card-body p-4">
+                        <div asp-validation-summary="All" class="text-danger small mb-4"></div>
+
+                        <div class="mb-4">
+                            <label asp-for="Title" class="form-label fw-bold text-dark">Title</label>
+                            <input asp-for="Title" class="form-control form-control-lg border-2 rounded-3" placeholder="Enter task title" />
+                            <span asp-validation-for="Title" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="Description" class="form-label fw-bold text-dark">Description</label>
+                            <textarea asp-for="Description" class="form-control border-2 rounded-3" rows="6" placeholder="Describe the task details..."></textarea>
+                            <span asp-validation-for="Description" class="text-danger small"></span>
+                        </div>
+
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label asp-for="Status" class="form-label fw-bold text-dark">Status</label>
+                                <select asp-for="Status" asp-items="Html.GetEnumSelectList<MvcProject.Models.Enums.TaskStatus>()" class="form-select border-2 rounded-3 py-2 px-3">
+                                </select>
+                                <span asp-validation-for="Status" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="Priority" class="form-label fw-bold text-dark">Priority</label>
+                                <select asp-for="Priority" asp-items="Html.GetEnumSelectList<TaskPriority>()" class="form-select border-2 rounded-3 py-2 px-3">
+                                </select>
+                                <span asp-validation-for="Priority" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label asp-for="Deadline" class="form-label fw-bold text-dark">Deadline</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white border-2 border-end-0 rounded-start-3">
+                                        <span class="material-symbols-outlined text-muted fs-5">calendar_today</span>
+                                    </span>
+                                    <input asp-for="Deadline" class="form-control border-2 border-start-0 rounded-end-3" type="date" />
+                                </div>
+                                <span asp-validation-for="Deadline" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="AssigneeId" class="form-label fw-bold text-dark">Assignee</label>
+                                <select asp-for="AssigneeId" asp-items="Model.UsersList" class="form-select border-2 rounded-3 py-2 px-3">
+                                    <option value="">-- Select Assignee --</option>
+                                </select>
+                                <span asp-validation-for="AssigneeId" class="text-danger small"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Existing Attachments -->
+                <div class="card border-0 shadow-sm rounded-4 mb-4">
+                    <div class="card-header bg-white border-0 pt-4 px-4">
+                        <h5 class="fw-bold text-dark mb-0">Current Attachments</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        @if (!Model.ExistingAttachments.Any())
+                        {
+                            <p class="text-muted small italic">No attachments currently linked to this task.</p>
+                        }
+                        else
+                        {
+                            <div class="list-group list-group-flush border-top">
+                                @foreach (var file in Model.ExistingAttachments)
+                                {
+                                    <div class="list-group-item px-0 py-3 d-flex align-items-center justify-content-between border-border-light">
+                                        <div class="d-flex align-items-center gap-3">
+                                            <div class="bg-primary-light rounded-3 p-2 d-flex align-items-center justify-content-center">
+                                                <span class="material-symbols-outlined text-primary">description</span>
+                                            </div>
+                                            <div>
+                                                <p class="fw-semibold text-dark mb-0 small">@file.FileName</p>
+                                                <span class="text-muted-light small">@((file.Size / 1024d / 1024d).ToString("F2")) MB</span>
+                                            </div>
+                                        </div>
+                                        <button type="button" class="btn btn-icon btn-outline-danger border-0 rounded-circle" 
+                                                onclick="confirmDeleteAttachment(@file.Id)" title="Delete Attachment">
+                                            <span class="material-symbols-outlined">delete</span>
+                                        </button>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- New Attachments -->
+                <div class="card border-0 shadow-sm rounded-4 mb-4">
+                    <div class="card-header bg-white border-0 pt-4 px-4 pb-0">
+                        <h5 class="fw-bold text-dark mb-0">Add More Attachments</h5>
+                    </div>
+                    <div class="card-body p-4 text-center">
+                        <div class="upload-area p-5 bg-light rounded-4 border-2 border-dashed border-primary-light position-relative">
+                            <span class="material-symbols-outlined fs-1 text-primary mb-3">cloud_upload</span>
+                            <h6 class="fw-bold text-dark mb-1">Upload New Files</h6>
+                            <p class="text-muted small mb-3 text-center mx-auto" style="max-width: 300px;">
+                                Max 10MB per file. Allowed: PDF, DOCX, XLSX, PNG, JPG, TXT.
+                            </p>
+                            <input asp-for="NewAttachments" type="file" multiple class="position-absolute h-100 w-100 top-0 start-0 opacity-0 cursor-pointer" id="fileInput" />
+                            <div id="fileNames" class="mt-3 text-primary fw-medium small"></div>
+                        </div>
+                        <span asp-validation-for="NewAttachments" class="text-danger small mt-2 d-block"></span>
+                    </div>
+                </div>
+
+                <div class="d-flex gap-3 mt-4">
+                    <button type="submit" class="btn btn-primary px-5 py-2 rounded-3 shadow-sm d-flex align-items-center gap-2">
+                        <span class="material-symbols-outlined fs-5">save</span>
+                        Save Changes
+                    </button>
+                    <a asp-action="Detail" asp-route-id="@Model.Id" asp-route-projectId="@Model.ProjectId" class="btn btn-light px-4 py-2 rounded-3 border">Cancel</a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Sidebar Tips -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm bg-primary text-white rounded-4 h-100">
+                <div class="card-body p-4">
+                    <div class="bg-white bg-opacity-20 rounded-3 p-2 d-inline-block mb-3">
+                        <span class="material-symbols-outlined text-white">info</span>
+                    </div>
+                    <h5 class="fw-bold mb-3 font-display text-white">Editing Guide</h5>
+                    <p class="small opacity-75 mb-4 lh-lg">
+                        You can update any aspect of the task here. Changes are saved immediately upon clicking "Save Changes".
+                    </p>
+                    
+                    <div class="bg-white bg-opacity-20 rounded-4 p-3 mb-4">
+                        <h6 class="fw-bold small text-uppercase mb-2">Assignee Tips</h6>
+                        <p class="x-small mb-0 opacity-75">
+                            Only members already added to the project appear in the assignee list. Use project settings to add more team members.
+                        </p>
+                    </div>
+
+                    <div class="bg-white bg-opacity-20 rounded-4 p-3">
+                        <h6 class="fw-bold small text-uppercase mb-2">Attachments</h6>
+                        <p class="x-small mb-0 opacity-75">
+                            Files are stored securely. Replacing files requires deleting the old one and uploading a new one.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Attachment Form (Hidden) -->
+<form id="deleteAttachmentForm" asp-action="DeleteAttachment" method="post" style="display:none;">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="id" id="deleteAttachId" />
+    <input type="hidden" name="projectId" value="@Model.ProjectId" />
+    <input type="hidden" name="taskId" value="@Model.Id" />
+</form>
+
+<script>
+    function confirmDeleteAttachment(id) {
+        if (confirm('Are you sure you want to remove this attachment?')) {
+            document.getElementById('deleteAttachId').value = id;
+            document.getElementById('deleteAttachmentForm').submit();
+        }
+    }
+
+    document.getElementById('fileInput').addEventListener('change', function(e) {
+        const fileNamesDiv = document.getElementById('fileNames');
+        fileNamesDiv.innerHTML = '';
+        if (this.files.length > 0) {
+            const list = document.createElement('div');
+            list.className = 'text-start bg-white p-3 rounded-3 shadow-sm border mt-2';
+            for (let i = 0; i < this.files.length; i++) {
+                const item = document.createElement('div');
+                item.className = 'd-flex align-items-center gap-2 mb-1';
+                item.innerHTML = `<span class="material-symbols-outlined fs-6 text-primary">check_circle</span> <span class="small">${this.files[i].name}</span>`;
+                list.appendChild(item);
+            }
+            fileNamesDiv.appendChild(list);
+        }
+    });
+</script>
+
+<style>
+    .bg-primary-light { background-color: #E0E7FF; }
+    .border-primary-light { border-color: #C7D2FE !important; }
+    .cursor-pointer { cursor: pointer; }
+    .x-small { font-size: 0.75rem; }
+    .btn-icon { width: 38px; height: 38px; padding: 0; display: inline-flex; align-items: center; justify-content: center; }
+</style>

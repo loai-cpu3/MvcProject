@@ -22,6 +22,9 @@
                 <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuCU_4K8R15USDca_tYDCPrOylUfjUhpDzSxOdwqdhCw-GSEjFTof9E0ADecoAvM90ktMwrmZQLjTrORgHIWHHnZ6Lxi4nVy_Kzk8jwxVwI9WTy27byfKKhe5snFSHf9xBGAx-N_VDp8bmoDj41GI_eINdpnOQVowaQ26nn6XmaF3ccm25-W-V2EJ1CtVGQJigX1fdADGPrADwZnActTpLC9PZbxNN6DfN3qqL0YBhXkRj1qjVwbbrBShh4wLSrWl0-BZryJvwf-Jpmw" alt="Team member" class="rounded-circle border border-2 border-white object-fit-cover" style="width: 32px; height: 32px; margin-left: -8px; z-index: 2;">
                 <div class="rounded-circle border border-2 border-white bg-light d-flex align-items-center justify-content-center text-muted fw-medium" style="width: 32px; height: 32px; margin-left: -8px; font-size: 12px; z-index: 1;">+3</div>
             </div>
+            <a asp-controller="ProjectTask" asp-action="Create" asp-route-projectId="@Model.ProjectId" class="btn btn-primary fw-semibold font-display shadow-sm" style="font-size: 0.875rem;">
+                Create Task
+            </a>
             <button type="button" class="btn btn-light bg-surface-light border-border-light text-dark fw-semibold font-display shadow-sm" style="font-size: 0.875rem;" data-bs-toggle="modal" data-bs-target="#editProjectModal">
                 Edit Project
             </button>
@@ -122,93 +125,93 @@
     <!-- Tab Content: Tasks -->
     <div class="d-flex flex-column gap-4">
         
-        <!-- Task Group: To Do -->
-        <div class="d-flex flex-column gap-3">
-            <div class="d-flex align-items-center justify-content-between">
-                <h3 class="font-display fw-semibold text-dark fs-6 mb-0 d-flex align-items-center gap-2">
-                    <span class="rounded-circle bg-secondary" style="width: 8px; height: 8px;"></span>
-                    To Do
-                    <span class="text-muted-light fw-normal small ms-1">3</span>
-                </h3>
-                <button class="btn btn-link p-0 text-muted-light"><span class="material-symbols-outlined fs-6">add</span></button>
-            </div>
-            
-            <div class="bg-surface-light rounded-3 shadow-soft border border-border-light overflow-hidden">
-                <!-- Task Row 1 -->
-                <div class="task-row d-flex align-items-center justify-content-between p-3 border-bottom border-border-light" style="cursor: pointer;">
-                    <div class="d-flex align-items-center gap-3 min-w-0">
-                        <div class="rounded border border-border-light bg-white shadow-sm d-flex align-items-center justify-content-center" style="width: 20px; height: 20px;">
-                            <span class="material-symbols-outlined text-transparent" style="font-size: 14px;">check</span>
-                        </div>
-                        <div class="min-w-0">
-                            <p class="fw-medium small text-dark mb-0 text-truncate transition-colors">Draft landing page copy</p>
-                        </div>
+        @foreach (var status in Enum.GetValues(typeof(MvcProject.Models.Enums.TaskStatus)).Cast<MvcProject.Models.Enums.TaskStatus>())
+        {
+            var statusTasks = Model.Tasks.Where(t => t.Status == status).ToList();
+            if (statusTasks.Any())
+            {
+                <div class="d-flex flex-column gap-3">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <h3 class="font-display fw-semibold text-dark fs-6 mb-0 d-flex align-items-center gap-2">
+                            @{
+                                var dotColor = status switch
+                                {
+                                    MvcProject.Models.Enums.TaskStatus.ToDo => "bg-secondary",
+                                    MvcProject.Models.Enums.TaskStatus.InProgress => "bg-primary",
+                                    MvcProject.Models.Enums.TaskStatus.Review => "bg-info",
+                                    MvcProject.Models.Enums.TaskStatus.Done => "bg-success",
+                                    _ => "bg-secondary"
+                                };
+                                var statusName = status switch
+                                {
+                                    MvcProject.Models.Enums.TaskStatus.ToDo => "To Do",
+                                    MvcProject.Models.Enums.TaskStatus.InProgress => "In Progress",
+                                    _ => status.ToString()
+                                };
+                            }
+                            <span class="rounded-circle @dotColor" style="width: 8px; height: 8px;"></span>
+                            @statusName
+                            <span class="text-muted-light fw-normal small ms-1">@statusTasks.Count</span>
+                        </h3>
+                        <a asp-controller="ProjectTask" asp-action="Create" asp-route-projectId="@Model.ProjectId" class="btn btn-link p-0 text-muted-light">
+                            <span class="material-symbols-outlined fs-6">add</span>
+                        </a>
                     </div>
-                    <div class="d-flex align-items-center gap-3 flex-shrink-0 ms-3">
-                        <div class="d-none d-sm-flex align-items-center gap-1 small text-muted-light">
-                            <span class="material-symbols-outlined" style="font-size: 14px;">calendar_today</span>
-                            Oct 12
-                        </div>
-                        <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuCq4FcOh3fQBIGd91foqvNylM45Tn8RACrLxaJzS3dTOMZsNMQIvKrGvNg8kwUFHxcW7Dv_Y1cFEEOwx0qMZH_HVDKtjjkofPeIjp7zM5YpegtHkglTyxnpFAvMUc2jq0VnoNnSY8pAisxFb8oCSNBYEqn-C8ESQfJ7TOpk_74gromeJhtATKx4QxjXMBpgt_ntY6l54Urm8EOAH-24rmODvpqhpToH1XNcEIEYjQQ5OCSVmhzA9kZ3cpRw4Fc-Y3M-KmJzPZJ4ox4y" alt="Assignee" class="rounded-circle border border-border-light" style="width: 24px; height: 24px; object-fit: cover;">
-                    </div>
-                </div>
-                
-                <!-- Task Row 2 -->
-                <div class="task-row d-flex align-items-center justify-content-between p-3 border-bottom border-border-light" style="cursor: pointer;">
-                    <div class="d-flex align-items-center gap-3 min-w-0">
-                        <div class="rounded border border-border-light bg-white shadow-sm d-flex align-items-center justify-content-center" style="width: 20px; height: 20px;">
-                            <span class="material-symbols-outlined text-transparent" style="font-size: 14px;">check</span>
-                        </div>
-                        <div class="min-w-0 d-flex align-items-center gap-2">
-                            <p class="fw-medium small text-dark mb-0 text-truncate transition-colors">Finalize ad creative assets</p>
-                            <span class="badge fw-medium d-none d-sm-inline-block" style="background-color: #FEE2E2; color: #991B1B; font-size: 10px;">High</span>
-                        </div>
-                    </div>
-                    <div class="d-flex align-items-center gap-3 flex-shrink-0 ms-3">
-                        <div class="d-none d-sm-flex align-items-center gap-1 small text-muted-light">
-                            <span class="material-symbols-outlined" style="font-size: 14px;">calendar_today</span>
-                            Oct 14
-                        </div>
-                        <div class="rounded-circle bg-light border border-border-light border-dashed d-flex align-items-center justify-content-center text-muted-light" style="width: 24px; height: 24px;">
-                            <span class="material-symbols-outlined" style="font-size: 12px;">person_add</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Task Group: In Progress -->
-        <div class="d-flex flex-column gap-3">
-            <div class="d-flex align-items-center justify-content-between">
-                <h3 class="font-display fw-semibold text-dark fs-6 mb-0 d-flex align-items-center gap-2">
-                    <span class="rounded-circle bg-primary" style="width: 8px; height: 8px;"></span>
-                    In Progress
-                    <span class="text-muted-light fw-normal small ms-1">2</span>
-                </h3>
-                <button class="btn btn-link p-0 text-muted-light"><span class="material-symbols-outlined fs-6">add</span></button>
-            </div>
-            
-            <div class="bg-surface-light rounded-3 shadow-soft border border-border-light overflow-hidden">
-                <!-- Task Row 3 -->
-                <div class="task-row d-flex align-items-center justify-content-between p-3 border-start border-4 border-primary" style="cursor: pointer;">
-                    <div class="d-flex align-items-center gap-3 min-w-0">
-                        <div class="rounded border border-border-light bg-white shadow-sm d-flex align-items-center justify-content-center" style="width: 20px; height: 20px;">
-                            <span class="material-symbols-outlined text-transparent" style="font-size: 14px;">check</span>
-                        </div>
-                        <div class="min-w-0">
-                            <p class="fw-medium small text-dark mb-0 text-truncate transition-colors">Set up Google Analytics tracking</p>
-                        </div>
-                    </div>
-                    <div class="d-flex align-items-center gap-3 flex-shrink-0 ms-3">
-                        <div class="d-none d-sm-flex align-items-center gap-1 small text-danger fw-medium">
-                            <span class="material-symbols-outlined" style="font-size: 14px;">error</span>
-                            Today
-                        </div>
-                        <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuBruWTOwvwZ6K5VCnYYxSPrr8t8FqEcCHT2eKuSEb4WWsAs2kcWIwWv75tCxnQjTSI0Fh7JhPbiT7LYh3xTBg-YGt84ocXAIMJfVaYxzan58d2JBkcPkaSBtdMgOxvU6qPPeEbRUho5kDmgO5-Eb6tkoBetZXXwlknOoQkqCfY6O70TbeOFgSDDZcJvb64TKe5Ivm1MqKn9M_5vAGUgWAVN-94vrU9nrtVQ0KU2R7TeK1SU-ZFijv78p0MzKRS76-h50ibQLVYjFshE" alt="Assignee" class="rounded-circle border border-border-light" style="width: 24px; height: 24px; object-fit: cover;">
+                    
+                    <div class="bg-surface-light rounded-3 shadow-soft border border-border-light overflow-hidden">
+                        @foreach (var task in statusTasks)
+                        {
+                            <div class="task-row d-flex align-items-center justify-content-between p-3 border-bottom border-border-light" 
+                                 onclick="window.location.href='@Url.Action("Detail", "ProjectTask", new { id = task.Id, projectId = Model.ProjectId })'"
+                                 style="cursor: pointer;">
+                                <div class="d-flex align-items-center gap-3 min-w-0">
+                                    <div class="rounded border border-border-light bg-white shadow-sm d-flex align-items-center justify-content-center @(task.Status == MvcProject.Models.Enums.TaskStatus.Done ? "bg-success-light" : "")" style="width: 20px; height: 20px;">
+                                        <span class="material-symbols-outlined @(task.Status == MvcProject.Models.Enums.TaskStatus.Done ? "text-success" : "text-transparent")" style="font-size: 14px;">check</span>
+                                    </div>
+                                    <div class="min-w-0 d-flex align-items-center gap-2">
+                                        <p class="fw-medium small text-dark mb-0 text-truncate @(task.Status == MvcProject.Models.Enums.TaskStatus.Done ? "text-decoration-line-through text-muted" : "")">@task.Title</p>
+                                        @if (task.Priority == MvcProject.Models.Enums.TaskPriority.High)
+                                        {
+                                            <span class="badge fw-medium d-none d-sm-inline-block" style="background-color: #FEE2E2; color: #991B1B; font-size: 10px;">High</span>
+                                        }
+                                    </div>
+                                </div>
+                                <div class="d-flex align-items-center gap-3 flex-shrink-0 ms-3">
+                                    @if (task.Deadline.HasValue)
+                                    {
+                                        <div class="d-none d-sm-flex align-items-center gap-1 small @(task.Deadline < DateTime.Now && task.Status != MvcProject.Models.Enums.TaskStatus.Done ? "text-danger fw-medium" : "text-muted-light")">
+                                            <span class="material-symbols-outlined" style="font-size: 14px;">@(task.Deadline < DateTime.Now && task.Status != MvcProject.Models.Enums.TaskStatus.Done ? "error" : "calendar_today")</span>
+                                            @task.Deadline.Value.ToString("MMM dd")
+                                        </div>
+                                    }
+                                    @if (!string.IsNullOrEmpty(task.AssigneePhotoUrl))
+                                    {
+                                        <img src="@task.AssigneePhotoUrl" alt="@task.AssigneeName" class="rounded-circle border border-border-light" title="@task.AssigneeName" style="width: 24px; height: 24px; object-fit: cover;">
+                                    }
+                                    else
+                                    {
+                                        <div class="rounded-circle bg-light border border-border-light border-dashed d-flex align-items-center justify-content-center text-muted-light" title="@task.AssigneeName" style="width: 24px; height: 24px;">
+                                            <span class="material-symbols-outlined" style="font-size: 12px;">person_add</span>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        }
                     </div>
                 </div>
+            }
+        }
+
+        @if (!Model.Tasks.Any())
+        {
+            <div class="text-center py-5 border border-dashed border-border-light rounded-3 bg-surface-light">
+                <span class="material-symbols-outlined text-muted-light fs-1 mb-2">task_alt</span>
+                <p class="text-muted-light mb-3">No tasks found for this project.</p>
+                <a asp-controller="ProjectTask" asp-action="Create" asp-route-projectId="@Model.ProjectId" class="btn btn-outline-primary btn-sm">
+                    Create First Task
+                </a>
             </div>
-        </div>
+        }
         
     </div>
 </div>
