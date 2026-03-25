@@ -5,7 +5,11 @@ using System.Linq.Expressions;
 
 namespace MvcProject.Repositories.Implementations
 {
+<<<<<<< HEAD
     public class Repository<T> : IRepository<T> where T : class
+=======
+    public class Repository<T> : IRepository<T> where T : BaseEntity
+>>>>>>> 8ede1be8af9ec82583cabefb08c524b5a2f670d2
     {
         protected readonly ApplicationDbContext _context;
         protected readonly DbSet<T> _dbSet;

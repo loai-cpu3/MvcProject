@@ -16,7 +16,11 @@ namespace MvcProject.Data
         public DbSet<AuditLog> AuditLogs { get; set; }
         public DbSet<ProjectUser> ProjectUsers { get; set; }
         public DbSet<Notification> Notifications { get; set; }
+<<<<<<< HEAD
        
+=======
+        public DbSet<Attachment> Attachments { get; set; }
+>>>>>>> 8ede1be8af9ec82583cabefb08c524b5a2f670d2
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -104,6 +108,26 @@ namespace MvcProject.Data
                 .WithMany()
                 .HasForeignKey(n => n.SenderUserId)
                 .OnDelete(DeleteBehavior.NoAction);
+<<<<<<< HEAD
+=======
+
+            // Attachment configuration
+            builder.Entity<Attachment>(b =>
+            {
+                b.HasKey(a => a.Id);
+                b.Property(a => a.OriginalFileName).HasMaxLength(260).IsRequired();
+                b.Property(a => a.StoredFileName).HasMaxLength(260).IsRequired();
+                b.Property(a => a.ContentType).HasMaxLength(100).IsRequired();
+                b.Property(a => a.Size).IsRequired();
+                b.Property(a => a.UploadedAt).IsRequired();
+
+                // FK to ProjectTask
+                b.HasOne(a => a.ProjectTask)
+                    .WithMany(t => t.Attachments)
+                    .HasForeignKey(a => a.ProjectTaskId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+>>>>>>> 8ede1be8af9ec82583cabefb08c524b5a2f670d2
         }
     }
 }

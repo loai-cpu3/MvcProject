@@ -360,4 +360,13 @@ MigrationBackup/
 .ionide/
 
 # Fody - auto-generated XML schema
+<<<<<<< HEAD
 FodyWeavers.xsd
+=======
+FodyWeavers.xsd
+/.agents/skills
+/DESIGN.md
+/skills-lock.json
+/.stitch
+/.vscode
+>>>>>>> 8ede1be8af9ec82583cabefb08c524b5a2f670d2

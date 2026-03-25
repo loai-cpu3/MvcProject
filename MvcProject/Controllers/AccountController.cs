@@ -1,12 +1,16 @@
 using Microsoft.AspNetCore.Mvc;
+<<<<<<< HEAD
 using Microsoft.AspNetCore.Identity;
 using MvcProject.Models.Domain;
 using MvcProject.ViewModels;
+=======
+>>>>>>> 8ede1be8af9ec82583cabefb08c524b5a2f670d2
 
 namespace MvcProject.Controllers
 {
     public class AccountController : Controller
     {
+<<<<<<< HEAD
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IWebHostEnvironment _webHostEnvironment;
@@ -118,10 +122,13 @@ namespace MvcProject.Controllers
             return View("Login", loginReq);
         }
         [HttpGet]
+=======
+>>>>>>> 8ede1be8af9ec82583cabefb08c524b5a2f670d2
         public IActionResult Login()
         {
             return View();
         }
+<<<<<<< HEAD
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
@@ -131,3 +138,7 @@ namespace MvcProject.Controllers
         }
     }
 }
+=======
+    }
+}
+>>>>>>> 8ede1be8af9ec82583cabefb08c524b5a2f670d2

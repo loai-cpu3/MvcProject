@@ -1,5 +1,8 @@
+<<<<<<< HEAD
 @using MvcProject.ViewModels
 @model ApplicationUserLoginVM
+=======
+>>>>>>> 8ede1be8af9ec82583cabefb08c524b5a2f670d2
 @{
     ViewData["Title"] = "Login";
     Layout = "_AuthLayout";
@@ -68,6 +71,7 @@
             </div>
 
             <!-- Form -->
+<<<<<<< HEAD
             <form asp-action="Login" asp-Controller="Account" class="d-flex flex-column gap-3" method="POST">
                 @Html.AntiForgeryToken()
                 <div  class="text-danger"></div>
@@ -81,25 +85,44 @@
                     </div>
                     <span asp-validation-for="Email" class="text-danger"></span>
 
+=======
+            <form action="#" class="d-flex flex-column gap-3" method="POST">
+                <!-- Email Field -->
+                <div>
+                    <div class="input-auth-field rounded-3 d-flex align-items-center px-3 py-2">
+                        <input type="email" class="form-control bg-transparent border-0 shadow-none p-0 text-dark" id="email" name="email" placeholder="Email Address" required />
+                    </div>
+>>>>>>> 8ede1be8af9ec82583cabefb08c524b5a2f670d2
                 </div>
 
                 <!-- Password Field -->
                 <div>
                     <div class="input-auth-field rounded-3 d-flex align-items-center px-3 py-2">
+<<<<<<< HEAD
                         <input type="password" class="form-control bg-transparent border-0 shadow-none p-0 text-dark" id="password" asp-for="Password" placeholder="Password" required />
 
+=======
+                        <input type="password" class="form-control bg-transparent border-0 shadow-none p-0 text-dark" id="password" name="password" placeholder="Password" required />
+>>>>>>> 8ede1be8af9ec82583cabefb08c524b5a2f670d2
                         <button type="button" class="btn btn-link text-muted p-0 ms-2 text-decoration-none shadow-none">
                             <i class="fa-solid fa-eye-slash"></i>
                         </button>
                     </div>
+<<<<<<< HEAD
                     <span asp-validation-for="Password" class="text-danger"></span>
 
+=======
+>>>>>>> 8ede1be8af9ec82583cabefb08c524b5a2f670d2
                 </div>
 
                 <!-- Options Row -->
                 <div class="d-flex align-items-center justify-content-between mt-2">
                     <div class="form-check mb-0">
+<<<<<<< HEAD
                         <input class="form-check-input" type="checkbox" id="remember-me" asp-for="RememberMe">
+=======
+                        <input class="form-check-input" type="checkbox" id="remember-me" name="remember-me">
+>>>>>>> 8ede1be8af9ec82583cabefb08c524b5a2f670d2
                         <label class="form-check-label text-dark small" for="remember-me">
                             Remember me
                         </label>
@@ -120,7 +143,11 @@
             <!-- Sign Up Link -->
             <p class="text-center text-muted small mt-4 mb-0">
                 Don't have an account? 
+<<<<<<< HEAD
                 <a asp-action="Register" asp-controller="Account" class="text-decoration-none fw-medium ms-1" style="color: #6366f1;">Create Account</a>
+=======
+                <a href="#" class="text-decoration-none fw-medium ms-1" style="color: #6366f1;">Create Account</a>
+>>>>>>> 8ede1be8af9ec82583cabefb08c524b5a2f670d2
             </p>
         </div>
     </section>

@@ -4,7 +4,16 @@ using MvcProject.Data;
 using MvcProject.Models.Domain;
 using MvcProject.Repositories.Interfaces;
 using MvcProject.Repositories.Implementations;
+<<<<<<< HEAD
 using MvcProject.Authorization.Requirements;
+=======
+using MvcProject.Authorization.Handlers;
+using MvcProject.Authorization.Requirements;
+using Microsoft.AspNetCore.Authorization;
+using MvcProject.Services;
+using MvcProject.Services.Interfaces;
+using MvcProject.Hubs;
+>>>>>>> 8ede1be8af9ec82583cabefb08c524b5a2f670d2
 
 namespace MvcProject
 {
@@ -16,6 +25,10 @@ namespace MvcProject
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+<<<<<<< HEAD
+=======
+            builder.Services.AddSignalR();
+>>>>>>> 8ede1be8af9ec82583cabefb08c524b5a2f670d2
              
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -37,7 +50,18 @@ namespace MvcProject
                     policy.Requirements.Add(new ProjectRequirement(ProjectRole.Member)));
             });
 
+<<<<<<< HEAD
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+=======
+            builder.Services.AddScoped<IAuthorizationHandler, ProjectRoleHandler>();
+
+            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+            builder.Services.AddScoped<IDashboardService, DashboardService>();
+            builder.Services.AddScoped<IProjectService, ProjectService>();
+
+            builder.Services.AddScoped<IAttachmentService, AttachmentService>();
+
+>>>>>>> 8ede1be8af9ec82583cabefb08c524b5a2f670d2
 
             var app = builder.Build();
 
@@ -61,6 +85,12 @@ namespace MvcProject
                 pattern: "{controller=Home}/{action=Index}/{id?}")
                 .WithStaticAssets();
 
+<<<<<<< HEAD
+=======
+            app.MapHub<TaskHub>("/hubs/task");
+            app.MapHub<CommentHub>("/hubs/comment");
+
+>>>>>>> 8ede1be8af9ec82583cabefb08c524b5a2f670d2
             app.Run();
         }
     }
