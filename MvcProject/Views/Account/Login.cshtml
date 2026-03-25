@@ -1,3 +1,5 @@
+@using MvcProject.ViewModels
+@model ApplicationUserLoginVM
 @{
     ViewData["Title"] = "Login";
     Layout = "_AuthLayout";
@@ -66,28 +68,38 @@
             </div>
 
             <!-- Form -->
-            <form action="#" class="d-flex flex-column gap-3" method="POST">
+            <form asp-action="Login" asp-Controller="Account" class="d-flex flex-column gap-3" method="POST">
+                @Html.AntiForgeryToken()
+                <div  class="text-danger"></div>
+
                 <!-- Email Field -->
                 <div>
                     <div class="input-auth-field rounded-3 d-flex align-items-center px-3 py-2">
-                        <input type="email" class="form-control bg-transparent border-0 shadow-none p-0 text-dark" id="email" name="email" placeholder="Email Address" required />
+                        
+                        <input type="email" class="form-control bg-transparent border-0 shadow-none p-0 text-dark" id="email" asp-for="Email" placeholder="Email Address" required />
+
                     </div>
+                    <span asp-validation-for="Email" class="text-danger"></span>
+
                 </div>
 
                 <!-- Password Field -->
                 <div>
                     <div class="input-auth-field rounded-3 d-flex align-items-center px-3 py-2">
-                        <input type="password" class="form-control bg-transparent border-0 shadow-none p-0 text-dark" id="password" name="password" placeholder="Password" required />
+                        <input type="password" class="form-control bg-transparent border-0 shadow-none p-0 text-dark" id="password" asp-for="Password" placeholder="Password" required />
+
                         <button type="button" class="btn btn-link text-muted p-0 ms-2 text-decoration-none shadow-none">
                             <i class="fa-solid fa-eye-slash"></i>
                         </button>
                     </div>
+                    <span asp-validation-for="Password" class="text-danger"></span>
+
                 </div>
 
                 <!-- Options Row -->
                 <div class="d-flex align-items-center justify-content-between mt-2">
                     <div class="form-check mb-0">
-                        <input class="form-check-input" type="checkbox" id="remember-me" name="remember-me">
+                        <input class="form-check-input" type="checkbox" id="remember-me" asp-for="RememberMe">
                         <label class="form-check-label text-dark small" for="remember-me">
                             Remember me
                         </label>
@@ -108,7 +120,7 @@
             <!-- Sign Up Link -->
             <p class="text-center text-muted small mt-4 mb-0">
                 Don't have an account? 
-                <a href="#" class="text-decoration-none fw-medium ms-1" style="color: #6366f1;">Create Account</a>
+                <a asp-action="Register" asp-controller="Account" class="text-decoration-none fw-medium ms-1" style="color: #6366f1;">Create Account</a>
             </p>
         </div>
     </section>

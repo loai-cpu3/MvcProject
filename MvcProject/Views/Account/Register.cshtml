@@ -1,0 +1,152 @@
+﻿@model MvcProject.ViewModels.ApplicationUserRegisterVM
+
+@{
+    ViewData["Title"] = "Register";
+    Layout = "_AuthLayout";
+}
+
+<main class="d-flex flex-column flex-md-row w-100 vh-100">
+    <!-- Left Panel -->
+    <section class="left-bg-gradient position-relative flex-grow-1 d-none d-md-flex flex-column justify-content-between p-5 text-white overflow-hidden">
+        <div class="glass-shape-1"></div>
+        <div class="glass-shape-2"></div>
+
+        <!-- Top Branding -->
+        <div class="position-relative z-1 d-flex align-items-center gap-2">
+            <div class="d-flex align-items-center justify-content-center rounded" style="width: 32px; height: 32px; background-color: rgba(255,255,255,0.2);">
+                <svg class="text-white" style="width: 20px; height: 20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect height="18" rx="4" stroke-width="2" width="18" x="3" y="3"></rect><path d="M8 10v4m4-6v6m4-2v2" stroke-linecap="round" stroke-width="2"></path></svg>
+            </div>
+            <span class="fs-5 fw-semibold tracking-wide">Velocity</span>
+        </div>
+
+        <!-- Center Content -->
+        <div class="position-relative z-1 mt-5 mb-auto" style="max-width: 32rem;">
+            <h1 class="font-display fw-bold text-white mb-4" style="font-size: 3.5rem; line-height: 1.1;">
+                Start your<br />journey.
+            </h1>
+            <p class="fs-5 text-white-50 fw-light" style="line-height: 1.6;">
+                Join Velocity and experience a cleaner, smarter way to manage your tasks and collaborate with your team.
+            </p>
+        </div>
+
+        <!-- Bottom Carousel Indicators -->
+        <div class="position-relative z-1 d-flex gap-2 pb-3">
+            <div class="bg-white rounded-pill" style="width: 32px; height: 4px;"></div>
+            <div class="rounded-pill" style="width: 4px; height: 4px; background-color: rgba(255,255,255,0.5);"></div>
+            <div class="rounded-pill" style="width: 4px; height: 4px; background-color: rgba(255,255,255,0.5);"></div>
+        </div>
+    </section>
+
+    <!-- Right Panel -->
+    <section class="flex-grow-1 d-flex align-items-center justify-content-center p-4 p-sm-5 position-relative" style="background-color: #fafafa;">
+
+        <!-- Register Card -->
+        <div class="w-100 bg-white rounded-4 shadow-lg position-relative z-1 p-4 p-sm-5" style="max-width: 28rem;">
+            <div class="mb-4">
+                <h2 class="fs-2 fw-bold text-dark mb-2">Create account</h2>
+                <p class="text-muted small">Fill in your details to get started.</p>
+            </div>
+
+            <!-- Form -->
+            <form asp-action="Register" asp-controller="Account" method="post"
+                  enctype="multipart/form-data" class="d-flex flex-column gap-3">
+                @Html.AntiForgeryToken()
+
+                <!-- First Name & Last Name -->
+                <div class="d-flex gap-2">
+                    <div class="flex-fill">
+                        <div class="input-auth-field rounded-3 d-flex align-items-center px-3 py-2">
+                            <input asp-for="FirstName"
+                                   class="form-control bg-transparent border-0 shadow-none p-0 text-dark"
+                                   placeholder="First Name" />
+                        </div>
+                        <span asp-validation-for="FirstName" class="text-danger" style="font-size: 0.75rem;"></span>
+                    </div>
+                    <div class="flex-fill">
+                        <div class="input-auth-field rounded-3 d-flex align-items-center px-3 py-2">
+                            <input asp-for="LastName"
+                                   class="form-control bg-transparent border-0 shadow-none p-0 text-dark"
+                                   placeholder="Last Name" />
+                        </div>
+                        <span asp-validation-for="LastName" class="text-danger" style="font-size: 0.75rem;"></span>
+                    </div>
+                </div>
+
+                <!-- Email -->
+                <div>
+                    <div class="input-auth-field rounded-3 d-flex align-items-center px-3 py-2">
+                        <input asp-for="Email"
+                               class="form-control bg-transparent border-0 shadow-none p-0 text-dark"
+                               placeholder="Email Address" />
+                    </div>
+                    <span asp-validation-for="Email" class="text-danger" style="font-size: 0.75rem;"></span>
+                </div>
+
+                <!-- Password -->
+                <div>
+                    <div class="input-auth-field rounded-3 d-flex align-items-center px-3 py-2">
+                        <input asp-for="Password"
+                               class="form-control bg-transparent border-0 shadow-none p-0 text-dark"
+                               placeholder="Password" />
+                        <button type="button" onclick="togglePassword('Password')" class="btn btn-link text-muted p-0 ms-2 text-decoration-none shadow-none">
+                            <i class="fa-solid fa-eye-slash" id="Password-icon"></i>
+                        </button>
+                    </div>
+                    <span asp-validation-for="Password" class="text-danger" style="font-size: 0.75rem;"></span>
+                </div>
+
+                <!-- Confirm Password -->
+                <div>
+                    <div class="input-auth-field rounded-3 d-flex align-items-center px-3 py-2">
+                        <input asp-for="ConfirmPassowrd"
+                               class="form-control bg-transparent border-0 shadow-none p-0 text-dark"
+                               placeholder="Confirm Password" />
+                        <button type="button" onclick="togglePassword('ConfirmPassowrd')" class="btn btn-link text-muted p-0 ms-2 text-decoration-none shadow-none">
+                            <i class="fa-solid fa-eye-slash" id="ConfirmPassowrd-icon"></i>
+                        </button>
+                    </div>
+                    <span asp-validation-for="ConfirmPassowrd" class="text-danger" style="font-size: 0.75rem;"></span>
+                </div>
+
+                <!-- General Errors -->
+                <div asp-validation-summary="ModelOnly" class="text-danger small"></div>
+                <div>
+                    <label class="form-label small fw-medium text-muted">Profile Picture (optional)</label>
+                    <input asp-for="ProfilePicture" type="file" accept=".jpg,.jpeg,.png,.webp"
+                           class="form-control bg-transparent border-0 shadow-none p-0 text-dark input-auth-field rounded-3 px-3 py-2" />
+                    <span asp-validation-for="ProfilePicture" class="text-danger" style="font-size: 0.75rem;"></span>
+                </div>
+                <!-- Submit Button -->
+                <div class="mt-2">
+                    <button type="submit" class="btn w-100 rounded-pill text-white fw-medium py-2 shadow-sm" style="background-color: #6366f1;">
+                        Create Account
+                    </button>
+                </div>
+            </form>
+
+            <!-- Login Link -->
+            <p class="text-center text-muted small mt-4 mb-0">
+                Already have an account?
+                <a asp-action="Login" asp-controller="Account" class="text-decoration-none fw-medium ms-1" style="color: #6366f1;">Sign In</a>
+            </p>
+        </div>
+    </section>
+</main>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+
+    <script>
+        function togglePassword(fieldId) {
+            const input = document.getElementById(fieldId);
+            const icon  = document.getElementById(fieldId + '-icon');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.replace('fa-eye-slash', 'fa-eye');
+            } else {
+                input.type = 'password';
+                icon.classList.replace('fa-eye', 'fa-eye-slash');
+            }
+        }
+    </script>
+}

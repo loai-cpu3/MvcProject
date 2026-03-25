@@ -1,3 +1,4 @@
+@using Microsoft.AspNetCore.Identity
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -87,10 +88,93 @@
                     <span class="material-symbols-outlined">notifications</span>
                     <span class="position-absolute rounded-circle bg-danger border border-white" style="width: 8px; height: 8px; top: 6px; right: 6px;"></span>
                 </button>
-                <div class="ms-1 border border-2 border-white shadow-sm overflow-hidden" style="width: 32px; height: 32px; border-radius: 50%; cursor: pointer;">
+                @* <div class="ms-1 border border-2 border-white shadow-sm overflow-hidden" style="width: 32px; height: 32px; border-radius: 50%; cursor: pointer;">
                     <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuBfanUbcrhevPueAU9SDuQ2k-054rYQd_P0AQg_N81Iv-G5sSgoZVyABcYvPM6hsbxwh2oxfU7DwnCkDlAjmkQ7U0bY2cxXmyTFZBpxOtRRvAlnsDaijhIjPzDKbYcZVXgv-MnNd7IiS6YC5z5ijuxF-twMZfroLXJ-KP2un4YRyN0WnOCuQOwXaQnIThJvkVspYsfHCbhLDauR1sGtMeKcM8fDYb6Mxh_ifn_jCEwtrWjxzDt-kGtuGqMEm6k1eRV41xx1eIHsW6Jb" alt="User profile" style="width: 100%; height: 100%; object-fit: cover;" />
-                </div>
+                </div> *@
             </div>
+            @if (@User.Identity.IsAuthenticated)
+            {
+
+
+                <div class="d-flex align-items-center gap-2 gap-sm-3">
+                    <button class="btn btn-primary d-flex align-items-center gap-2 rounded-3 font-display fw-semibold border-0 shadow-sm" style="font-size: 0.875rem; padding: 0.4rem 1rem;">
+                        <span class="material-symbols-outlined fs-6" style="vertical-align: middle;">add</span>
+                        <span class="d-none d-sm-inline">Quick Add</span>
+                    </button>
+                    <div class="vr bg-border-light mx-1 d-none d-sm-block" style="height: 24px; opacity: 1;"></div>
+                    <button class="btn btn-link p-2 text-muted-light position-relative rounded-circle d-flex align-items-center justify-content-center text-decoration-none border-0 shadow-none hover-bg-light">
+                        <span class="material-symbols-outlined">notifications</span>
+                        <span class="position-absolute rounded-circle bg-danger border border-white" style="width: 8px; height: 8px; top: 6px; right: 6px;"></span>
+                    </button>
+
+                    @inject UserManager<MvcProject.Models.Domain.ApplicationUser> UserManager
+                    @{
+                        var currentUser = await UserManager.GetUserAsync(User);
+                    }
+
+                    <div class="dropdown">
+                        <div class="ms-1 border border-2 border-white shadow-sm overflow-hidden"
+                             style="width: 32px; height: 32px; border-radius: 50%; cursor: pointer;"
+                             data-bs-toggle="dropdown"
+                             aria-expanded="false">
+
+                            @if (!string.IsNullOrEmpty(currentUser?.ProfilePictureUrl))
+                            {
+                        
+                                <img src="@currentUser.ProfilePictureUrl" alt="Profile"
+                                     style="width: 100%; height: 100%; object-fit: cover;" />
+                            }
+                            else
+                            {
+                               
+                                <div class="w-100 h-100 d-flex align-items-center justify-content-center text-white fw-bold"
+                                     style="background-color: #6366f1; font-size: 0.8rem;">
+                                    @currentUser?.FirstName?.Substring(0, 1).ToUpper()
+                                </div>
+                            }
+
+                        </div>
+
+                        <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2">
+                            <li class="px-3 py-2">
+                                <p class="mb-0 fw-semibold text-dark small">
+                                    @currentUser?.FirstName @currentUser?.LastName
+                                </p>
+                                <p class="mb-0 text-muted" style="font-size: 11px;">
+                                    @currentUser?.Email
+                                </p>
+                            </li>
+                            <li><hr class="dropdown-divider my-1"></li>
+                            <li>
+                                <form asp-action="Logout" asp-controller="Account" method="POST">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="dropdown-item small text-danger">
+                                        <i class="fa-solid fa-right-from-bracket me-2"></i>Logout
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                    ```
+
+                 
+                </div>
+            }
+            else
+            {
+                <div class="d-flex align-items-center gap-2">
+                    <a asp-controller="Account" asp-action="Login"
+                           class="btn btn-outline-secondary rounded-pill px-3 py-1"
+                           style="font-size: 0.875rem;">
+                        Login
+                    </a>
+                    <a asp-controller="Account" asp-action="Register"
+                           class="btn btn-primary rounded-pill px-3 py-1"
+                           style="font-size: 0.875rem; background-color: #6366f1; border-color: #6366f1;">
+                        Register
+                    </a>
+                </div>
+            }
         </header>
 
         <!-- Page Content -->
