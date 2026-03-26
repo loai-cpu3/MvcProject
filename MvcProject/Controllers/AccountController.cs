@@ -97,24 +97,25 @@ namespace MvcProject.Controllers
         {
             if (ModelState.IsValid)
             {
-                ApplicationUser user = await _userManager.FindByEmailAsync(loginReq.Email);
 
-                if (user == null)
+                ApplicationUser? user = await _userManager.FindByEmailAsync(loginReq.Email);
+
+                bool validCredentials = false;
+                if (user != null)
                 {
-                    ModelState.AddModelError("Email", "This email is not registered");
+                    validCredentials = await _userManager.CheckPasswordAsync(user, loginReq.Password);
+                }
+
+                if (!validCredentials)
+                {
+                    ModelState.AddModelError(string.Empty, "Invalid credentials.");
                     return View("Login", loginReq);
                 }
 
-                bool found = await _userManager.CheckPasswordAsync(user, loginReq.Password);
-                if (!found)
-                {
-                    ModelState.AddModelError("Password", "Incorrect password");
-                    return View("Login", loginReq);
-                }
-
-                await _signInManager.SignInAsync(user, loginReq.RememberMe);
+                await _signInManager.SignInAsync(user!, loginReq.RememberMe);
                 return RedirectToAction("Index", "Home");
             }
+
             return View("Login", loginReq);
         }
         [HttpGet]
