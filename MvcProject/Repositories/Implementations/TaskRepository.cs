@@ -28,13 +28,25 @@ namespace MvcProject.Repositories.Implementations
 
         }
 
-        public async Task<int> GetTotalPendingTasksCountAsync()
+        public async Task<int> GetTotalPendingTasksCountAsync(string userId)
         {
-            return await _dbSet.CountAsync(t => t.Status != TaskStatus.Done);
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                throw new ArgumentException("Value cannot be null or whitespace.", nameof(userId));
+            }
+
+            return await _dbSet.CountAsync(t =>
+                t.Status != TaskStatus.Done &&
+                t.Project.Members.Any(m => m.UserId == userId));
         }
 
-        public async Task<List<ProjectTask>> GetRecentTasksAsync(int count)
+        public async Task<List<ProjectTask>> GetRecentTasksAsync(string userId, int count)
         {
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                throw new ArgumentException("Value cannot be null or whitespace.", nameof(userId));
+            }
+
             if (count <= 0)
             {
                 return new List<ProjectTask>();
@@ -43,7 +55,7 @@ namespace MvcProject.Repositories.Implementations
             return await _dbSet
                 .AsNoTracking()
                 .Include(t => t.Project)
-                .Where(t => t.Status != TaskStatus.Done)
+                .Where(t => t.Status != TaskStatus.Done && (t.AssigneeId == userId || t.AssigneeId == null))
                 .OrderBy(t => t.Deadline ?? DateTime.MaxValue)
                 .ThenByDescending(t => t.CreatedAt)
                 .Take(count)

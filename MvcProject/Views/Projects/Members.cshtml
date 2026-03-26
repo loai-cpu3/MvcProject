@@ -1,0 +1,94 @@
+@model MvcProject.ViewModels.Projects.ProjectMembersViewModel
+@{
+    ViewData["Title"] = "Project Members";
+}
+
+<div class="mx-auto pb-5 d-flex flex-column gap-4" style="max-width: 1200px;">
+    <div class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-2">
+                <a asp-controller="Projects" asp-action="Details" asp-route-projectId="@Model.ProjectId" class="btn btn-light bg-surface-light border-border-light rounded-3 px-2 py-1 text-muted-light">
+                    <span class="material-symbols-outlined fs-6">arrow_back</span>
+                </a>
+                <h2 class="font-display fw-bold fs-4 text-dark mb-0">Members</h2>
+            </div>
+            <p class="text-muted-light small mb-0">Manage members for <span class="fw-semibold text-dark">@Model.ProjectTitle</span>.</p>
+        </div>
+        <a asp-controller="Projects" asp-action="AddMembers" asp-route-projectId="@Model.ProjectId" class="btn btn-primary rounded-3 shadow-sm">Add Member</a>
+    </div>
+
+    @if (Model.Members.Any())
+    {
+        <div class="row g-4">
+            @for (var i = 0; i < Model.Members.Count; i++)
+            {
+                var member = Model.Members[i];
+                var actionModalId = $"memberActionModal{i}";
+                var deleteModalId = $"memberDeleteModal{i}";
+                <div class="col-12 col-md-6 col-lg-4 col-xl-3">
+                    <div class="bg-surface-light p-4 rounded-4 border border-border-light shadow-soft position-relative text-center w-100 h-100">
+                        <button type="button" class="btn btn-link position-absolute top-0 end-0 p-3 text-muted-light shadow-none text-decoration-none" data-bs-toggle="modal" data-bs-target="#@actionModalId">
+                            <span class="material-symbols-outlined fs-5">more_vert</span>
+                        </button>
+                        <div class="position-relative mx-auto mt-2 mb-3" style="width: 80px; height: 80px;">
+                            @if (!string.IsNullOrWhiteSpace(member.AvatarUrl))
+                            {
+                                <img src="@member.AvatarUrl" alt="@member.FullName" class="w-100 h-100 rounded-circle border border-4 border-light shadow-inner object-fit-cover">
+                            }
+                            else
+                            {
+                                var initials = MvcProject.Helpers.AvatarHelper.GetInitials(member.FullName);
+                                <div class="w-100 h-100 rounded-circle border border-4 border-light shadow-inner d-flex align-items-center justify-content-center fw-bold text-primary" style="background-color: #EEF2FF;">@initials</div>
+                            }
+                        </div>
+                        <h3 class="font-display fw-bold text-dark fs-6 mb-1 text-truncate">@member.FullName</h3>
+                        <p class="text-muted-light mb-2 small text-truncate">@member.Email</p>
+                        <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill fw-semibold px-3 py-2">@member.Role</span>
+                    </div>
+                </div>
+
+                <div class="modal fade" id="@actionModalId" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered modal-sm">
+                        <div class="modal-content border-0 shadow-soft rounded-4">
+                            <div class="modal-header border-bottom border-border-light">
+                                <h5 class="modal-title font-display fw-bold text-dark">Member Actions</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body d-flex flex-column gap-2">
+                                <a asp-controller="Projects" asp-action="EditMember" asp-route-projectId="@Model.ProjectId" asp-route-userId="@member.UserId" class="btn btn-light bg-surface-light border-border-light text-start">Edit</a>
+                                <button type="button" class="btn btn-outline-danger text-start" data-bs-target="#@deleteModalId" data-bs-toggle="modal">Delete</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal fade" id="@deleteModalId" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content border-0 shadow-soft rounded-4">
+                            <div class="modal-header border-bottom border-border-light">
+                                <h5 class="modal-title font-display fw-bold text-dark">Remove Member</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p class="mb-0 text-muted-light">Are you sure you want to remove <span class="fw-semibold text-dark">@member.FullName</span> from this project?</p>
+                            </div>
+                            <div class="modal-footer border-top border-border-light">
+                                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                                <form asp-controller="Projects" asp-action="RemoveUserFromProject" asp-route-projectId="@Model.ProjectId" method="post">
+                                    <input type="hidden" name="userId" value="@member.UserId" />
+                                    <button type="submit" class="btn btn-danger">Delete</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="bg-surface-light rounded-3 p-4 border border-border-light shadow-soft text-muted-light">
+            No members found for this project.
+        </div>
+    }
+</div>

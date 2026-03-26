@@ -14,7 +14,7 @@ namespace MvcProject.Repositories.Implementations
 
         public ApplicationUserRepository(ApplicationDbContext context)
         {
-
+            _context = context;
             _dbSet = _context.Set<ApplicationUser>();
         }
 
@@ -41,6 +41,27 @@ namespace MvcProject.Repositories.Implementations
         public void Delete(ApplicationUser entity)
         {
             _dbSet.Remove(entity);
+        }
+
+        public async Task<List<ApplicationUser>> SearchByNameOrEmailAsync(string searchTerm, int maxResults)
+        {
+            if (string.IsNullOrWhiteSpace(searchTerm) || maxResults <= 0)
+            {
+                return new List<ApplicationUser>();
+            }
+
+            var term = searchTerm.Trim();
+
+            return await _dbSet
+                .AsNoTracking()
+                .Where(user =>
+                    user.FirstName.Contains(term) ||
+                    user.LastName.Contains(term) ||
+                    user.Email!.Contains(term))
+                .OrderBy(user => user.FirstName)
+                .ThenBy(user => user.LastName)
+                .Take(maxResults)
+                .ToListAsync();
         }
     }
 }

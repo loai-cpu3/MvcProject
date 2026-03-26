@@ -1,0 +1,78 @@
+@model MvcProject.ViewModels.Projects.AddProjectMembersViewModel
+@{
+    ViewData["Title"] = "Add Members";
+}
+
+<div class="mx-auto pb-5 d-flex flex-column gap-4" style="max-width: 1000px;">
+    <div class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-2">
+                <a asp-controller="Projects" asp-action="Members" asp-route-projectId="@Model.ProjectId" class="btn btn-light bg-surface-light border-border-light rounded-3 px-2 py-1 text-muted-light">
+                    <span class="material-symbols-outlined fs-6">arrow_back</span>
+                </a>
+                <h2 class="font-display fw-bold fs-4 text-dark mb-0">Add Members</h2>
+            </div>
+            <p class="text-muted-light small mb-0">Search users and add them to <span class="fw-semibold text-dark">@Model.ProjectTitle</span>.</p>
+        </div>
+    </div>
+
+    <div class="bg-surface-light rounded-4 border border-border-light shadow-soft p-4">
+        <form asp-controller="Projects" asp-action="AddMembers" method="get" class="d-flex gap-2">
+            <input type="hidden" name="projectId" value="@Model.ProjectId" />
+            <input type="text" name="searchTerm" value="@Model.SearchTerm" class="form-control" placeholder="Search by first name, last name, or email" />
+            <button type="submit" class="btn btn-primary">Search</button>
+        </form>
+    </div>
+
+    <div class="bg-surface-light rounded-4 border border-border-light shadow-soft overflow-hidden">
+        @if (!string.IsNullOrWhiteSpace(Model.SearchTerm))
+        {
+            if (Model.MatchedUsers.Any())
+            {
+                <div class="list-group list-group-flush">
+                    @foreach (var user in Model.MatchedUsers)
+                    {
+                        <div class="list-group-item bg-transparent border-border-light d-flex align-items-center justify-content-between py-3 px-4">
+                            <div class="d-flex align-items-center gap-3 min-w-0">
+                                @if (!string.IsNullOrWhiteSpace(user.AvatarUrl))
+                                {
+                                    <img src="@user.AvatarUrl" alt="@user.FullName" class="rounded-circle border border-border-light object-fit-cover" style="width: 42px; height: 42px;" />
+                                }
+                                else
+                                {
+                                    var initials = MvcProject.Helpers.AvatarHelper.GetInitials(user.FullName);
+                                    <div class="rounded-circle border border-border-light d-flex align-items-center justify-content-center fw-semibold text-primary" style="width: 42px; height: 42px; background-color: #EEF2FF;">@initials</div>
+                                }
+                                <div class="min-w-0">
+                                    <p class="mb-0 fw-semibold text-dark text-truncate">@user.FullName</p>
+                                    <p class="mb-0 small text-muted-light text-truncate">@user.Email</p>
+                                </div>
+                            </div>
+
+                            @if (user.AlreadyMember)
+                            {
+                                <span class="badge bg-light text-muted-light rounded-pill">Already member</span>
+                            }
+                            else
+                            {
+                                <form asp-controller="Projects" asp-action="AddUserToProject" asp-route-projectId="@Model.ProjectId" method="post" class="m-0">
+                                    <input type="hidden" name="userId" value="@user.UserId" />
+                                    <input type="hidden" name="role" value="Member" />
+                                    <button type="submit" class="btn btn-sm btn-primary">Add</button>
+                                </form>
+                            }
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="p-4 text-muted-light">No users matched your search.</div>
+            }
+        }
+        else
+        {
+            <div class="p-4 text-muted-light">Enter a name or email to search users.</div>
+        }
+    </div>
+</div>

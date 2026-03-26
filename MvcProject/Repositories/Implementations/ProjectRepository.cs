@@ -28,6 +28,7 @@ namespace MvcProject.Repositories.Implementations
             return await _dbSet
                 .AsNoTracking()
                 .Include(p => p.Tasks)
+                .ThenInclude(t => t.Assignee)
                 .FirstOrDefaultAsync(p => p.Id == projectId);
         }
     }

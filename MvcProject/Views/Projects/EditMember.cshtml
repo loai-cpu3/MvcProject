@@ -1,0 +1,74 @@
+@model MvcProject.ViewModels.Projects.EditProjectMemberViewModel
+@{
+    ViewData["Title"] = "Edit Member";
+}
+
+<div class="mx-auto pb-5 d-flex flex-column gap-4" style="max-width: 900px;">
+    <div class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-2">
+                <a asp-controller="Projects" asp-action="Members" asp-route-projectId="@Model.ProjectId" class="btn btn-light bg-surface-light border-border-light rounded-3 px-2 py-1 text-muted-light">
+                    <span class="material-symbols-outlined fs-6">arrow_back</span>
+                </a>
+                <h2 class="font-display fw-bold fs-4 text-dark mb-0">Edit Member</h2>
+            </div>
+            <p class="text-muted-light small mb-0">Update role or remove member from <span class="fw-semibold text-dark">@Model.ProjectTitle</span>.</p>
+        </div>
+    </div>
+
+    <div class="bg-surface-light rounded-4 border border-border-light shadow-soft p-4 p-sm-5">
+        <div class="d-flex flex-column flex-sm-row align-items-start align-items-sm-center gap-3 mb-4">
+            @if (!string.IsNullOrWhiteSpace(Model.AvatarUrl))
+            {
+                <img src="@Model.AvatarUrl" alt="@Model.FullName" class="rounded-circle border border-border-light object-fit-cover" style="width: 64px; height: 64px;">
+            }
+            else
+            {
+                var initials = MvcProject.Helpers.AvatarHelper.GetInitials(Model.FullName);
+                <div class="rounded-circle border border-border-light d-flex align-items-center justify-content-center fw-bold text-primary" style="width: 64px; height: 64px; background-color: #EEF2FF;">@initials</div>
+            }
+            <div>
+                <h3 class="font-display fw-bold fs-5 mb-1 text-dark">@Model.FullName</h3>
+                <p class="text-muted-light small mb-1">@Model.Email</p>
+                <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill fw-semibold">Current: @Model.CurrentRole</span>
+            </div>
+        </div>
+
+        <form asp-controller="Projects" asp-action="UpdateUserRoleInProject" asp-route-projectId="@Model.ProjectId" method="post" class="d-flex flex-column gap-3 mb-3">
+            <input type="hidden" name="userId" value="@Model.UserId" />
+            <div>
+                <label asp-for="NewRole" class="form-label fw-semibold text-dark"></label>
+                <select asp-for="NewRole" name="newRole" class="form-select" asp-items="Html.GetEnumSelectList<MvcProject.Models.Enums.ProjectRole>()"></select>
+                <span asp-validation-for="NewRole" class="text-danger small"></span>
+            </div>
+            <div class="d-flex justify-content-end">
+                <button type="submit" class="btn btn-primary">Update Role</button>
+            </div>
+        </form>
+
+        <div class="border-top border-border-light pt-3 d-flex justify-content-end">
+            <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#confirmRemoveMemberModal">Delete Member</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="confirmRemoveMemberModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-soft rounded-4">
+            <div class="modal-header border-bottom border-border-light">
+                <h5 class="modal-title font-display fw-bold text-dark">Remove Member</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-0 text-muted-light">Are you sure you want to remove <span class="fw-semibold text-dark">@Model.FullName</span> from this project?</p>
+            </div>
+            <div class="modal-footer border-top border-border-light">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                <form asp-controller="Projects" asp-action="RemoveUserFromProject" asp-route-projectId="@Model.ProjectId" method="post">
+                    <input type="hidden" name="userId" value="@Model.UserId" />
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

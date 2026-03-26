@@ -8,8 +8,8 @@ using System.Security.Claims;
 namespace MvcProject.Controllers
 {
 
-    
 
+    [Authorize]
     public class ProjectsController : Controller
     {
         private readonly IProjectService _projectService;
@@ -31,11 +31,58 @@ namespace MvcProject.Controllers
             return View(model);
         }
 
+        [ProjectAuthorize(ProjectRole.Admin)]
+        public async Task<IActionResult> AddMembers([FromQuery] int projectId, string? searchTerm)
+        {
+            var model = await _projectService.GetAddMembersViewModelAsync(projectId, searchTerm);
+            if (model is null)
+            {
+                return NotFound();
+            }
+
+            return View(model);
+        }
+
+        [ProjectAuthorize(ProjectRole.Admin)]
+        public async Task<IActionResult> Members(int projectId)
+        {
+            var model = await _projectService.GetMembersViewModelAsync(projectId);
+            if (model is null)
+            {
+                return NotFound();
+            }
+
+            return View(model);
+        }
+
+        [ProjectAuthorize(ProjectRole.Admin)]
+        public async Task<IActionResult> EditMember(int projectId, string userId)
+        {
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                return BadRequest();
+            }
+
+            var model = await _projectService.GetEditMemberViewModelAsync(projectId, userId);
+            if (model is null)
+            {
+                return NotFound();
+            }
+
+            return View(model);
+        }
+
 
         [ProjectAuthorize(ProjectRole.Admin, ProjectRole.Manager, ProjectRole.Member)]
         public async Task<IActionResult> Details(int projectId)
         {
-            var model = await _projectService.GetDetailsViewModelAsync(projectId);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                return Challenge();
+            }
+
+            var model = await _projectService.GetDetailsViewModelAsync(projectId, userId);
             if (model is null)
             {
                 return NotFound();
@@ -66,7 +113,13 @@ namespace MvcProject.Controllers
 
             if (!ModelState.IsValid)
             {
-                var detailsModel = await _projectService.GetDetailsViewModelAsync(projectId);
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                if (string.IsNullOrWhiteSpace(userId))
+                {
+                    return Challenge();
+                }
+
+                var detailsModel = await _projectService.GetDetailsViewModelAsync(projectId, userId);
                 if (detailsModel is null)
                 {
                     return NotFound();
@@ -129,9 +182,14 @@ namespace MvcProject.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateUserRoleInProject(int projectId, string userId, ProjectRole newRole)
         {
-            await _projectService.UpdateUserRoleInProjectAsync(projectId, userId, newRole);
+            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrWhiteSpace(currentUserId))
+            {
+                return Challenge();
+            }
 
-            return RedirectToAction("Details", new { projectId });
+            await _projectService.UpdateUserRoleInProjectAsync(projectId, userId, currentUserId, newRole);
+            return RedirectToAction(nameof(Members), new { projectId });
         }
 
         [ProjectAuthorize(ProjectRole.Admin)]
@@ -139,8 +197,14 @@ namespace MvcProject.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> RemoveUserFromProject(int projectId, string userId)
         {
-            await _projectService.RemoveUserFromProjectAsync(projectId, userId);
-            return RedirectToAction("Details", new { projectId });
+            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrWhiteSpace(currentUserId))
+            {
+                return Challenge();
+            }
+
+            await _projectService.RemoveUserFromProjectAsync(projectId, userId, currentUserId);
+            return RedirectToAction(nameof(Members), new { projectId });
         }
     }
 }

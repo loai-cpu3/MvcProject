@@ -56,14 +56,14 @@
 
                     <div>
                         <label asp-for="CreateProject.Title" class="form-label fw-semibold text-dark"></label>
-                        <input asp-for="CreateProject.Title" class="form-control" />
-                        <span asp-validation-for="CreateProject.Title" class="text-danger small"></span>
+                        <input asp-for="CreateProject.Title" name="Title" class="form-control" />
+                        <span class="text-danger small" data-valmsg-for="Title" data-valmsg-replace="true"></span>
                     </div>
 
                     <div>
                         <label asp-for="CreateProject.Description" class="form-label fw-semibold text-dark"></label>
-                        <textarea asp-for="CreateProject.Description" class="form-control" rows="4"></textarea>
-                        <span asp-validation-for="CreateProject.Description" class="text-danger small"></span>
+                        <textarea asp-for="CreateProject.Description" name="Description" class="form-control" rows="4"></textarea>
+                        <span class="text-danger small" data-valmsg-for="Description" data-valmsg-replace="true"></span>
                     </div>
                 </div>
                 <div class="modal-footer border-top border-border-light">

@@ -1,11 +1,13 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MvcProject.Models;
 using MvcProject.Services.Interfaces;
-using MvcProject.ViewModels.Home;
+using System.Security.Claims;
 using System.Diagnostics;
 
 namespace MvcProject.Controllers
 {
+    [Authorize]
     public class HomeController : Controller
     {
         IDashboardService _dashboardService;
@@ -15,23 +17,19 @@ namespace MvcProject.Controllers
         }
         public IActionResult Index()
         {
-            return RedirectToAction("Dashboard");
+            return RedirectToAction("Dashboard"); 
             //return RedirectToAction("login", "account");
         }
 
-        public IActionResult Dashboard()
+        public async Task<IActionResult> Dashboard()
         {
-            return View(new DashboardViewModel() { 
-                    CompletionRate = 75.5,
-                    TotalPendingTasks = 12,
-                    TotalProjects = 5,
-                    RecentTasks = new List<DashboardTaskViewModel>()
-                    {
-                        new DashboardTaskViewModel() { Id = 1, Title = "Design Database Schema", ProjectName = "Project Alpha", DueDate =DateOnly.FromDateTime( DateTime.UtcNow.AddDays(3)) },
-                        new DashboardTaskViewModel() { Id = 2, Title = "Implement Authentication", ProjectName = "Project Beta", DueDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(5)) },
-                        new DashboardTaskViewModel() { Id = 3, Title = "Create API Endpoints", ProjectName = "Project Gamma", DueDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(7)) }
-                    }
-            });
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                return Challenge();
+            }
+
+            return View(await _dashboardService.GetDashboardViewModelAsync(userId));
         }
 
         public IActionResult Privacy()
