@@ -16,6 +16,7 @@ namespace MvcProject.Controllers
         public IActionResult Index()
         {
             return RedirectToAction("Dashboard");
+            //return RedirectToAction("login", "account");
         }
 
         public IActionResult Dashboard()
