@@ -19,7 +19,7 @@ namespace MvcProject.Services
         private readonly IWebHostEnvironment _env;
         private readonly ILogger<AttachmentService> _logger;
 
-        private static readonly string[] AllowedExtensions = new[] { ".pdf", ".docx", ".xlsx", ".png", ".jpg", ".jpeg", ".txt" };
+        private static readonly string[] AllowedExtensions = new[] { ".pdf", ".doc", ".docx", ".xls", ".xlsx", ".csv", ".png", ".jpg", ".jpeg", ".gif", ".webp", ".txt" };
         private const long MaxFileSize = 10 * 1024 * 1024; // 10 MB
 
         public AttachmentService(ApplicationDbContext db, IWebHostEnvironment env, ILogger<AttachmentService> logger)

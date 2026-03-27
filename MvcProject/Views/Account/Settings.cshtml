@@ -1,0 +1,151 @@
+@model MvcProject.ViewModels.Account.AccountSettingsVM
+@{
+    ViewData["Title"] = "Account Settings";
+}
+
+<div class="mx-auto pb-5" style="max-width: 800px;">
+    <div class="mb-4">
+        <h2 class="font-display fw-bold fs-3 text-dark tracking-tight mb-1">Account Settings</h2>
+        <p class="text-muted-light small mb-0">Update your profile information and manage your security settings.</p>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success border-0 shadow-sm rounded-3 mb-4 d-flex align-items-center gap-2" role="alert">
+            <span class="material-symbols-outlined fs-5">check_circle</span>
+            <div class="small fw-medium">@TempData["SuccessMessage"]</div>
+        </div>
+    }
+
+    <form asp-action="Settings" method="post" enctype="multipart/form-data">
+        @Html.AntiForgeryToken()
+        <div asp-validation-summary="ModelOnly" class="text-danger small mb-4"></div>
+
+        <div class="d-flex flex-column gap-4">
+            <!-- Profile Section -->
+            <div class="bg-surface-light rounded-4 shadow-soft border border-border-light overflow-hidden">
+                <div class="px-4 py-3 border-bottom border-border-light bg-light">
+                    <h3 class="font-display fw-semibold text-dark fs-6 mb-0">Profile Information</h3>
+                </div>
+                <div class="p-4">
+                    <div class="row g-4">
+                        <div class="col-md-4 text-center border-end border-border-light pe-md-4">
+                            <div class="position-relative d-inline-block mb-3">
+                                <div class="rounded-circle border border-4 border-white shadow-sm overflow-hidden" 
+                                     style="width: 120px; height: 120px; background-color: #f3f4f6;">
+                                    @if (!string.IsNullOrEmpty(Model.CurrentProfilePictureUrl))
+                                    {
+                                        <img src="@Model.CurrentProfilePictureUrl" id="profilePreview" alt="Profile" 
+                                             style="width: 100%; height: 100%; object-fit: cover;" />
+                                    }
+                                    else
+                                    {
+                                        <div id="profileInitials" class="w-100 h-100 d-flex align-items-center justify-content-center text-white fw-bold fs-2"
+                                             style="background-color: #6366f1;">
+                                            @Model.FirstName.Substring(0, 1).ToUpper()
+                                        </div>
+                                    }
+                                </div>
+                                <label for="ProfilePicture" class="position-absolute bottom-0 end-0 bg-primary text-white p-2 rounded-circle shadow-sm border border-2 border-white cursor-pointer d-flex align-items-center justify-content-center" 
+                                       style="width: 36px; height: 36px; transform: translate(10%, 10%); cursor: pointer;">
+                                    <span class="material-symbols-outlined fs-6">photo_camera</span>
+                                    <input type="file" asp-for="ProfilePicture" id="ProfilePicture" class="d-none" accept="image/*" onchange="previewImage(this)" />
+                                </label>
+                            </div>
+                            <p class="extra-small text-muted-light mb-0">Recommended: Square JPG or PNG, max 2MB.</p>
+                            <span asp-validation-for="ProfilePicture" class="text-danger extra-small d-block mt-1"></span>
+                        </div>
+                        
+                        <div class="col-md-8 ps-md-4">
+                            <div class="row g-3">
+                                <div class="col-sm-6">
+                                    <label asp-for="FirstName" class="form-label small fw-semibold text-muted-light"></label>
+                                    <input asp-for="FirstName" class="form-control border-border-light bg-light shadow-xs" placeholder="First Name" />
+                                    <span asp-validation-for="FirstName" class="text-danger extra-small"></span>
+                                </div>
+                                <div class="col-sm-6">
+                                    <label asp-for="LastName" class="form-label small fw-semibold text-muted-light"></label>
+                                    <input asp-for="LastName" class="form-control border-border-light bg-light shadow-xs" placeholder="Last Name" />
+                                    <span asp-validation-for="LastName" class="text-danger extra-small"></span>
+                                </div>
+                                <div class="col-12">
+                                    <label asp-for="Email" class="form-label small fw-semibold text-muted-light"></label>
+                                    <input asp-for="Email" class="form-control border-border-light bg-light opacity-75 shadow-none" readonly />
+                                    <p class="extra-small text-muted-light mt-1 mb-0">Email address cannot be changed.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Security Section -->
+            <div class="bg-surface-light rounded-4 shadow-soft border border-border-light overflow-hidden">
+                <div class="px-4 py-3 border-bottom border-border-light bg-light d-flex align-items-center justify-content-between">
+                    <h3 class="font-display fw-semibold text-dark fs-6 mb-0">Security & Password</h3>
+                    <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill extra-small px-3 py-1">Recommended Monthly</span>
+                </div>
+                <div class="p-4">
+                    <p class="small text-muted-light mb-4">To change your password, provide your current password followed by the new one.</p>
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label asp-for="CurrentPassword" class="form-label small fw-semibold text-muted-light"></label>
+                            <input asp-for="CurrentPassword" class="form-control border-border-light bg-light shadow-xs" placeholder="••••••••" />
+                            <span asp-validation-for="CurrentPassword" class="text-danger extra-small"></span>
+                        </div>
+                        <div class="col-sm-6">
+                            <label asp-for="NewPassword" class="form-label small fw-semibold text-muted-light"></label>
+                            <input asp-for="NewPassword" class="form-control border-border-light bg-light shadow-xs" placeholder="••••••••" />
+                            <span asp-validation-for="NewPassword" class="text-danger extra-small"></span>
+                        </div>
+                        <div class="col-sm-6">
+                            <label asp-for="ConfirmNewPassword" class="form-label small fw-semibold text-muted-light"></label>
+                            <input asp-for="ConfirmNewPassword" class="form-control border-border-light bg-light shadow-xs" placeholder="••••••••" />
+                            <span asp-validation-for="ConfirmNewPassword" class="text-danger extra-small"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-end gap-3 mt-2">
+                <button type="submit" class="btn btn-primary px-5 py-2 fw-semibold shadow-sm d-flex align-items-center gap-2">
+                    <span class="material-symbols-outlined fs-5">save</span>
+                    Save Changes
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        function previewImage(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    var preview = document.getElementById('profilePreview');
+                    var initials = document.getElementById('profileInitials');
+                    
+                    if (preview) {
+                        preview.src = e.target.result;
+                    } else if (initials) {
+                        // Replace initials with img
+                        var img = document.createElement('img');
+                        img.id = 'profilePreview';
+                        img.src = e.target.result;
+                        img.style = "width: 100%; height: 100%; object-fit: cover;";
+                        initials.parentNode.replaceChild(img, initials);
+                    }
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+    </script>
+    <style>
+        .shadow-soft { box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); }
+        .shadow-xs { box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); }
+        .extra-small { font-size: 0.75rem; }
+        .cursor-pointer { cursor: pointer; }
+    </style>
+}

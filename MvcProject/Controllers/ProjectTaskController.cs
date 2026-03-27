@@ -22,6 +22,54 @@ namespace MvcProject.Controllers
             _attachmentService = attachmentService;
         }
 
+        public async Task<IActionResult> MyTasks(int? projectId, MvcProject.Models.Enums.TaskStatus? status)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrWhiteSpace(userId)) return Challenge();
+
+            // Fetch all tasks in projects the user is a member of
+            var tasks = await _unitOfWork.Tasks.GetAllTasksInUserProjectsAsync(userId);
+            var userProjects = await _unitOfWork.Projects.GetProjectsForUserAsync(userId);
+
+            // Apply filters
+            if (projectId.HasValue)
+            {
+                tasks = tasks.Where(t => t.ProjectId == projectId.Value).ToList();
+            }
+
+            if (status.HasValue)
+            {
+                tasks = tasks.Where(t => t.Status == status.Value).ToList();
+            }
+
+            var model = new UserTasksViewModel
+            {
+                ToDoTasks = tasks.Where(t => t.Status == MvcProject.Models.Enums.TaskStatus.ToDo).ToList(),
+                InProgressTasks = tasks.Where(t => t.Status == MvcProject.Models.Enums.TaskStatus.InProgress).ToList(),
+                ReviewTasks = tasks.Where(t => t.Status == MvcProject.Models.Enums.TaskStatus.Review).ToList(),
+                DoneTasks = tasks.Where(t => t.Status == MvcProject.Models.Enums.TaskStatus.Done).ToList(),
+                
+                SelectedProjectId = projectId,
+                SelectedStatus = status,
+                ProjectList = userProjects.Select(p => new SelectListItem
+                {
+                    Value = p.Id.ToString(),
+                    Text = p.Title,
+                    Selected = projectId == p.Id
+                }).ToList(),
+                StatusList = Enum.GetValues(typeof(MvcProject.Models.Enums.TaskStatus))
+                    .Cast<MvcProject.Models.Enums.TaskStatus>()
+                    .Select(s => new SelectListItem
+                    {
+                        Value = s.ToString(),
+                        Text = s.ToString(),
+                        Selected = status == s
+                    }).ToList()
+            };
+
+            return View(model);
+        }
+
         public IActionResult Index()
         {
             return RedirectToAction("Index", "Home");
@@ -32,7 +80,7 @@ namespace MvcProject.Controllers
         [ProjectAuthorize(ProjectRole.Admin, ProjectRole.Manager, ProjectRole.Member)]
         public async Task<IActionResult> Detail(int id, int projectId)
         {
-            var task = await _unitOfWork.Tasks.GetByIdAsync(id);
+            var task = await _unitOfWork.Tasks.GetByIdWithAttachmentsAsync(id);
             if (task == null || task.ProjectId != projectId) return NotFound();
 
             // Ensure related data is loaded. Since generic GetByIdAsync might not include them,
@@ -47,9 +95,6 @@ namespace MvcProject.Controllers
 
             var canEditDelete = projectUser != null &&
                                (projectUser.Role == ProjectRole.Admin || projectUser.Role == ProjectRole.Manager);
-
-            // Fetch attachments separately if they're not included
-            var attachments = await _unitOfWork.Tasks.GetByIdAsync(id); // Simple way if it includes by default, otherwise we'd need a repo method
 
             var model = new ProjectTaskDetailViewModel
             {
@@ -140,6 +185,18 @@ namespace MvcProject.Controllers
                 {
                     foreach (var file in model.Attachments)
                     {
+                        var ext = Path.GetExtension(file.FileName).ToLower();
+                        if (!TaskAttachmentConstants.AllowedExtensions.Contains(ext))
+                        {
+                            ModelState.AddModelError("Attachments", $"File type {ext} is not allowed. Allowed: {TaskAttachmentConstants.AllowedExtensionsDisplay}");
+                            var m = await _unitOfWork.ProjectUsers.GetProjectMembersWithUsersAsync(model.ProjectId);
+                            model.UsersList = m.Select(member => new SelectListItem { Value = member.UserId, Text = $"{member.User.FirstName} {member.User.LastName}" });
+                            return View(model);
+                        }
+                    }
+
+                    foreach (var file in model.Attachments)
+                    {
                         if (file.Length > 0)
                         {
                             await _attachmentService.UploadAsync(file, task.Id);
@@ -179,6 +236,15 @@ namespace MvcProject.Controllers
                 {
                     foreach (var file in model.Attachments)
                     {
+                        var ext = Path.GetExtension(file.FileName).ToLower();
+                        if (!TaskAttachmentConstants.AllowedExtensions.Contains(ext))
+                        {
+                            return BadRequest($"File type {ext} is not allowed.");
+                        }
+                    }
+
+                    foreach (var file in model.Attachments)
+                    {
                         if (file.Length > 0)
                         {
                             await _attachmentService.UploadAsync(file, task.Id);
@@ -194,7 +260,7 @@ namespace MvcProject.Controllers
         [ProjectAuthorize(ProjectRole.Admin, ProjectRole.Manager)]
         public async Task<IActionResult> Edit(int id, int projectId)
         {
-            var task = await _unitOfWork.Tasks.GetByIdAsync(id);
+            var task = await _unitOfWork.Tasks.GetByIdWithAttachmentsAsync(id);
             if (task == null || task.ProjectId != projectId) return NotFound();
 
             var members = await _unitOfWork.ProjectUsers.GetProjectMembersWithUsersAsync(projectId);
@@ -251,6 +317,18 @@ namespace MvcProject.Controllers
                 {
                     foreach (var file in model.NewAttachments)
                     {
+                        var ext = Path.GetExtension(file.FileName).ToLower();
+                        if (!TaskAttachmentConstants.AllowedExtensions.Contains(ext))
+                        {
+                            ModelState.AddModelError("NewAttachments", $"File type {ext} is not allowed. Allowed: {TaskAttachmentConstants.AllowedExtensionsDisplay}");
+                            var m = await _unitOfWork.ProjectUsers.GetProjectMembersWithUsersAsync(model.ProjectId);
+                            model.UsersList = m.Select(member => new SelectListItem { Value = member.UserId, Text = $"{member.User.FirstName} {member.User.LastName}" });
+                            return View(model);
+                        }
+                    }
+
+                    foreach (var file in model.NewAttachments)
+                    {
                         if (file.Length > 0)
                         {
                             await _attachmentService.UploadAsync(file, task.Id);
@@ -267,17 +345,18 @@ namespace MvcProject.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         [ProjectAuthorize(ProjectRole.Admin, ProjectRole.Manager, ProjectRole.Member)]
         public async Task<IActionResult> UpdateStatus(int id, int projectId, Models.Enums.TaskStatus status)
         {
             var task = await _unitOfWork.Tasks.GetByIdAsync(id);
-            if (task == null) return NotFound();
+            if (task == null || task.ProjectId != projectId) return NotFound();
 
             task.Status = status;
             _unitOfWork.Tasks.Update(task);
             await _unitOfWork.SaveAsync();
 
-            return Json(new { success = true });
+            return RedirectToAction("Details", "Projects", new { projectId = projectId });
         }
 
         [HttpPost]
@@ -294,7 +373,7 @@ namespace MvcProject.Controllers
         [ProjectAuthorize(ProjectRole.Admin, ProjectRole.Manager)]
         public async Task<IActionResult> Delete(int id, int projectId)
         {
-            var task = await _unitOfWork.Tasks.GetByIdAsync(id);
+            var task = await _unitOfWork.Tasks.GetByIdWithAttachmentsAsync(id);
             if (task == null || task.ProjectId != projectId) return NotFound();
 
             // Delete attachments
@@ -313,7 +392,7 @@ namespace MvcProject.Controllers
         [ProjectAuthorize(ProjectRole.Admin, ProjectRole.Manager)]
         public async Task<IActionResult> AjaxDelete(int id, int projectId)
         {
-            var task = await _unitOfWork.Tasks.GetByIdAsync(id);
+            var task = await _unitOfWork.Tasks.GetByIdWithAttachmentsAsync(id);
             if (task == null) return NotFound();
 
             // Delete attachments
@@ -327,5 +406,52 @@ namespace MvcProject.Controllers
 
             return Json(new { success = true });
         }
+
+        [HttpPost]
+        [ProjectAuthorize(ProjectRole.Admin, ProjectRole.Manager)]
+        public async Task<IActionResult> DeleteAllAttachments(int taskId, int projectId)
+        {
+            var task = await _unitOfWork.Tasks.GetByIdWithAttachmentsAsync(taskId);
+            if (task == null || task.ProjectId != projectId) return NotFound();
+
+            foreach (var attachment in task.Attachments.ToList())
+            {
+                await _attachmentService.DeleteAsync(attachment.Id);
+            }
+
+            return RedirectToAction("Edit", new { id = taskId, projectId = projectId });
+        }
+        public async Task<IActionResult> AllTasks(string searchTerm)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrWhiteSpace(userId)) return Challenge();
+
+            var tasks = await _unitOfWork.Tasks.GetAllTasksInUserProjectsAsync(userId);
+
+            // Filtering
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                tasks = tasks.Where(t => 
+                    t.Project.Title.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) || 
+                    t.Status.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    t.Title.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
+                ).ToList();
+            }
+
+            var today = DateTime.Today;
+            var model = new AllTasksViewModel
+            {
+                SearchTerm = searchTerm,
+                PresentTasks = tasks.Where(t => t.Deadline == null || t.Deadline.Value.Date >= today)
+                                    .OrderBy(t => t.Deadline ?? DateTime.MaxValue)
+                                    .ToList(),
+                PastTasks = tasks.Where(t => t.Deadline != null && t.Deadline.Value.Date < today)
+                                 .OrderByDescending(t => t.Deadline)
+                                 .ToList()
+            };
+
+            return View(model);
+        }
+
     }
 }

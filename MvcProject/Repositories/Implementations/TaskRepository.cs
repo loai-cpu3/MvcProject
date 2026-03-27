@@ -61,5 +61,43 @@ namespace MvcProject.Repositories.Implementations
                 .Take(count)
                 .ToListAsync();
         }
+
+        public async Task<ProjectTask?> GetByIdWithAttachmentsAsync(int id)
+        {
+            return await _dbSet
+                .Include(t => t.Attachments)
+                .FirstOrDefaultAsync(t => t.Id == id);
+        }
+
+        public async Task<List<ProjectTask>> GetAllUserTasksAsync(string userId)
+        {
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                throw new ArgumentException("Value cannot be null or whitespace.", nameof(userId));
+            }
+
+            return await _dbSet
+                .AsNoTracking()
+                .Include(t => t.Project)
+                .Where(t => t.AssigneeId == userId)
+                .OrderBy(t => t.Status)
+                .ToListAsync();
+        }
+
+        public async Task<List<ProjectTask>> GetAllTasksInUserProjectsAsync(string userId)
+        {
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                throw new ArgumentException("Value cannot be null or whitespace.", nameof(userId));
+            }
+
+            return await _dbSet
+                .AsNoTracking()
+                .Include(t => t.Project)
+                .Where(t => t.Project.Members.Any(m => m.UserId == userId))
+                .OrderBy(t => t.Status)
+                .ThenBy(t => t.Deadline ?? DateTime.MaxValue)
+                .ToListAsync();
+        }
     }
 }

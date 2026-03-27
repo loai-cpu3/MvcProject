@@ -100,4 +100,10 @@ namespace MvcProject.ViewModels.ProjectTask
         public int Likes { get; set; }
         public List<TaskCommentViewModel> Replies { get; set; } = new List<TaskCommentViewModel>();
     }
+    public static class TaskAttachmentConstants
+    {
+        public static readonly string[] AllowedExtensions = { ".pdf", ".doc", ".docx", ".xls", ".xlsx", ".csv", ".png", ".jpg", ".jpeg", ".gif", ".webp", ".txt" };
+        public static string AllowedExtensionsDisplay => string.Join(", ", AllowedExtensions).Replace(".", "").ToUpper();
+        public static string AcceptAttribute => string.Join(",", AllowedExtensions);
+    }
 }

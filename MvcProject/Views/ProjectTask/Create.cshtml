@@ -72,8 +72,9 @@
                 <!-- Attachments -->
                 <div>
                     <label asp-for="Attachments" class="form-label fw-bold text-dark small text-uppercase tracking-wider">Attachments</label>
-                    <input asp-for="Attachments" class="form-control" type="file" multiple />
-                    <p class="extra-small text-muted-light mt-1">Maximum file size: 10MB. Allowed types: PDF, Word, Excel, Images, Text.</p>
+                    <input asp-for="Attachments" class="form-control" type="file" multiple accept="@MvcProject.ViewModels.ProjectTask.TaskAttachmentConstants.AcceptAttribute" />
+                    <p class="extra-small text-muted-light mt-1">Maximum file size: 10MB. Allowed types: @MvcProject.ViewModels.ProjectTask.TaskAttachmentConstants.AllowedExtensionsDisplay</p>
+                    <span asp-validation-for="Attachments" class="text-danger small"></span>
                 </div>
 
                 <!-- Actions -->

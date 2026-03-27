@@ -1,0 +1,25 @@
+﻿  Determining projects to restore...
+  All projects are up-to-date for restore.
+C:\Users\ahta6\OneDrive\Desktop\MvcProject\MvcProject\MvcProject\Views\ProjectTask\Detail.cshtml(118,76): error RZ1031: The tag helper 'option' must not have C# in the element's attribute declaration area. [C:\Users\ahta6\OneDrive\Desktop\MvcProject\MvcProject\MvcProject\MvcProject.csproj]
+C:\Users\ahta6\OneDrive\Desktop\MvcProject\MvcProject\MvcProject\Views\ProjectTask\MyTasks.cshtml(78,2): error RZ1002: The helper directive is not supported. [C:\Users\ahta6\OneDrive\Desktop\MvcProject\MvcProject\MvcProject\MvcProject.csproj]
+C:\Users\ahta6\OneDrive\Desktop\MvcProject\MvcProject\MvcProject\Migrations\20260326154010_attatchment table.cs(9,26): warning CS8981: The type name 'attatchmenttable' only contains lower-cased ascii characters. Such names may become reserved for the language. [C:\Users\ahta6\OneDrive\Desktop\MvcProject\MvcProject\MvcProject\MvcProject.csproj]
+C:\Users\ahta6\OneDrive\Desktop\MvcProject\MvcProject\MvcProject\Migrations\20260326154010_attatchment table.Designer.cs(16,19): warning CS8981: The type name 'attatchmenttable' only contains lower-cased ascii characters. Such names may become reserved for the language. [C:\Users\ahta6\OneDrive\Desktop\MvcProject\MvcProject\MvcProject\MvcProject.csproj]
+C:\Users\ahta6\OneDrive\Desktop\MvcProject\MvcProject\MvcProject\ViewModels\ProjectTask\UserTasksViewModel.cs(7,21): error CS0118: 'ProjectTask' is a namespace but is used like a type [C:\Users\ahta6\OneDrive\Desktop\MvcProject\MvcProject\MvcProject\MvcProject.csproj]
+C:\Users\ahta6\OneDrive\Desktop\MvcProject\MvcProject\MvcProject\ViewModels\ProjectTask\UserTasksViewModel.cs(8,21): error CS0118: 'ProjectTask' is a namespace but is used like a type [C:\Users\ahta6\OneDrive\Desktop\MvcProject\MvcProject\MvcProject\MvcProject.csproj]
+C:\Users\ahta6\OneDrive\Desktop\MvcProject\MvcProject\MvcProject\ViewModels\ProjectTask\UserTasksViewModel.cs(9,21): error CS0118: 'ProjectTask' is a namespace but is used like a type [C:\Users\ahta6\OneDrive\Desktop\MvcProject\MvcProject\MvcProject\MvcProject.csproj]
+C:\Users\ahta6\OneDrive\Desktop\MvcProject\MvcProject\MvcProject\ViewModels\ProjectTask\UserTasksViewModel.cs(10,21): error CS0118: 'ProjectTask' is a namespace but is used like a type [C:\Users\ahta6\OneDrive\Desktop\MvcProject\MvcProject\MvcProject\MvcProject.csproj]
+
+Build FAILED.
+
+C:\Users\ahta6\OneDrive\Desktop\MvcProject\MvcProject\MvcProject\Migrations\20260326154010_attatchment table.cs(9,26): warning CS8981: The type name 'attatchmenttable' only contains lower-cased ascii characters. Such names may become reserved for the language. [C:\Users\ahta6\OneDrive\Desktop\MvcProject\MvcProject\MvcProject\MvcProject.csproj]
+C:\Users\ahta6\OneDrive\Desktop\MvcProject\MvcProject\MvcProject\Migrations\20260326154010_attatchment table.Designer.cs(16,19): warning CS8981: The type name 'attatchmenttable' only contains lower-cased ascii characters. Such names may become reserved for the language. [C:\Users\ahta6\OneDrive\Desktop\MvcProject\MvcProject\MvcProject\MvcProject.csproj]
+C:\Users\ahta6\OneDrive\Desktop\MvcProject\MvcProject\MvcProject\Views\ProjectTask\Detail.cshtml(118,76): error RZ1031: The tag helper 'option' must not have C# in the element's attribute declaration area. [C:\Users\ahta6\OneDrive\Desktop\MvcProject\MvcProject\MvcProject\MvcProject.csproj]
+C:\Users\ahta6\OneDrive\Desktop\MvcProject\MvcProject\MvcProject\Views\ProjectTask\MyTasks.cshtml(78,2): error RZ1002: The helper directive is not supported. [C:\Users\ahta6\OneDrive\Desktop\MvcProject\MvcProject\MvcProject\MvcProject.csproj]
+C:\Users\ahta6\OneDrive\Desktop\MvcProject\MvcProject\MvcProject\ViewModels\ProjectTask\UserTasksViewModel.cs(7,21): error CS0118: 'ProjectTask' is a namespace but is used like a type [C:\Users\ahta6\OneDrive\Desktop\MvcProject\MvcProject\MvcProject\MvcProject.csproj]
+C:\Users\ahta6\OneDrive\Desktop\MvcProject\MvcProject\MvcProject\ViewModels\ProjectTask\UserTasksViewModel.cs(8,21): error CS0118: 'ProjectTask' is a namespace but is used like a type [C:\Users\ahta6\OneDrive\Desktop\MvcProject\MvcProject\MvcProject\MvcProject.csproj]
+C:\Users\ahta6\OneDrive\Desktop\MvcProject\MvcProject\MvcProject\ViewModels\ProjectTask\UserTasksViewModel.cs(9,21): error CS0118: 'ProjectTask' is a namespace but is used like a type [C:\Users\ahta6\OneDrive\Desktop\MvcProject\MvcProject\MvcProject\MvcProject.csproj]
+C:\Users\ahta6\OneDrive\Desktop\MvcProject\MvcProject\MvcProject\ViewModels\ProjectTask\UserTasksViewModel.cs(10,21): error CS0118: 'ProjectTask' is a namespace but is used like a type [C:\Users\ahta6\OneDrive\Desktop\MvcProject\MvcProject\MvcProject\MvcProject.csproj]
+    2 Warning(s)
+    6 Error(s)
+
+Time Elapsed 00:00:04.07

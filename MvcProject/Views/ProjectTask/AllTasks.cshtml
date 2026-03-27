@@ -1,0 +1,87 @@
+@model MvcProject.ViewModels.ProjectTask.AllTasksViewModel
+@{
+    ViewData["Title"] = "Tasks Explorer";
+}
+
+<div class="mx-auto pb-5" style="max-width: 1200px;">
+    <div class="mb-4 d-flex align-items-center justify-content-between flex-wrap gap-3">
+        <div>
+            <h2 class="font-display fw-bold fs-3 text-dark tracking-tight mb-1">Tasks Explorer</h2>
+            <p class="text-muted-light small mb-0">Browse and search through all tasks across your projects.</p>
+        </div>
+        <div class="position-relative" style="min-width: 300px;">
+            <form asp-action="AllTasks" method="get">
+                <span class="material-symbols-outlined position-absolute top-50 translate-middle-y text-muted-light fs-5" style="left: 12px;">search</span>
+                <input type="text" name="searchTerm" value="@Model.SearchTerm" class="form-control bg-surface-light border-border-light rounded-3 shadow-none text-dark" style="padding-left: 40px; font-size: 0.875rem;" placeholder="Search project or status..." autocomplete="off" />
+            </form>
+        </div>
+    </div>
+
+    <!-- Present Tasks Section -->
+    <div class="mb-5">
+        <div class="d-flex align-items-center gap-2 mb-3">
+            <span class="material-symbols-outlined text-primary">schedule</span>
+            <h3 class="font-display fw-semibold text-dark fs-5 mb-0">Upcoming & Active</h3>
+            <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill small ms-2">@Model.PresentTasks.Count</span>
+        </div>
+        
+        <div class="bg-surface-light rounded-4 shadow-soft border border-border-light overflow-hidden">
+            @if (Model.PresentTasks.Any())
+            {
+                <div class="task-list">
+                    @foreach (var task in Model.PresentTasks)
+                    {
+                        @await Html.PartialAsync("_TaskRow", task)
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="p-5 text-center">
+                    <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 48px; height: 48px;">
+                        <span class="material-symbols-outlined text-muted-light">task</span>
+                    </div>
+                    <p class="text-muted-light small">No active or upcoming tasks found.</p>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Past Tasks Section -->
+    <div>
+        <div class="d-flex align-items-center gap-2 mb-3">
+            <span class="material-symbols-outlined text-muted-light">history</span>
+            <h3 class="font-display fw-semibold text-dark fs-5 mb-0">History & Past Deadlines</h3>
+            <span class="badge bg-light text-muted border border-border-light rounded-pill small ms-2">@Model.PastTasks.Count</span>
+        </div>
+        
+        <div class="bg-surface-light rounded-4 shadow-soft border border-border-light overflow-hidden">
+            @if (Model.PastTasks.Any())
+            {
+                <div class="task-list">
+                    @foreach (var task in Model.PastTasks)
+                    {
+                        @await Html.PartialAsync("_TaskRow", task)
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="p-5 text-center">
+                    <p class="text-muted-light small mb-0 italic">No past tasks found.</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <style>
+        .task-row:hover { background-color: #F9FAFB !important; }
+        .task-row:hover .fw-bold { color: var(--bs-primary) !important; }
+        .extra-small { font-size: 0.75rem; }
+        .shadow-soft { box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); }
+        .shadow-xs { box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); }
+        .badge { font-weight: 500; font-size: 0.7rem; }
+    </style>
+}

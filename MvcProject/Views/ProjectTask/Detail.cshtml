@@ -97,16 +97,36 @@
                     <h5 class="text-dark fw-bold small text-uppercase tracking-wider mb-3">Task Details</h5>
                     
                     <div class="d-flex flex-column gap-3">
-                        <div>
-                            <p class="extra-small tracking-wider text-muted-light text-uppercase fw-bold mb-1">Status</p>
-                            @{
-                                var statusClass = Model.Status switch {
-                                    MvcProject.Models.Enums.TaskStatus.Done => "bg-success-subtle text-success",
-                                    MvcProject.Models.Enums.TaskStatus.InProgress => "bg-primary-subtle text-primary",
-                                    _ => "bg-secondary-subtle text-secondary"
-                                };
-                            }
-                            <span class="badge rounded-pill fw-semibold @statusClass" style="font-size: 0.75rem;">@Model.Status</span>
+                        <div class="mb-3">
+                            <p class="extra-small tracking-wider text-muted-light text-uppercase fw-bold mb-2">Status</p>
+                            <div class="d-flex flex-column gap-2">
+                                @{
+                                    var statusClass = Model.Status switch {
+                                        MvcProject.Models.Enums.TaskStatus.Done => "bg-success-subtle text-success",
+                                        MvcProject.Models.Enums.TaskStatus.InProgress => "bg-primary-subtle text-primary",
+                                        _ => "bg-secondary-subtle text-secondary"
+                                    };
+                                }
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <span id="statusBadge" class="badge rounded-pill fw-semibold @statusClass" style="font-size: 0.75rem;">@Model.Status</span>
+                                </div>
+                                
+                                <form asp-controller="ProjectTask" asp-action="UpdateStatus" method="post">
+                                    <input type="hidden" name="id" value="@Model.Id" />
+                                    <input type="hidden" name="projectId" value="@Model.ProjectId" />
+                                    <div class="d-flex gap-2 mt-1">
+                                        <select id="statusSelect" name="status" class="form-select form-select-sm text-dark extra-small">
+                                            @foreach (var status in Enum.GetValues<MvcProject.Models.Enums.TaskStatus>())
+                                            {
+                                                <!option value="@((int)status)" @(status == Model.Status ? "selected" : "")>@status</!option>
+                                            }
+                                        </select>
+                                        <button type="submit" id="saveStatusBtn" class="btn btn-primary btn-sm px-3 shadow-none fw-bold" style="font-size: 0.7rem;">
+                                            Save
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
                         </div>
 
                         <div>
@@ -154,14 +174,12 @@
     </div>
 </div>
 
-<style>
-    .extra-small {
-        font-size: 0.75rem;
-    }
-    .shadow-soft {
-        box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-    }
-    .border-dashed {
-        border-style: dashed !important;
-    }
 </style>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Updated to use standard form submission for status updates.
+        });
+    </script>
+}

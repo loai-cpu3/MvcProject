@@ -17,7 +17,7 @@
     <div class="bg-surface-light rounded-4 border border-border-light p-4 p-sm-5 shadow-soft">
         <h1 class="font-display fw-bold text-dark fs-3 mb-4">Edit Task</h1>
 
-        <form asp-action="Edit" method="post" enctype="multipart/form-data">
+        <form asp-action="Edit" method="post" enctype="multipart/form-data" id="mainEditForm">
             <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
             <input type="hidden" asp-for="Id" />
             <input type="hidden" asp-for="ProjectId" />
@@ -75,21 +75,32 @@
                 @if (Model.ExistingAttachments.Any())
                 {
                     <div class="mt-2">
-                        <label class="form-label fw-bold text-dark small text-uppercase tracking-wider">Existing Attachments</label>
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <label class="form-label fw-bold text-dark small text-uppercase tracking-wider mb-0">Existing Attachments</label>
+                            <form asp-action="DeleteAllAttachments" asp-route-taskId="@Model.Id" asp-route-projectId="@Model.ProjectId" method="post" onsubmit="return confirm('Are you sure you want to delete ALL attachments?');">
+                                <button type="submit" class="btn btn-link text-danger text-decoration-none extra-small fw-bold p-0 shadow-none">
+                                    <span class="material-symbols-outlined fs-6 align-middle">delete_sweep</span> Delete All
+                                </button>
+                            </form>
+                        </div>
                         <div class="d-flex flex-column gap-2">
                             @foreach (var attachment in Model.ExistingAttachments)
                             {
-                                <div class="d-flex align-items-center justify-content-between p-2 px-3 rounded-3 border border-border-light bg-light">
-                                    <div class="d-flex align-items-center gap-2 overflow-hidden">
-                                        <span class="material-symbols-outlined text-muted-light small">description</span>
-                                        <span class="text-dark small text-truncate">@attachment.FileName</span>
-                                        <span class="text-muted-light extra-small">(@attachment.SizeDisplay)</span>
+                                <div class="d-flex align-items-center justify-content-between p-2 px-3 rounded-3 border border-border-light bg-white shadow-xs">
+                                    <div class="d-flex align-items-center gap-3 overflow-hidden">
+                                        <div class="bg-light rounded p-1 d-flex align-items-center justify-content-center">
+                                            <span class="material-symbols-outlined text-muted-light small">description</span>
+                                        </div>
+                                        <div class="min-w-0">
+                                            <p class="text-dark small fw-medium mb-0 text-truncate">@attachment.FileName</p>
+                                            <p class="text-muted-light extra-small mb-0">@attachment.SizeDisplay</p>
+                                        </div>
                                     </div>
-                                    <button type="submit" asp-action="DeleteAttachment" asp-route-id="@attachment.Id" asp-route-taskId="@Model.Id" asp-route-projectId="@Model.ProjectId" 
-                                            class="btn btn-link p-0 text-danger text-decoration-none shadow-none" 
-                                            onclick="return confirm('Delete this attachment?');">
-                                        <span class="material-symbols-outlined fs-6">close</span>
-                                    </button>
+                                    <form asp-action="DeleteAttachment" asp-route-id="@attachment.Id" asp-route-taskId="@Model.Id" asp-route-projectId="@Model.ProjectId" method="post" onsubmit="return confirm('Delete this attachment?');">
+                                        <button type="submit" class="btn btn-link p-2 text-danger text-decoration-none shadow-none">
+                                            <span class="material-symbols-outlined fs-6">close</span>
+                                        </button>
+                                    </form>
                                 </div>
                             }
                         </div>
@@ -97,16 +108,22 @@
                 }
 
                 <!-- New Attachments -->
-                <div>
-                    <label asp-for="NewAttachments" class="form-label fw-bold text-dark small text-uppercase tracking-wider">Add Attachments</label>
-                    <input asp-for="NewAttachments" class="form-control" type="file" multiple />
-                    <p class="extra-small text-muted-light mt-1">Maximum file size: 10MB. Allowed types: PDF, Word, Excel, Images, Text.</p>
+                <div class="bg-light rounded-3 p-4 border border-border-light border-dashed">
+                    <label asp-for="NewAttachments" class="form-label fw-bold text-dark small text-uppercase tracking-wider mb-2">Add New Attachments</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0">
+                            <span class="material-symbols-outlined text-muted-light">attach_file</span>
+                        </span>
+                        <input asp-for="NewAttachments" class="form-control border-start-0 ps-0" type="file" multiple accept="@MvcProject.ViewModels.ProjectTask.TaskAttachmentConstants.AcceptAttribute" />
+                    </div>
+                    <p class="extra-small text-muted-light mt-2 mb-0">Maximum file size: 10MB per file. Allowed types: @MvcProject.ViewModels.ProjectTask.TaskAttachmentConstants.AllowedExtensionsDisplay</p>
+                    <span asp-validation-for="NewAttachments" class="text-danger small"></span>
                 </div>
 
                 <!-- Actions -->
                 <div class="d-flex align-items-center justify-content-end gap-3 pt-3 border-top border-border-light mt-2">
                     <a asp-action="Detail" asp-route-id="@Model.Id" asp-route-projectId="@Model.ProjectId" class="btn btn-light fw-semibold">Cancel</a>
-                    <button type="submit" class="btn btn-primary px-4 fw-semibold font-display">Save Changes</button>
+                    <button type="submit" form="mainEditForm" class="btn btn-primary px-5 fw-semibold font-display shadow-sm">Save Changes</button>
                 </div>
             </div>
         </form>
@@ -119,5 +136,14 @@
     }
     .shadow-soft {
         box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    }
+    .shadow-xs {
+        box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    }
+    .border-dashed {
+        border-style: dashed !important;
+    }
+    .form-control-lg {
+        padding: 0.75rem 1rem;
     }
 </style>
