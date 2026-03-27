@@ -12,6 +12,7 @@ namespace MvcProject.ViewModels.Projects
         public List<ProjectDetailsTaskItemViewModel> ToDoTasks { get; set; } = new List<ProjectDetailsTaskItemViewModel>();
         public List<ProjectDetailsTaskItemViewModel> InProgressTasks { get; set; } = new List<ProjectDetailsTaskItemViewModel>();
         public List<ProjectDetailsTaskItemViewModel> DoneTasks { get; set; } = new List<ProjectDetailsTaskItemViewModel>();
+        public List<ProjectMemberViewModel> Members { get; set; } = new List<ProjectMemberViewModel>();
         public EditProjectViewModel EditProject { get; set; } = new EditProjectViewModel();
     }
 
@@ -21,5 +22,10 @@ namespace MvcProject.ViewModels.Projects
         public string Title { get; set; } = string.Empty;
         public DateTime? Deadline { get; set; }
         public string? AssigneeAvatarUrl { get; set; }
+    }
+    public class ProjectMemberViewModel
+    {
+        public string UserId { get; set; } = string.Empty;
+        public string FullName { get; set; } = string.Empty;
     }
 }
