@@ -1,0 +1,96 @@
+@model MvcProject.ViewModels.ProjectTask.ProjectTaskCreateViewModel
+@{
+    ViewData["Title"] = "Create Task";
+}
+
+<div class="mx-auto pb-5" style="max-width: 800px;">
+    <!-- Navigation -->
+    <nav class="mb-4" aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-controller="Projects" asp-action="Index" class="text-decoration-none text-muted">Projects</a></li>
+            <li class="breadcrumb-item"><a asp-controller="Projects" asp-action="Details" asp-route-projectId="@Model.ProjectId" class="text-decoration-none text-muted">Project Details</a></li>
+            <li class="breadcrumb-item active text-dark" aria-current="page">Create New Task</li>
+        </ol>
+    </nav>
+
+    <div class="bg-surface-light rounded-4 border border-border-light p-4 p-sm-5 shadow-soft">
+        <h1 class="font-display fw-bold text-dark fs-3 mb-4">Create New Task</h1>
+
+        <form asp-controller="ProjectTask" asp-action="CreateNewTask"  method="post" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+            <input type="hidden" asp-for="ProjectId" />
+
+            <div class="d-flex flex-column gap-4">
+                <!-- Title -->
+                <div>
+                    <label asp-for="Title" class="form-label fw-bold text-dark small text-uppercase tracking-wider">Title</label>
+                    <input asp-for="Title" class="form-control form-control-lg fs-6" placeholder="What needs to be done?" />
+                    <span asp-validation-for="Title" class="text-danger small"></span>
+                </div>
+
+                <!-- Description -->
+                <div>
+                    <label asp-for="Description" class="form-label fw-bold text-dark small text-uppercase tracking-wider">Description</label>
+                    <textarea asp-for="Description" class="form-control" rows="4" placeholder="Add some details about this task..."></textarea>
+                    <span asp-validation-for="Description" class="text-danger small"></span>
+                </div>
+
+                <div class="row g-4">
+                    <!-- Status -->
+                    <div class="col-md-6">
+                        <label asp-for="Status" class="form-label fw-bold text-dark small text-uppercase tracking-wider">Initial Status</label>
+                        <select asp-for="Status" class="form-select" asp-items="Html.GetEnumSelectList<MvcProject.Models.Enums.TaskStatus>()"></select>
+                        <span asp-validation-for="Status" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Priority -->
+                    <div class="col-md-6">
+                        <label asp-for="Priority" class="form-label fw-bold text-dark small text-uppercase tracking-wider">Priority</label>
+                        <select asp-for="Priority" class="form-select" asp-items="Html.GetEnumSelectList<MvcProject.Models.Enums.TaskPriority>()"></select>
+                        <span asp-validation-for="Priority" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <div class="row g-4">
+                    <!-- Assignee -->
+                    <div class="col-md-6">
+                        <label asp-for="AssigneeId" class="form-label fw-bold text-dark small text-uppercase tracking-wider">Assignee</label>
+                        <select asp-for="AssigneeId" class="form-select" asp-items="Model.UsersList">
+                            <option value="">Unassigned</option>
+                        </select>
+                        <span asp-validation-for="AssigneeId" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Deadline -->
+                    <div class="col-md-6">
+                        <label asp-for="Deadline" class="form-label fw-bold text-dark small text-uppercase tracking-wider">Deadline</label>
+                        <input asp-for="Deadline" type="date" class="form-control" />
+                        <span asp-validation-for="Deadline" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <!-- Attachments -->
+                <div>
+                    <label asp-for="Attachments" class="form-label fw-bold text-dark small text-uppercase tracking-wider">Attachments</label>
+                    <input asp-for="Attachments" class="form-control" type="file" multiple />
+                    <p class="extra-small text-muted-light mt-1">Maximum file size: 10MB. Allowed types: PDF, Word, Excel, Images, Text.</p>
+                </div>
+
+                <!-- Actions -->
+                <div class="d-flex align-items-center justify-content-end gap-3 pt-3 border-top border-border-light mt-2">
+                    <a asp-controller="Projects" asp-action="Details" asp-route-projectId="@Model.ProjectId" class="btn btn-light fw-semibold">Cancel</a>
+                    <button type="submit" class="btn btn-primary px-4 fw-semibold font-display">Create Task</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .extra-small {
+        font-size: 0.75rem;
+    }
+    .shadow-soft {
+        box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    }
+</style>

@@ -112,6 +112,11 @@ namespace MvcProject.Services
                         Deadline = task.Deadline,
                         AssigneeAvatarUrl = task.Assignee?.ProfilePictureUrl
                     }).ToList(),
+                Members = project.Members.Select(m => new ProjectMemberViewModel
+                {
+                    UserId = m.UserId,
+                    FullName = $"{m.User.FirstName} {m.User.LastName}"
+                }).ToList(),
                 EditProject = new EditProjectViewModel
                 {
                     Id = project.Id,
