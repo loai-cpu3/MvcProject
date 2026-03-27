@@ -1,9 +1,10 @@
-﻿namespace MvcProject.Models.Enums
+namespace MvcProject.Models.Enums
 {
     public enum NotificationType
     {
         TaskAssigned,
         CommentAdded,
-        ProjectUpdated
+        ProjectUpdated,
+        ProjectMemberAdded
     }
 }

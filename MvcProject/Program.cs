@@ -8,8 +8,8 @@ using MvcProject.Authorization.Handlers;
 using MvcProject.Authorization.Requirements;
 using Microsoft.AspNetCore.Authorization;
 using MvcProject.Services;
-using MvcProject.Services.Interfaces;
 using MvcProject.Hubs;
+using MvcProject.Services.Interfaces;
 
 namespace MvcProject
 {
@@ -76,6 +76,7 @@ namespace MvcProject
 
             app.MapHub<TaskHub>("/hubs/task");
             app.MapHub<CommentHub>("/hubs/comment");
+            app.MapHub<NotificationHub>("/hubs/notification");
 
             app.Run();
         }

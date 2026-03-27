@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using MvcProject.Attributes;
+using MvcProject.Hubs;
 using MvcProject.Models.Domain;
 using MvcProject.Models.Enums;
 using MvcProject.Services.Interfaces;
@@ -15,11 +17,13 @@ namespace MvcProject.Controllers
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IAttachmentService _attachmentService;
+        private readonly IHubContext<NotificationHub> _notificationHub;
 
-        public ProjectTaskController(IUnitOfWork unitOfWork, IAttachmentService attachmentService)
+        public ProjectTaskController(IUnitOfWork unitOfWork, IAttachmentService attachmentService, IHubContext<NotificationHub> notificationHub)
         {
             _unitOfWork = unitOfWork;
             _attachmentService = attachmentService;
+            _notificationHub = notificationHub;
         }
 
         public IActionResult Index()
@@ -147,12 +151,46 @@ namespace MvcProject.Controllers
                     }
                 }
 
+                if (!string.IsNullOrEmpty(task.AssigneeId))
+                {
+                    var project = await _unitOfWork.Projects.GetByIdAsync(projectId);
+                    var actorId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                    if (task.AssigneeId != actorId)
+                    {
+                        var notif = new Notification
+                        {
+                            UserId = task.AssigneeId,
+                            SenderUserId = actorId,
+                            Type = NotificationType.TaskAssigned,
+                            Content = $"You have been assigned to task \"{task.Title}\" in {project?.Title}",
+                            RelatedEntityType = "ProjectTask",
+                            RelatedEntityId = task.Id,
+                            CreatedAt = DateTime.UtcNow
+                        };
+                        await _unitOfWork.Notifications.AddAsync(notif);
+                        await _unitOfWork.SaveAsync();
+
+                        var unreadCount = await _unitOfWork.Notifications.GetUnreadCountAsync(task.AssigneeId);
+                        await _notificationHub.Clients.Group($"user_{task.AssigneeId}").SendAsync("ReceiveNotification", new
+                        {
+                            notif.Id,
+                            notif.Content,
+                            Type = "TaskAssigned",
+                            RelatedEntityType = "ProjectTask",
+                            RelatedEntityId = task.Id,
+                            ProjectId = projectId,
+                            notif.CreatedAt,
+                            UnreadCount = unreadCount
+                        });
+                    }
+                }
+
                 return RedirectToAction("Details", "Projects", new { projectId = model.ProjectId });
             }
 
             var members = await _unitOfWork.ProjectUsers.GetProjectMembersWithUsersAsync(model.ProjectId);
             model.UsersList = members.Select(m => new SelectListItem { Value = m.UserId, Text = $"{m.User.FirstName} {m.User.LastName}" });
-            return View(model);
+            return View("Create", model);
         }
 
         [HttpPost]
@@ -183,6 +221,40 @@ namespace MvcProject.Controllers
                         {
                             await _attachmentService.UploadAsync(file, task.Id);
                         }
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(task.AssigneeId))
+                {
+                    var project = await _unitOfWork.Projects.GetByIdAsync(projectId);
+                    var actorId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                    if (task.AssigneeId != actorId)
+                    {
+                        var notif = new Notification
+                        {
+                            UserId = task.AssigneeId,
+                            SenderUserId = actorId,
+                            Type = NotificationType.TaskAssigned,
+                            Content = $"You have been assigned to task \"{task.Title}\" in {project?.Title}",
+                            RelatedEntityType = "ProjectTask",
+                            RelatedEntityId = task.Id,
+                            CreatedAt = DateTime.UtcNow
+                        };
+                        await _unitOfWork.Notifications.AddAsync(notif);
+                        await _unitOfWork.SaveAsync();
+
+                        var unreadCount = await _unitOfWork.Notifications.GetUnreadCountAsync(task.AssigneeId);
+                        await _notificationHub.Clients.Group($"user_{task.AssigneeId}").SendAsync("ReceiveNotification", new
+                        {
+                            notif.Id,
+                            notif.Content,
+                            Type = "TaskAssigned",
+                            RelatedEntityType = "ProjectTask",
+                            RelatedEntityId = task.Id,
+                            ProjectId = projectId,
+                            notif.CreatedAt,
+                            UnreadCount = unreadCount
+                        });
                     }
                 }
 
@@ -258,12 +330,49 @@ namespace MvcProject.Controllers
                     }
                 }
 
+                // If assignee changed, we could notify them, but let's just trigger a notification if there's someone assigned
+                // Alternatively, detect if assignee changed by keeping track of old assignee.
+                // For simplicity as requested: when assigned, notify them. We'll send it simply if an assignee exists.
+                if (!string.IsNullOrEmpty(task.AssigneeId))
+                {
+                    var project = await _unitOfWork.Projects.GetByIdAsync(model.ProjectId);
+                    var actorId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                    if (task.AssigneeId != actorId)
+                    {
+                        var notif = new Notification
+                        {
+                            UserId = task.AssigneeId,
+                            SenderUserId = actorId,
+                            Type = NotificationType.TaskAssigned,
+                            Content = $"Task \"{task.Title}\" in {project?.Title} has been updated and assigned to you",
+                            RelatedEntityType = "ProjectTask",
+                            RelatedEntityId = task.Id,
+                            CreatedAt = DateTime.UtcNow
+                        };
+                        await _unitOfWork.Notifications.AddAsync(notif);
+                        await _unitOfWork.SaveAsync();
+
+                        var unreadCount = await _unitOfWork.Notifications.GetUnreadCountAsync(task.AssigneeId);
+                        await _notificationHub.Clients.Group($"user_{task.AssigneeId}").SendAsync("ReceiveNotification", new
+                        {
+                            notif.Id,
+                            notif.Content,
+                            Type = "TaskAssigned",
+                            RelatedEntityType = "ProjectTask",
+                            RelatedEntityId = task.Id,
+                            ProjectId = model.ProjectId,
+                            notif.CreatedAt,
+                            UnreadCount = unreadCount
+                        });
+                    }
+                }
+
                 return RedirectToAction("Detail", new { id = task.Id, projectId = task.ProjectId });
             }
 
             var members = await _unitOfWork.ProjectUsers.GetProjectMembersWithUsersAsync(model.ProjectId);
             model.UsersList = members.Select(m => new SelectListItem { Value = m.UserId, Text = $"{m.User.FirstName} {m.User.LastName}" });
-            return View(model);
+            return View("Edit", model);
         }
 
         [HttpPost]

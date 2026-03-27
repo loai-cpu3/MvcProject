@@ -1,6 +1,7 @@
 @model MvcProject.ViewModels.ProjectTask.ProjectTaskDetailViewModel
 @{
     ViewData["Title"] = Model.Title;
+    var currentUserId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
 }
 
 <div class="mx-auto pb-5" style="max-width: 1000px;">
@@ -87,6 +88,51 @@
                         </div>
                     }
                 </div>
+
+                <hr class="border-border-light my-4">
+
+                <!-- Comments Section -->
+                <div id="comments-section">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <h5 class="text-dark fw-bold small text-uppercase tracking-wider mb-0">
+                            Comments <span id="comments-count" class="text-muted-light fw-normal">(0)</span>
+                        </h5>
+                        <span id="signalr-status" class="badge rounded-pill bg-secondary-subtle text-secondary extra-small">Connecting...</span>
+                    </div>
+
+                    <!-- Comment Input -->
+                    <div class="d-flex gap-3 mb-4">
+                        <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center flex-shrink-0" style="width: 36px; height: 36px;">
+                            <span class="material-symbols-outlined text-white" style="font-size: 18px;">person</span>
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="input-group">
+                                <input type="text" id="comment-input" class="form-control form-control-sm border-border-light rounded-start-3"
+                                       placeholder="Write a comment..." maxlength="2000"
+                                       style="border-right: none;" />
+                                <button id="comment-send-btn" class="btn btn-primary btn-sm px-3 rounded-end-3" disabled>
+                                    <span class="material-symbols-outlined" style="font-size: 18px;">send</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Comments List -->
+                    <div id="comments-list" class="d-flex flex-column gap-3">
+                        <div id="comments-loading" class="text-center py-4">
+                            <div class="spinner-border spinner-border-sm text-muted" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <p class="text-muted-light small mb-0 mt-2">Loading comments...</p>
+                        </div>
+                    </div>
+
+                    <!-- Empty State -->
+                    <div id="comments-empty" class="text-center py-4 rounded-3 border border-border-light border-dashed" style="display: none;">
+                        <span class="material-symbols-outlined text-muted-light opacity-50 fs-1">chat_bubble_outline</span>
+                        <p class="text-muted-light small mb-0 mt-2">No comments yet. Be the first to comment!</p>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -164,4 +210,337 @@
     .border-dashed {
         border-style: dashed !important;
     }
+    .comment-card {
+        transition: background-color 0.2s ease;
+    }
+    .comment-card:hover {
+        background-color: #f8f9fa !important;
+    }
+    .comment-card .comment-actions {
+        opacity: 0;
+        transition: opacity 0.2s ease;
+    }
+    .comment-card:hover .comment-actions {
+        opacity: 1;
+    }
+    .comment-highlight {
+        animation: highlightFade 2s ease-out;
+    }
+    @@keyframes highlightFade {
+        0% { background-color: #e8f4fd; }
+        100% { background-color: transparent; }
+    }
 </style>
+
+@section Scripts {
+    <script>
+        (function () {
+            const taskId = @Model.Id;
+            const currentUserId = '@Html.Raw(currentUserId)';
+            const commentsList = document.getElementById('comments-list');
+            const commentsLoading = document.getElementById('comments-loading');
+            const commentsEmpty = document.getElementById('comments-empty');
+            const commentsCount = document.getElementById('comments-count');
+            const commentInput = document.getElementById('comment-input');
+            const commentSendBtn = document.getElementById('comment-send-btn');
+            const signalrStatus = document.getElementById('signalr-status');
+
+            let commentCount = 0;
+
+            // -- Helpers --
+            function formatTimeAgo(dateStr) {
+                const date = new Date(dateStr);
+                const now = new Date();
+                const seconds = Math.floor((now - date) / 1000);
+                if (seconds < 60) return 'just now';
+                const minutes = Math.floor(seconds / 60);
+                if (minutes < 60) return minutes + 'm ago';
+                const hours = Math.floor(minutes / 60);
+                if (hours < 24) return hours + 'h ago';
+                const days = Math.floor(hours / 24);
+                if (days < 7) return days + 'd ago';
+                return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            }
+
+            function escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+
+            function updateCount(count) {
+                commentCount = count;
+                commentsCount.textContent = '(' + count + ')';
+                commentsEmpty.style.display = count === 0 ? '' : 'none';
+            }
+
+            function createCommentHtml(comment, highlight) {
+                const isOwner = comment.userId === currentUserId;
+                const highlightClass = highlight ? ' comment-highlight' : '';
+                return `
+                    <div class="comment-card d-flex gap-3 p-3 rounded-3 border border-border-light bg-white${highlightClass}" data-comment-id="${comment.id}">
+                        <div class="rounded-circle bg-primary-subtle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 32px; height: 32px;">
+                            <span class="material-symbols-outlined text-primary" style="font-size: 16px;">person</span>
+                        </div>
+                        <div class="flex-grow-1 min-w-0">
+                            <div class="d-flex align-items-center justify-content-between mb-1">
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="fw-semibold text-dark small">${escapeHtml(comment.authorName)}</span>
+                                    <span class="text-muted-light extra-small">${formatTimeAgo(comment.createdAt)}</span>
+                                </div>
+                                ${isOwner ? `
+                                <div class="comment-actions d-flex gap-1">
+                                    <button class="btn btn-link btn-sm p-0 text-muted comment-edit-btn" title="Edit">
+                                        <span class="material-symbols-outlined" style="font-size: 16px;">edit</span>
+                                    </button>
+                                    <button class="btn btn-link btn-sm p-0 text-danger comment-delete-btn" title="Delete">
+                                        <span class="material-symbols-outlined" style="font-size: 16px;">delete</span>
+                                    </button>
+                                </div>` : ''}
+                            </div>
+                            <p class="comment-content text-dark small mb-0" style="white-space: pre-wrap; word-break: break-word;">${escapeHtml(comment.content)}</p>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // -- Load existing comments --
+            async function loadComments() {
+                try {
+                    const res = await fetch('/api/Comment/' + taskId);
+                    if (!res.ok) throw new Error('Failed to load');
+                    const comments = await res.json();
+                    commentsLoading.remove();
+                    comments.forEach(c => {
+                        commentsList.insertAdjacentHTML('beforeend', createCommentHtml(c, false));
+                    });
+                    updateCount(comments.length);
+                    bindCommentActions();
+                } catch (err) {
+                    commentsLoading.innerHTML = '<p class="text-danger small mb-0">Failed to load comments.</p>';
+                    console.error('Comment load error:', err);
+                }
+            }
+
+            // -- Post comment --
+            async function postComment() {
+                const content = commentInput.value.trim();
+                if (!content) return;
+
+                commentSendBtn.disabled = true;
+                commentInput.disabled = true;
+
+                try {
+                    const res = await fetch('/api/Comment', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ taskId: taskId, content: content })
+                    });
+                    if (!res.ok) throw new Error('Failed to post');
+                    commentInput.value = '';
+                } catch (err) {
+                    alert('Failed to post comment. Please try again.');
+                } finally {
+                    commentSendBtn.disabled = !commentInput.value.trim();
+                    commentInput.disabled = false;
+                    commentInput.focus();
+                }
+            }
+
+            // -- Edit comment --
+            async function editComment(card) {
+                const contentEl = card.querySelector('.comment-content');
+                const oldContent = contentEl.textContent;
+                const commentId = card.dataset.commentId;
+
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.className = 'form-control form-control-sm';
+                input.value = oldContent;
+                input.maxLength = 2000;
+
+                const btnGroup = document.createElement('div');
+                btnGroup.className = 'd-flex gap-2 mt-2';
+                btnGroup.innerHTML = `
+                    <button class="btn btn-primary btn-sm px-3 save-edit-btn">Save</button>
+                    <button class="btn btn-light btn-sm px-3 cancel-edit-btn">Cancel</button>
+                `;
+
+                contentEl.replaceWith(input);
+                input.after(btnGroup);
+                input.focus();
+                input.select();
+
+                const save = async () => {
+                    const newContent = input.value.trim();
+                    if (!newContent || newContent === oldContent) {
+                        cancel();
+                        return;
+                    }
+                    try {
+                        const res = await fetch('/api/Comment/' + commentId, {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ content: newContent })
+                        });
+                        if (!res.ok) throw new Error('Failed');
+                    } catch (err) {
+                        alert('Failed to update comment.');
+                        cancel();
+                    }
+                };
+
+                const cancel = () => {
+                    const p = document.createElement('p');
+                    p.className = 'comment-content text-dark small mb-0';
+                    p.style.whiteSpace = 'pre-wrap';
+                    p.style.wordBreak = 'break-word';
+                    p.textContent = oldContent;
+                    btnGroup.remove();
+                    input.replaceWith(p);
+                };
+
+                btnGroup.querySelector('.save-edit-btn').addEventListener('click', save);
+                btnGroup.querySelector('.cancel-edit-btn').addEventListener('click', cancel);
+                input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') save();
+                    if (e.key === 'Escape') cancel();
+                });
+            }
+
+            // -- Delete comment --
+            async function deleteComment(card) {
+                if (!confirm('Delete this comment?')) return;
+                const commentId = card.dataset.commentId;
+                try {
+                    const res = await fetch('/api/Comment/' + commentId, { method: 'DELETE' });
+                    if (!res.ok) throw new Error('Failed');
+                } catch (err) {
+                    alert('Failed to delete comment.');
+                }
+            }
+
+            // -- Bind actions to comment cards --
+            function bindCommentActions() {
+                commentsList.querySelectorAll('.comment-card').forEach(card => {
+                    const editBtn = card.querySelector('.comment-edit-btn');
+                    const deleteBtn = card.querySelector('.comment-delete-btn');
+                    if (editBtn && !editBtn._bound) {
+                        editBtn.addEventListener('click', () => editComment(card));
+                        editBtn._bound = true;
+                    }
+                    if (deleteBtn && !deleteBtn._bound) {
+                        deleteBtn.addEventListener('click', () => deleteComment(card));
+                        deleteBtn._bound = true;
+                    }
+                });
+            }
+
+            // -- Input events --
+            commentInput.addEventListener('input', () => {
+                commentSendBtn.disabled = !commentInput.value.trim();
+            });
+            commentInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && commentInput.value.trim()) postComment();
+            });
+            commentSendBtn.addEventListener('click', postComment);
+
+            // -- SignalR Connection (isolated to not crash loadComments) --
+            async function initSignalR() {
+                if (typeof signalR === 'undefined') {
+                    console.warn('SignalR library not loaded');
+                    signalrStatus.className = 'badge rounded-pill bg-danger-subtle text-danger extra-small';
+                    signalrStatus.textContent = 'Offline';
+                    return;
+                }
+
+                const connection = new signalR.HubConnectionBuilder()
+                    .withUrl('/hubs/comment')
+                    .withAutomaticReconnect()
+                    .build();
+
+                connection.on('ReceiveComment', (comment) => {
+                    commentsList.insertAdjacentHTML('beforeend', createCommentHtml(comment, true));
+                    updateCount(commentCount + 1);
+                    bindCommentActions();
+                    const newCard = commentsList.lastElementChild;
+                    if (newCard) newCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                });
+
+                connection.on('UpdateComment', (data) => {
+                    const card = commentsList.querySelector(`[data-comment-id="${data.id}"]`);
+                    if (card) {
+                        const input = card.querySelector('input.form-control');
+                        const btnGroup = card.querySelector('.save-edit-btn')?.closest('.d-flex');
+                        if (input) {
+                            const p = document.createElement('p');
+                            p.className = 'comment-content text-dark small mb-0';
+                            p.style.whiteSpace = 'pre-wrap';
+                            p.style.wordBreak = 'break-word';
+                            p.textContent = data.content;
+                            if (btnGroup) btnGroup.remove();
+                            input.replaceWith(p);
+                        } else {
+                            const contentEl = card.querySelector('.comment-content');
+                            if (contentEl) contentEl.textContent = data.content;
+                        }
+                        card.classList.add('comment-highlight');
+                        setTimeout(() => card.classList.remove('comment-highlight'), 2000);
+                    }
+                });
+
+                connection.on('DeleteComment', (data) => {
+                    const card = commentsList.querySelector(`[data-comment-id="${data.id}"]`);
+                    if (card) {
+                        card.style.transition = 'opacity 0.3s ease, max-height 0.3s ease';
+                        card.style.opacity = '0';
+                        card.style.maxHeight = card.offsetHeight + 'px';
+                        setTimeout(() => {
+                            card.style.maxHeight = '0';
+                            card.style.padding = '0';
+                            card.style.margin = '0';
+                            card.style.border = 'none';
+                        }, 150);
+                        setTimeout(() => {
+                            card.remove();
+                            updateCount(commentCount - 1);
+                        }, 400);
+                    }
+                });
+
+                connection.onreconnecting(() => {
+                    signalrStatus.className = 'badge rounded-pill bg-warning-subtle text-warning extra-small';
+                    signalrStatus.textContent = 'Reconnecting...';
+                });
+
+                connection.onreconnected(() => {
+                    signalrStatus.className = 'badge rounded-pill bg-success-subtle text-success extra-small';
+                    signalrStatus.textContent = 'Live';
+                    connection.invoke('JoinTaskGroup', taskId.toString());
+                });
+
+                connection.onclose(() => {
+                    signalrStatus.className = 'badge rounded-pill bg-danger-subtle text-danger extra-small';
+                    signalrStatus.textContent = 'Disconnected';
+                });
+
+                try {
+                    await connection.start();
+                    await connection.invoke('JoinTaskGroup', taskId.toString());
+                    signalrStatus.className = 'badge rounded-pill bg-success-subtle text-success extra-small';
+                    signalrStatus.textContent = 'Live';
+                } catch (err) {
+                    console.error('SignalR connection error:', err);
+                    signalrStatus.className = 'badge rounded-pill bg-danger-subtle text-danger extra-small';
+                    signalrStatus.textContent = 'Offline';
+                    setTimeout(() => initSignalR(), 5000);
+                }
+            }
+
+            // -- Init --
+            loadComments();
+            initSignalR();
+        })();
+    </script>
+}
+

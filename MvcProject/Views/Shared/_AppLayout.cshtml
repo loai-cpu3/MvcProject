@@ -80,10 +80,30 @@
 
 
                 <div class="d-flex align-items-center gap-2 gap-sm-3">
-                    <button class="btn btn-link p-2 text-muted-light position-relative rounded-circle d-flex align-items-center justify-content-center text-decoration-none border-0 shadow-none hover-bg-light">
-                        <span class="material-symbols-outlined">notifications</span>
-                        <span class="position-absolute rounded-circle bg-danger border border-white" style="width: 8px; height: 8px; top: 6px; right: 6px;"></span>
-                    </button>
+                    <!-- Notification Bell Dropdown -->
+                    <div class="dropdown" id="notification-dropdown">
+                        <button class="btn btn-link p-2 text-muted-light position-relative rounded-circle d-flex align-items-center justify-content-center text-decoration-none border-0 shadow-none hover-bg-light"
+                                data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false" id="notification-bell">
+                            <span class="material-symbols-outlined">notifications</span>
+                            <span class="position-absolute rounded-pill bg-danger text-white d-flex align-items-center justify-content-center"
+                                  style="min-width: 18px; height: 18px; font-size: 0.65rem; top: 2px; right: 2px; padding: 0 4px; display: none !important;"
+                                  id="notification-badge">0</span>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-end shadow-lg border-0 mt-2 p-0" style="width: 360px; max-height: 420px; overflow: hidden; border-radius: 12px;">
+                            <div class="d-flex align-items-center justify-content-between px-3 py-2 border-bottom" style="background: linear-gradient(135deg, #6366f1, #8b5cf6);">
+                                <span class="fw-bold text-white small">Notifications</span>
+                                <button class="btn btn-link btn-sm text-white text-decoration-none p-0" style="font-size: 0.75rem;" id="mark-all-read-btn">
+                                    Mark all as read
+                                </button>
+                            </div>
+                            <div id="notification-list" style="max-height: 340px; overflow-y: auto;">
+                                <div class="text-center text-muted py-4" id="notification-empty">
+                                    <span class="material-symbols-outlined d-block mb-1" style="font-size: 32px; opacity: 0.4;">notifications_off</span>
+                                    <span class="small">No new notifications</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
                     @inject UserManager<MvcProject.Models.Domain.ApplicationUser> UserManager
                     @{
@@ -159,7 +179,199 @@
         </main>
     </div>
 
+    <style>
+        .notif-item {
+            transition: background-color 0.2s ease;
+            cursor: pointer;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .notif-item:hover {
+            background-color: #f8f8ff;
+        }
+        .notif-item:last-child {
+            border-bottom: none;
+        }
+        .notif-new {
+            animation: notifSlideIn 0.3s ease;
+        }
+        @@keyframes notifSlideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/lib/microsoft-signalr/dist/browser/signalr.min.js"></script>
+
+    @if (User.Identity.IsAuthenticated)
+    {
+        <script>
+            (function () {
+                const badge = document.getElementById('notification-badge');
+                const list = document.getElementById('notification-list');
+                const emptyMsg = document.getElementById('notification-empty');
+                const markAllBtn = document.getElementById('mark-all-read-btn');
+                const bell = document.getElementById('notification-bell');
+
+                let notificationsLoaded = false;
+
+                function updateBadge(count) {
+                    if (count > 0) {
+                        badge.textContent = count > 99 ? '99+' : count;
+                        badge.style.cssText = 'min-width: 18px; height: 18px; font-size: 0.65rem; top: 2px; right: 2px; padding: 0 4px;';
+                    } else {
+                        badge.style.cssText = 'display: none !important;';
+                    }
+                }
+
+                function getNotifUrl(notif) {
+                    if (notif.relatedEntityType === 'ProjectTask') {
+                        const pid = notif.projectId || 0;
+                        return '/ProjectTask/Detail/' + notif.relatedEntityId + '?projectId=' + pid;
+                    }
+                    if (notif.relatedEntityType === 'Project') {
+                        return '/Projects/Details?projectId=' + notif.relatedEntityId;
+                    }
+                    return '#';
+                }
+
+                function getNotifIcon(type) {
+                    if (type === 'CommentAdded') return 'chat_bubble';
+                    if (type === 'ProjectMemberAdded') return 'group_add';
+                    if (type === 'TaskAssigned') return 'task_alt';
+                    return 'notifications';
+                }
+
+                function getNotifColor(type) {
+                    if (type === 'CommentAdded') return '#3b82f6';
+                    if (type === 'ProjectMemberAdded') return '#8b5cf6';
+                    if (type === 'TaskAssigned') return '#10b981';
+                    return '#6b7280';
+                }
+
+                function formatTimeAgo(dateStr) {
+                    const d = new Date(dateStr);
+                    const now = new Date();
+                    const s = Math.floor((now - d) / 1000);
+                    if (s < 60) return 'just now';
+                    const m = Math.floor(s / 60);
+                    if (m < 60) return m + 'm ago';
+                    const h = Math.floor(m / 60);
+                    if (h < 24) return h + 'h ago';
+                    const days = Math.floor(h / 24);
+                    return days + 'd ago';
+                }
+
+                function createNotifHtml(n, isNew) {
+                    const icon = getNotifIcon(n.type);
+                    const color = getNotifColor(n.type);
+                    const url = getNotifUrl(n);
+                    const cls = isNew ? ' notif-new' : '';
+                    return `<a href="${url}" class="notif-item d-flex gap-3 px-3 py-3 text-decoration-none${cls}" data-notif-id="${n.id}">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 36px; height: 36px; background-color: ${color}20;">
+                            <span class="material-symbols-outlined" style="font-size: 18px; color: ${color};">${icon}</span>
+                        </div>
+                        <div class="flex-grow-1 min-w-0">
+                            <p class="mb-0 text-dark small" style="line-height: 1.4;">${n.content}</p>
+                            <span class="text-muted" style="font-size: 0.7rem;">${formatTimeAgo(n.createdAt)}</span>
+                        </div>
+                    </a>`;
+                }
+
+                // Load unread count on page load
+                async function loadCount() {
+                    try {
+                        const res = await fetch('/api/Notification/count');
+                        if (!res.ok) return;
+                        const data = await res.json();
+                        updateBadge(data.count);
+                    } catch (e) { console.warn('Notification count error:', e); }
+                }
+
+                // Load notifications when dropdown opens
+                async function loadNotifications() {
+                    try {
+                        const res = await fetch('/api/Notification');
+                        if (!res.ok) return;
+                        const notifs = await res.json();
+                        if (notifs.length === 0) {
+                            emptyMsg.style.display = '';
+                            return;
+                        }
+                        emptyMsg.style.display = 'none';
+                        list.innerHTML = '';
+                        notifs.forEach(n => {
+                            list.insertAdjacentHTML('beforeend', createNotifHtml(n, false));
+                        });
+                        notificationsLoaded = true;
+                    } catch (e) { console.warn('Notification load error:', e); }
+                }
+
+                // Open dropdown → load notifications
+                bell.addEventListener('click', () => {
+                    loadNotifications();
+                });
+
+                // Mark all as read
+                markAllBtn.addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    try {
+                        await fetch('/api/Notification/read-all', { method: 'POST' });
+                        updateBadge(0);
+                        list.innerHTML = '';
+                        emptyMsg.style.display = '';
+                        list.appendChild(emptyMsg);
+                    } catch (e) { console.warn('Mark all read error:', e); }
+                });
+
+                // Click a notification → mark as read
+                list.addEventListener('click', async (e) => {
+                    const item = e.target.closest('.notif-item');
+                    if (!item) return;
+                    const id = item.dataset.notifId;
+                    if (id) {
+                        fetch('/api/Notification/' + id + '/read', { method: 'POST' }).catch(() => {});
+                    }
+                });
+
+                // SignalR
+                async function initNotificationHub() {
+                    if (typeof signalR === 'undefined') return;
+
+                    const conn = new signalR.HubConnectionBuilder()
+                        .withUrl('/hubs/notification')
+                        .withAutomaticReconnect()
+                        .build();
+
+                    conn.on('ReceiveNotification', (notif) => {
+                        // Update badge
+                        if (notif.unreadCount !== undefined) {
+                            updateBadge(notif.unreadCount);
+                        } else {
+                            const current = parseInt(badge.textContent) || 0;
+                            updateBadge(current + 1);
+                        }
+
+                        // Prepend to list if open
+                        emptyMsg.style.display = 'none';
+                        list.insertAdjacentHTML('afterbegin', createNotifHtml(notif, true));
+                    });
+
+                    try {
+                        await conn.start();
+                    } catch (err) {
+                        console.warn('Notification hub error:', err);
+                        setTimeout(initNotificationHub, 5000);
+                    }
+                }
+
+                loadCount();
+                initNotificationHub();
+            })();
+        </script>
+    }
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
+

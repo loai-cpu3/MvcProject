@@ -348,6 +348,19 @@ namespace MvcProject.Services
             });
             await _unitOfWork.SaveAsync();
 
+            // Create notification for the added user
+            var notif = new Notification
+            {
+                UserId = userId,
+                Type = NotificationType.ProjectMemberAdded,
+                Content = $"You have been added to \"{project.Title}\" as {role}",
+                RelatedEntityType = "Project",
+                RelatedEntityId = projectId,
+                CreatedAt = DateTime.UtcNow
+            };
+            await _unitOfWork.Notifications.AddAsync(notif);
+            await _unitOfWork.SaveAsync();
+
             return true;
         }
 

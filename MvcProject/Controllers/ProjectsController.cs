@@ -1,6 +1,9 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using MvcProject.Attributes;
+using MvcProject.Hubs;
+using MvcProject.Repositories.Interfaces;
 using MvcProject.Services.Interfaces;
 using MvcProject.ViewModels.Projects;
 using System.Security.Claims;
@@ -13,10 +16,14 @@ namespace MvcProject.Controllers
     public class ProjectsController : Controller
     {
         private readonly IProjectService _projectService;
+        private readonly IHubContext<NotificationHub> _notificationHub;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public ProjectsController(IProjectService projectService)
+        public ProjectsController(IProjectService projectService, IHubContext<NotificationHub> notificationHub, IUnitOfWork unitOfWork)
         {
             _projectService = projectService;
+            _notificationHub = notificationHub;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<IActionResult> Index()
@@ -174,6 +181,22 @@ namespace MvcProject.Controllers
         public async Task<IActionResult> AddUserToProject(int projectId, string userId , ProjectRole role=ProjectRole.Member)
         {
             await _projectService.AddUserToProjectAsync(projectId, userId, role);
+
+            // Push real-time notification to the added user
+            var unreadCount = await _unitOfWork.Notifications.GetUnreadCountAsync(userId);
+            var project = await _unitOfWork.Projects.GetByIdAsync(projectId);
+
+            await _notificationHub.Clients.Group($"user_{userId}").SendAsync("ReceiveNotification", new
+            {
+                Content = $"You have been added to \"{project?.Title}\" as {role}",
+                Type = "ProjectMemberAdded",
+                RelatedEntityType = "Project",
+                RelatedEntityId = projectId,
+                ProjectId = projectId,
+                CreatedAt = DateTime.UtcNow,
+                UnreadCount = unreadCount
+            });
+
             return RedirectToAction("Details", new { projectId });
         }
 
