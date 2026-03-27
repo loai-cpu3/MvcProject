@@ -72,7 +72,7 @@
                                             <p class="text-muted-light extra-small mb-0">@attachment.SizeDisplay • @attachment.UploadedAt.ToString("MMM dd, yyyy")</p>
                                         </div>
                                     </div>
-                                    <a asp-action="DownloadAttachment" asp-route-id="@attachment.Id" class="btn btn-link p-2 text-primary shadow-none">
+                                    <a asp-action="DownloadAttachment" asp-route-id="@attachment.Id" asp-route-projectId="@Model.ProjectId" class="btn btn-link p-2 text-primary shadow-none">
                                         <span class="material-symbols-outlined">download</span>
                                     </a>
                                 </div>

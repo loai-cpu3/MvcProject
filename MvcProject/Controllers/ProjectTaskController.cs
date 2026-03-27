@@ -80,7 +80,7 @@ namespace MvcProject.Controllers
 
 
         [ProjectAuthorize(ProjectRole.Admin, ProjectRole.Manager, ProjectRole.Member)]
-        public async Task<IActionResult> DownloadAttachment(int id)
+        public async Task<IActionResult> DownloadAttachment(int id, int projectId)
         {
             try
             {
@@ -118,7 +118,7 @@ namespace MvcProject.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [ProjectAuthorize(ProjectRole.Admin, ProjectRole.Manager)]
-        public async Task<IActionResult> CreateNewTask(ProjectTaskCreateViewModel model)
+        public async Task<IActionResult> CreateNewTask(int projectId, ProjectTaskCreateViewModel model)
         {
             if (ModelState.IsValid)
             {
@@ -157,7 +157,7 @@ namespace MvcProject.Controllers
 
         [HttpPost]
         [ProjectAuthorize(ProjectRole.Admin, ProjectRole.Manager)]
-        public async Task<IActionResult> AjaxCreate(ProjectTaskCreateViewModel model)
+        public async Task<IActionResult> AjaxCreate(int projectId, ProjectTaskCreateViewModel model)
         {
             if (ModelState.IsValid)
             {
@@ -268,7 +268,7 @@ namespace MvcProject.Controllers
 
         [HttpPost]
         [ProjectAuthorize(ProjectRole.Admin, ProjectRole.Manager, ProjectRole.Member)]
-        public async Task<IActionResult> UpdateStatus(int id, Models.Enums.TaskStatus status)
+        public async Task<IActionResult> UpdateStatus(int id, int projectId, Models.Enums.TaskStatus status)
         {
             var task = await _unitOfWork.Tasks.GetByIdAsync(id);
             if (task == null) return NotFound();
@@ -311,7 +311,7 @@ namespace MvcProject.Controllers
 
         [HttpPost]
         [ProjectAuthorize(ProjectRole.Admin, ProjectRole.Manager)]
-        public async Task<IActionResult> AjaxDelete(int id)
+        public async Task<IActionResult> AjaxDelete(int id, int projectId)
         {
             var task = await _unitOfWork.Tasks.GetByIdAsync(id);
             if (task == null) return NotFound();
