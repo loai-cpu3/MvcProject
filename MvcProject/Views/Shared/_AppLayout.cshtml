@@ -14,7 +14,7 @@
     <aside class="sidebar-width bg-surface-light border-end border-border-light d-flex flex-column z-index-20">
         <div class="d-flex align-items-center px-4 border-bottom border-border-light" style="height: 64px;">
             <div class="d-flex align-items-center gap-3 w-100">
-                <div class="rounded p-2 d-flex align-items-center justify-content-center" style="background-color: rgba(79, 70, 229, 0.1);">
+                <div class="rounded p-2 d-flex align-items-center justify-content-center" style="background-color: #6366f1;">
                     <span class="material-symbols-outlined text-primary fs-5">view_kanban</span>
                 </div>
                 <div class="d-flex flex-column">
@@ -33,7 +33,7 @@
                 <span class="material-symbols-outlined fs-5">folder_open</span>
                 <span class="fs-6">Projects</span>
             </a>
-            <a class="nav-link-custom d-flex align-items-center gap-3 px-3 py-2 rounded font-display fw-semibold text-decoration-none shadow-none" asp-controller="projectTask" asp-action="create">
+            <a class="nav-link-custom d-flex align-items-center gap-3 px-3 py-2 rounded font-display fw-semibold text-decoration-none shadow-none @(ViewContext.RouteData.Values["Action"]?.ToString() == "AllTasks" ? "active" : "")" asp-controller="ProjectTask" asp-action="AllTasks">
                 <span class="material-symbols-outlined fs-5">task_alt</span>
                 <span class="fs-6">Tasks</span>
             </a>
@@ -44,7 +44,7 @@
         </nav>
 
         <div class="p-3 border-top border-border-light">
-            <a class="nav-link-custom d-flex align-items-center gap-3 px-3 py-2 rounded font-display fw-semibold text-decoration-none shadow-none" href="#">
+            <a class="nav-link-custom d-flex align-items-center gap-3 px-3 py-2 rounded font-display fw-semibold text-decoration-none shadow-none @(ViewContext.RouteData.Values["Action"]?.ToString() == "Settings" ? "active" : "")" asp-controller="Account" asp-action="Settings">
                 <span class="material-symbols-outlined fs-5">settings</span>
                 <span class="fs-6">Settings</span>
             </a>

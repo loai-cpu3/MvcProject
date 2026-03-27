@@ -77,6 +77,7 @@ namespace MvcProject.Services
                 Title = project.Title,
                 Description = project.Description,
                 IsCurrentUserAdmin = currentUserMembership?.Role == ProjectRole.Admin,
+                IsCanCreateTask = currentUserMembership?.Role == ProjectRole.Admin || currentUserMembership?.Role == ProjectRole.Manager,
                 TotalTasks = totalTasks,
                 CompletedTasks = completedTasks,
                 CompletionPercentage = completionPercentage,
@@ -92,7 +93,18 @@ namespace MvcProject.Services
                         AssigneeAvatarUrl = task.Assignee?.ProfilePictureUrl
                     }).ToList(),
                 InProgressTasks = project.Tasks
-                    .Where(task => task.Status == TaskStatus.InProgress || task.Status == TaskStatus.Review)
+                    .Where(task => task.Status == TaskStatus.InProgress)
+                    .OrderBy(task => task.Deadline ?? DateTime.MaxValue)
+                    .ThenByDescending(task => task.CreatedAt)
+                    .Select(task => new ProjectDetailsTaskItemViewModel
+                    {
+                        Id = task.Id,
+                        Title = task.Title,
+                        Deadline = task.Deadline,
+                        AssigneeAvatarUrl = task.Assignee?.ProfilePictureUrl
+                    }).ToList(),
+                ReviewTasks = project.Tasks
+                    .Where(task => task.Status == TaskStatus.Review)
                     .OrderBy(task => task.Deadline ?? DateTime.MaxValue)
                     .ThenByDescending(task => task.CreatedAt)
                     .Select(task => new ProjectDetailsTaskItemViewModel

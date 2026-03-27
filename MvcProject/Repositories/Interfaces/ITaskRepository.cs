@@ -1,4 +1,4 @@
-﻿using MvcProject.Models.Domain;
+using MvcProject.Models.Domain;
 
 namespace MvcProject.Repositories.Interfaces
 {
@@ -7,6 +7,8 @@ namespace MvcProject.Repositories.Interfaces
         Task<double> GetUserWeeklyCompletionRateAsync(int projectId,string userId);
         Task<int> GetTotalPendingTasksCountAsync(string userId);
         Task<List<ProjectTask>> GetRecentTasksAsync(string userId, int count);
-        
+        Task<ProjectTask?> GetByIdWithAttachmentsAsync(int id);
+        Task<List<ProjectTask>> GetAllUserTasksAsync(string userId);
+        Task<List<ProjectTask>> GetAllTasksInUserProjectsAsync(string userId);
     }
 }

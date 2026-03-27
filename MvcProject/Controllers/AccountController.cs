@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
 using MvcProject.Models.Domain;
 using MvcProject.ViewModels;
+using MvcProject.ViewModels.Account;
 
 namespace MvcProject.Controllers
 {
@@ -123,6 +125,124 @@ namespace MvcProject.Controllers
         {
             return View();
         }
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> Settings()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return NotFound();
+
+            var model = new AccountSettingsVM
+            {
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Email = user.Email ?? string.Empty,
+                CurrentProfilePictureUrl = user.ProfilePictureUrl
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [Authorize]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Settings(AccountSettingsVM model)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return NotFound();
+
+            if (!ModelState.IsValid)
+            {
+                model.Email = user.Email ?? string.Empty;
+                model.CurrentProfilePictureUrl = user.ProfilePictureUrl;
+                return View(model);
+            }
+
+            user.FirstName = model.FirstName;
+            user.LastName = model.LastName;
+
+            // Handle Profile Picture
+            if (model.ProfilePicture != null && model.ProfilePicture.Length > 0)
+            {
+                var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".webp" };
+                var extension = Path.GetExtension(model.ProfilePicture.FileName).ToLower();
+
+                if (allowedExtensions.Contains(extension))
+                {
+                    var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "uploads", "profiles");
+                    if (!Directory.Exists(uploadsFolder))
+                    {
+                        Directory.CreateDirectory(uploadsFolder);
+                    }
+
+                    var uniqueFileName = $"{Guid.NewGuid()}{extension}";
+                    var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await model.ProfilePicture.CopyToAsync(stream);
+                    }
+
+                    // Delete old image if it exists
+                    if (!string.IsNullOrEmpty(user.ProfilePictureUrl))
+                    {
+                        var oldFilePath = Path.Combine(_webHostEnvironment.WebRootPath, user.ProfilePictureUrl.TrimStart('/'));
+                        if (System.IO.File.Exists(oldFilePath))
+                        {
+                            try { System.IO.File.Delete(oldFilePath); } catch { /* Ignore delete errors */ }
+                        }
+                    }
+
+                    user.ProfilePictureUrl = $"/uploads/profiles/{uniqueFileName}";
+                }
+                else
+                {
+                    ModelState.AddModelError("ProfilePicture", "Invalid file format. Only JPG, PNG, and WebP are allowed.");
+                    model.Email = user.Email ?? string.Empty;
+                    model.CurrentProfilePictureUrl = user.ProfilePictureUrl;
+                    return View(model);
+                }
+            }
+
+            var updateResult = await _userManager.UpdateAsync(user);
+            if (!updateResult.Succeeded)
+            {
+                foreach (var error in updateResult.Errors)
+                    ModelState.AddModelError(string.Empty, error.Description);
+
+                model.Email = user.Email ?? string.Empty;
+                model.CurrentProfilePictureUrl = user.ProfilePictureUrl;
+                return View(model);
+            }
+
+            // Handle Password Change
+            if (!string.IsNullOrEmpty(model.NewPassword))
+            {
+                if (string.IsNullOrEmpty(model.CurrentPassword))
+                {
+                    ModelState.AddModelError("CurrentPassword", "Current password is required to set a new password.");
+                    model.Email = user.Email ?? string.Empty;
+                    model.CurrentProfilePictureUrl = user.ProfilePictureUrl;
+                    return View(model);
+                }
+
+                var passwordResult = await _userManager.ChangePasswordAsync(user, model.CurrentPassword, model.NewPassword);
+                if (!passwordResult.Succeeded)
+                {
+                    foreach (var error in passwordResult.Errors)
+                        ModelState.AddModelError(string.Empty, error.Description);
+
+                    model.Email = user.Email ?? string.Empty;
+                    model.CurrentProfilePictureUrl = user.ProfilePictureUrl;
+                    return View(model);
+                }
+            }
+
+            await _signInManager.RefreshSignInAsync(user);
+            TempData["SuccessMessage"] = "Profile updated successfully!";
+            return RedirectToAction(nameof(Settings));
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()

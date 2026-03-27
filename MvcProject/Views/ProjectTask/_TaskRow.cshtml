@@ -1,0 +1,41 @@
+@model MvcProject.Models.Domain.ProjectTask
+
+<a href="@Url.Action("Detail", "ProjectTask", new { id = Model.Id, projectId = Model.ProjectId })" class="task-row d-flex align-items-center justify-content-between p-3 border-bottom border-border-light text-decoration-none" style="cursor: pointer;">
+    <div class="d-flex align-items-center gap-3 min-w-0">
+        <div class="bg-light rounded p-2 d-flex align-items-center justify-content-center me-1 shadow-xs" style="width: 36px; height: 36px;">
+            @{
+                var icon = Model.Status == MvcProject.Models.Enums.TaskStatus.Done ? "task_alt" : "assignment";
+                var iconClass = Model.Status == MvcProject.Models.Enums.TaskStatus.Done ? "text-success" : "text-muted-light";
+            }
+            <span class="material-symbols-outlined @iconClass" style="font-size: 20px;">@icon</span>
+        </div>
+        <div class="min-w-0">
+            <p class="fw-bold text-dark mb-0 text-truncate @(Model.Status == MvcProject.Models.Enums.TaskStatus.Done ? "text-decoration-line-through opacity-75" : "")" style="font-size: 0.95rem;">@Model.Title</p>
+            <div class="d-flex align-items-center gap-2">
+                <p class="extra-small text-muted-light mb-0 fw-medium">@Model.Project.Title</p>
+                <span class="text-muted-light" style="font-size: 10px;">•</span>
+                <span class="extra-small fw-semibold @GetStatusClass(Model.Status)">@Model.Status</span>
+            </div>
+        </div>
+    </div>
+    <div class="d-flex align-items-center gap-4 flex-shrink-0 ms-3">
+        <div class="d-none d-sm-flex align-items-center gap-1 small text-muted-light fw-medium">
+            <span class="material-symbols-outlined" style="font-size: 14px;">calendar_today</span>
+            @(Model.Deadline?.ToString("MMM dd") ?? "No deadline")
+        </div>
+    </div>
+</a>
+
+@functions {
+    string GetStatusClass(MvcProject.Models.Enums.TaskStatus status)
+    {
+        return status switch
+        {
+            MvcProject.Models.Enums.TaskStatus.ToDo => "text-secondary",
+            MvcProject.Models.Enums.TaskStatus.InProgress => "text-primary",
+            MvcProject.Models.Enums.TaskStatus.Review => "text-warning",
+            MvcProject.Models.Enums.TaskStatus.Done => "text-success",
+            _ => "text-muted"
+        };
+    }
+}
