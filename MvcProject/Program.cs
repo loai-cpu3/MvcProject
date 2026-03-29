@@ -1,14 +1,15 @@
-using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
-using MvcProject.Data;
-using MvcProject.Models.Domain;
-using MvcProject.Repositories.Interfaces;
-using MvcProject.Repositories.Implementations;
+using Microsoft.EntityFrameworkCore;
 using MvcProject.Authorization.Handlers;
 using MvcProject.Authorization.Requirements;
-using Microsoft.AspNetCore.Authorization;
-using MvcProject.Services;
+using MvcProject.Data;
 using MvcProject.Hubs;
+using MvcProject.Models.Domain;
+using MvcProject.Repositories.Implementations;
+using MvcProject.Repositories.Interfaces;
+using MvcProject.Services;
 using MvcProject.Services.Interfaces;
 
 namespace MvcProject
@@ -26,10 +27,27 @@ namespace MvcProject
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+            //builder.Services
+            //    .AddIdentity<ApplicationUser, IdentityRole>()
+            //    .AddEntityFrameworkStores<ApplicationDbContext>()
+            //    .AddDefaultTokenProviders();
+
+       //     builder.Services.AddDataProtection()
+       ////  .PersistKeysToFileSystem(new DirectoryInfo(@"C:\Keys")) // any folder on your machine
+       //   .SetApplicationName("Velocity");
+          
             builder.Services
-                .AddIdentity<ApplicationUser, IdentityRole>()
-                .AddEntityFrameworkStores<ApplicationDbContext>();
-                
+               .AddIdentity<ApplicationUser, IdentityRole>()
+               .AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
+
+            builder.Services.ConfigureApplicationCookie(options =>
+            {
+                options.ExpireTimeSpan = TimeSpan.FromDays(20);
+                options.SlidingExpiration = true;
+                options.Cookie.IsEssential = true;
+                options.Cookie.HttpOnly = true;
+            });
+
 
             builder.Services.AddAuthorization(options =>
             {
@@ -53,6 +71,28 @@ namespace MvcProject
             builder.Services.AddScoped<IAttachmentService, AttachmentService>();
             builder.Services.AddScoped<IAuditLogRepository, AuditLogRepository>();
 
+            builder.Services.AddAuthentication()
+       .AddGoogle(options =>
+       {
+           options.CallbackPath = "/signin-google";
+           options.ClientId = builder.Configuration["Authentication:Google:ClientId"]!;
+           options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"]!;
+       });
+
+
+            builder.Services.ConfigureApplicationCookie(options =>
+            {
+                options.Cookie.SameSite = SameSiteMode.Lax;
+            });
+
+            //
+            builder.Services.Configure<EmailSettings>(
+               builder.Configuration.GetSection("EmailSettings"));
+
+            builder.Services.AddTransient<EmailService>();
+
+
+
 
             var app = builder.Build();
 
@@ -73,7 +113,7 @@ namespace MvcProject
             app.MapStaticAssets();
             app.MapControllerRoute(
                 name: "default",
-                pattern: "{controller=account}/{action=login}/{id?}")
+                pattern: "{controller=Home}/{action=Index}/{id?}")
                 .WithStaticAssets();
 
             app.MapHub<TaskHub>("/hubs/task");

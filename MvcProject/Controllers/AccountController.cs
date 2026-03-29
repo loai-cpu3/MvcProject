@@ -1,9 +1,11 @@
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using MvcProject.Models.Domain;
 using MvcProject.ViewModels;
 using MvcProject.ViewModels.Account;
+using System.Security.Claims;
 
 namespace MvcProject.Controllers
 {
@@ -12,15 +14,18 @@ namespace MvcProject.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly EmailService _emailService;
 
         public AccountController(
-            UserManager<ApplicationUser> userManager,
-            SignInManager<ApplicationUser> signInManager,
-            IWebHostEnvironment webHostEnvironment)
+     UserManager<ApplicationUser> userManager,
+     SignInManager<ApplicationUser> signInManager,
+     IWebHostEnvironment webHostEnvironment,
+     EmailService emailService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _webHostEnvironment = webHostEnvironment;
+            _emailService = emailService;
         }
 
         [HttpGet]
@@ -92,7 +97,6 @@ namespace MvcProject.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(ApplicationUserLoginVM loginReq)
@@ -114,6 +118,8 @@ namespace MvcProject.Controllers
                     return View("Login", loginReq);
                 }
 
+         
+
                 await _signInManager.SignInAsync(user!, loginReq.RememberMe);
                 return RedirectToAction("Index", "Home");
             }
@@ -123,6 +129,10 @@ namespace MvcProject.Controllers
         [HttpGet]
         public IActionResult Login()
         {
+            if (User.Identity!.IsAuthenticated)
+            {
+                return RedirectToAction("Index", "Home");
+            }
             return View();
         }
         [HttpGet]
@@ -247,8 +257,175 @@ namespace MvcProject.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
         {
+            await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
             await _signInManager.SignOutAsync();
             return RedirectToAction("Index","Home");
+        }
+
+
+
+      //google
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult ExternalLogin(string provider, string? returnUrl = null)
+        {
+            var redirectUrl = Url.Action(nameof(ExternalLoginCallback), "Account",
+                                         new { returnUrl });
+
+            var properties = _signInManager
+                .ConfigureExternalAuthenticationProperties(provider, redirectUrl);
+
+            return Challenge(properties, provider);
+        }
+
+       
+        [HttpGet]
+        public async Task<IActionResult> ExternalLoginCallback(string? returnUrl = null)
+        {
+         
+            var info = await _signInManager.GetExternalLoginInfoAsync();
+            if (info == null)
+                return RedirectToAction(nameof(Login));
+
+            var result = await _signInManager
+                .ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey,
+                                           isPersistent: false);
+
+            if (result.Succeeded)
+                return RedirectToLocal(returnUrl);
+
+           
+            var email = info.Principal.FindFirstValue(ClaimTypes.Email);
+            var firstName = info.Principal.FindFirstValue(ClaimTypes.GivenName) ?? "";
+            var lastName = info.Principal.FindFirstValue(ClaimTypes.Surname) ?? "";
+
+            if (email == null)
+            {
+                TempData["Error"] = "Could not retrieve email from external provider.";
+                return RedirectToAction(nameof(Login));
+            }
+
+     
+            var user = await _userManager.FindByEmailAsync(email);
+
+            if (user == null)
+            {
+             
+                user = new ApplicationUser
+                {
+                    UserName = email,
+                    Email = email,
+                    FirstName = firstName.Length >= 2 ? firstName : "User",
+                    LastName = lastName.Length >= 2 ? lastName : "Name",
+                    EmailConfirmed = true 
+                };
+
+                var createResult = await _userManager.CreateAsync(user);
+                if (!createResult.Succeeded)
+                {
+                    TempData["Error"] = "Account creation failed.";
+                    return RedirectToAction(nameof(Login));
+                }
+            }
+
+      
+            await _userManager.AddLoginAsync(user, info);
+            await _signInManager.SignInAsync(user, isPersistent: false);
+
+            return RedirectToLocal(returnUrl);
+        }
+
+       
+        private IActionResult RedirectToLocal(string? returnUrl)
+        {
+            if (Url.IsLocalUrl(returnUrl))
+                return Redirect(returnUrl);
+            return RedirectToAction("Index", "Home");
+        }
+
+
+        //
+        [HttpGet]
+        public IActionResult ForgetPassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ForgetPassword(forgetPassVM model)
+        {
+            if (!ModelState.IsValid) return View(model);
+
+            var user = await _userManager.FindByEmailAsync(model.Email);
+
+            if (user == null)
+                return RedirectToAction("ForgotPasswordConfirmation");
+
+            // Generate token
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+
+            // Build reset link
+            var resetLink = Url.Action("ResetPassword", "Account",
+                new { token, email = user.Email }, Request.Scheme);
+
+            // Build email body
+            var emailBody = $@"
+    <h2>Reset Your Password</h2>
+    <p>You requested a password reset. Click the button below:</p>
+    <a href='{resetLink}' 
+       style='background:#4F46E5; color:white; padding:12px 24px; 
+              text-decoration:none; border-radius:6px;'>
+        Reset Password
+    </a>
+    <p>This link expires in 24 hours.</p>
+    <p>If you did not request this, ignore this email.</p>
+";
+
+            // Send real email
+            await _emailService.SendAsync(model.Email, "Reset Your Password", emailBody);
+
+            return RedirectToAction("ForgotPasswordConfirmation");
+        }
+        [HttpGet]
+        public IActionResult ResetPassword(string token, string email)
+        {
+            if (token == null || email == null)
+                return RedirectToAction("Login");
+
+            var model = new resetPassVM { Token = token, Email = email };
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ResetPassword(resetPassVM model)
+        {
+            if (!ModelState.IsValid) return View(model);
+
+            var user = await _userManager.FindByEmailAsync(model.Email);
+
+            if (user == null)
+                return RedirectToAction("ResetPasswordConfirmation");
+
+            var result = await _userManager.ResetPasswordAsync(user, model.Token, model.Password);
+
+            if (result.Succeeded)
+                return RedirectToAction("ResetPasswordConfirmation");
+
+            foreach (var error in result.Errors)
+                ModelState.AddModelError("", error.Description);
+
+            return View(model);
+        }
+        [HttpGet]
+        public IActionResult ForgotPasswordConfirmation()
+        {
+            return View();
+        }
+
+        [HttpGet]
+        public IActionResult ResetPasswordConfirmation()
+        {
+            return View();
         }
     }
 }
