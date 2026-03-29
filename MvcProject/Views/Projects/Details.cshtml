@@ -59,6 +59,17 @@
                 <button type="button" class="btn btn-danger fw-semibold font-display shadow-sm" style="font-size: 0.875rem;" data-bs-toggle="modal" data-bs-target="#deleteProjectModal">
                     Delete Project
                 </button>
+
+            }
+            @if (Model.IsCanCreateTask)
+            {
+                <a asp-controller="ProjectTask"
+                       asp-action="Create"
+                       asp-route-projectId="@Model.ProjectId"
+                       class="btn btn-outline-success fw-semibold font-display shadow-sm"
+                       style="font-size: 0.875rem;">
+                    Create Task
+                </a>
             }
         </div>
     </div>
@@ -195,12 +206,7 @@
                     To Do
                     <span class="text-muted-light fw-normal small ms-1">@Model.ToDoTasks.Count</span>
                 </h3>
-                @if (Model.IsCanCreateTask)
-                {
-                    <a asp-controller="ProjectTask" asp-action="Create" asp-route-projectId="@Model.ProjectId" class="btn btn-sm btn-primary ms-2 shadow-sm fw-semibold" style="font-size:0.875rem;">
-                        Create Task
-                    </a>
-                }
+           
             </div>
 
             <div class="bg-surface-light rounded-3 shadow-soft border border-border-light overflow-hidden">

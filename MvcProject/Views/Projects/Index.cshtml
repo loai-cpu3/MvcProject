@@ -14,24 +14,33 @@
 
     @if (Model.Projects.Any())
     {
-        <div class="row g-4">
+        <div class="d-flex flex-column gap-3">
             @foreach (var project in Model.Projects)
             {
-                <div class="col-12 col-md-6 col-lg-4 col-xl-3">
+                <div class="col-12">
                     <a asp-controller="Projects" asp-action="Details" asp-route-projectId="@project.ProjectId" class="text-decoration-none">
-                        <div class="project-card bg-surface-light rounded-4 p-4 border border-border-light shadow-soft d-flex flex-column h-100 position-relative overflow-hidden" style="min-height: 220px; transition: all 0.3s ease;">
-                            <h3 class="font-display fw-bold fs-5 mb-2 text-truncate text-dark transition-colors">@project.Title</h3>
-                            <p class="small text-muted-light mb-auto lh-base" style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">@project.Description</p>
+                        <div class="project-card bg-surface-light rounded-4 p-4 border border-border-light shadow-soft d-flex flex-column flex-md-row justify-content-between align-items-md-center position-relative overflow-hidden" style="transition: all 0.3s ease;">
+                            <div class="flex-grow-1 pe-md-4 mb-3 mb-md-0">
+                                <h3 class="font-display fw-bold fs-5 mb-1 text-dark transition-colors">@project.Title</h3>
+                                <div class="d-flex align-items-center gap-2 mb-2">
+                                    <span class="material-symbols-outlined text-muted-light" style="font-size: 16px;">person</span>
+                                    <span class="small text-muted-light fw-medium">Owner: @project.OwnerName</span>
+                                </div>
+                                <p class="small text-muted-light mb-0 lh-base" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">@project.Description</p>
+                            </div>
 
-                            <div class="mt-4 d-flex flex-column gap-2">
-                                <span class="fw-bold text-dark" style="font-size: 12px;">@project.CompletionPercentage% Complete</span>
-                                <div class="progress w-100 bg-border-light rounded-pill" style="height: 6px;">
+                            <div class="d-flex flex-column gap-1" style="min-width: 200px;">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="fw-bold text-dark" style="font-size: 12px;">Progress</span>
+                                    <span class="fw-bold text-primary" style="font-size: 12px;">@project.CompletionPercentage%</span>
+                                </div>
+                                <div class="progress w-100 bg-border-light rounded-pill mt-1" style="height: 8px;">
                                     <div class="progress-bar bg-primary rounded-pill transition-all" role="progressbar" style="width: @project.CompletionPercentage%; transition: width 1s ease-in-out;" aria-valuenow="@project.CompletionPercentage" aria-valuemin="0" aria-valuemax="100"></div>
                                 </div>
                             </div>
 
                             <!-- Hover Overlay Tag -->
-                            <div class="project-hover-tag position-absolute start-0 end-0 bottom-0 bg-primary text-white text-center py-2 fw-bold tracking-wide" style="font-size: 11px; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); text-transform: uppercase;">
+                            <div class="project-hover-tag position-absolute start-0 end-0 bottom-0 bg-primary text-white text-center py-1 fw-bold tracking-wide" style="font-size: 11px; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); text-transform: uppercase;">
                                 Show project details
                             </div>
                         </div>

@@ -157,21 +157,24 @@
                                     <span id="statusBadge" class="badge rounded-pill fw-semibold @statusClass" style="font-size: 0.75rem;">@Model.Status</span>
                                 </div>
                                 
-                                <form asp-controller="ProjectTask" asp-action="UpdateStatus" method="post">
-                                    <input type="hidden" name="id" value="@Model.Id" />
-                                    <input type="hidden" name="projectId" value="@Model.ProjectId" />
-                                    <div class="d-flex gap-2 mt-1">
-                                        <select id="statusSelect" name="status" class="form-select form-select-sm text-dark extra-small">
-                                            @foreach (var status in Enum.GetValues<MvcProject.Models.Enums.TaskStatus>())
-                                            {
-                                                <!option value="@((int)status)" @(status == Model.Status ? "selected" : "")>@status</!option>
-                                            }
-                                        </select>
-                                        <button type="submit" id="saveStatusBtn" class="btn btn-primary btn-sm px-3 shadow-none fw-bold" style="font-size: 0.7rem;">
-                                            Save
-                                        </button>
-                                    </div>
-                                </form>
+                                @if (Model.CanChangeStatus)
+                                {
+                                    <form asp-controller="ProjectTask" asp-action="UpdateStatus" method="post">
+                                        <input type="hidden" name="id" value="@Model.Id" />
+                                        <input type="hidden" name="projectId" value="@Model.ProjectId" />
+                                        <div class="d-flex gap-2 mt-1">
+                                            <select id="statusSelect" name="status" class="form-select form-select-sm text-dark extra-small">
+                                                @foreach (var status in Enum.GetValues<MvcProject.Models.Enums.TaskStatus>())
+                                                {
+                                                    <!option value="@((int)status)" @(status == Model.Status ? "selected" : "")>@status</!option>
+                                                }
+                                            </select>
+                                            <button type="submit" id="saveStatusBtn" class="btn btn-primary btn-sm px-3 shadow-none fw-bold" style="font-size: 0.7rem;">
+                                                Save
+                                            </button>
+                                        </div>
+                                    </form>
+                                }
                             </div>
                         </div>
 

@@ -18,6 +18,7 @@ namespace MvcProject.Repositories.Implementations
             return await _dbSet
                 .AsNoTracking()
                 .Include(p => p.Tasks)
+                .Include(p => p.CreatedBy)
                 .Where(p => p.Members.Any(m => m.UserId == userId))
                 .OrderByDescending(p => p.CreatedAt)
                 .ToListAsync();

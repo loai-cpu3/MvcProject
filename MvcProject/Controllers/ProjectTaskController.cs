@@ -17,15 +17,13 @@ namespace MvcProject.Controllers
     [Authorize]
     public class ProjectTaskController : Controller
     {
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly IProjectTaskService _projectTaskService;
         private readonly IAttachmentService _attachmentService;
-        private readonly IHubContext<NotificationHub> _notificationHub;
 
-        public ProjectTaskController(IUnitOfWork unitOfWork, IAttachmentService attachmentService, IHubContext<NotificationHub> notificationHub)
+        public ProjectTaskController(IProjectTaskService projectTaskService, IAttachmentService attachmentService)
         {
-            _unitOfWork = unitOfWork;
+            _projectTaskService = projectTaskService;
             _attachmentService = attachmentService;
-            _notificationHub = notificationHub;
         }
 
         public async Task<IActionResult> MyTasks(int? projectId, MvcProject.Models.Enums.TaskStatus? status)
@@ -33,46 +31,7 @@ namespace MvcProject.Controllers
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrWhiteSpace(userId)) return Challenge();
 
-            // Fetch all tasks in projects the user is a member of
-            var tasks = await _unitOfWork.Tasks.GetAllTasksInUserProjectsAsync(userId);
-            var userProjects = await _unitOfWork.Projects.GetProjectsForUserAsync(userId);
-
-            // Apply filters
-            if (projectId.HasValue)
-            {
-                tasks = tasks.Where(t => t.ProjectId == projectId.Value).ToList();
-            }
-
-            if (status.HasValue)
-            {
-                tasks = tasks.Where(t => t.Status == status.Value).ToList();
-            }
-
-            var model = new UserTasksViewModel
-            {
-                ToDoTasks = tasks.Where(t => t.Status == MvcProject.Models.Enums.TaskStatus.ToDo).ToList(),
-                InProgressTasks = tasks.Where(t => t.Status == MvcProject.Models.Enums.TaskStatus.InProgress).ToList(),
-                ReviewTasks = tasks.Where(t => t.Status == MvcProject.Models.Enums.TaskStatus.Review).ToList(),
-                DoneTasks = tasks.Where(t => t.Status == MvcProject.Models.Enums.TaskStatus.Done).ToList(),
-                
-                SelectedProjectId = projectId,
-                SelectedStatus = status,
-                ProjectList = userProjects.Select(p => new SelectListItem
-                {
-                    Value = p.Id.ToString(),
-                    Text = p.Title,
-                    Selected = projectId == p.Id
-                }).ToList(),
-                StatusList = Enum.GetValues(typeof(MvcProject.Models.Enums.TaskStatus))
-                    .Cast<MvcProject.Models.Enums.TaskStatus>()
-                    .Select(s => new SelectListItem
-                    {
-                        Value = s.ToString(),
-                        Text = s.ToString(),
-                        Selected = status == s
-                    }).ToList()
-            };
-
+            var model = await _projectTaskService.GetMyTasksViewModelAsync(userId, projectId, status);
             return View(model);
         }
 
@@ -81,54 +40,17 @@ namespace MvcProject.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-
-
         [ProjectAuthorize(ProjectRole.Admin, ProjectRole.Manager, ProjectRole.Member)]
         public async Task<IActionResult> Detail(int id, int projectId)
         {
-            var task = await _unitOfWork.Tasks.GetByIdWithAttachmentsAsync(id);
-            if (task == null || task.ProjectId != projectId) return NotFound();
-
-            // Ensure related data is loaded. Since generic GetByIdAsync might not include them,
-            // we might need a more specific method or handle it here if possible.
-            // For now, let's assume we need to load them.
-
-            var project = await _unitOfWork.Projects.GetByIdAsync(projectId);
-            var assignee = task.AssigneeId != null ? await _unitOfWork.Users.GetByIdAsync(task.AssigneeId) : null;
-
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var projectUser = await _unitOfWork.ProjectUsers.GetByProjectAndUserAsync(projectId, userId);
+            if (string.IsNullOrWhiteSpace(userId)) return Challenge();
 
-            var canEditDelete = projectUser != null &&
-                               (projectUser.Role == ProjectRole.Admin || projectUser.Role == ProjectRole.Manager);
-
-            var model = new ProjectTaskDetailViewModel
-            {
-                Id = task.Id,
-                Title = task.Title,
-                Description = task.Description,
-                Status = task.Status,
-                Priority = task.Priority,
-                Deadline = task.Deadline,
-                ProjectId = task.ProjectId,
-                ProjectTitle = project?.Title ?? "Unknown",
-                AssigneeId = task.AssigneeId,
-                AssigneeName = assignee != null ? $"{assignee.FirstName} {assignee.LastName}" : "Unassigned",
-                AssigneePhotoUrl = assignee?.ProfilePictureUrl,
-                CanEditDelete = canEditDelete,
-                Attachments = task.Attachments.Select(a => new AttachmentViewModel
-                {
-                    Id = a.Id,
-                    FileName = a.OriginalFileName,
-                    Size = a.Size,
-                    ContentType = a.ContentType,
-                    UploadedAt = a.UploadedAt
-                }).ToList()
-            };
+            var model = await _projectTaskService.GetTaskDetailViewModelAsync(id, projectId, userId);
+            if (model == null) return NotFound();
 
             return View(model);
         }
-
 
         [ProjectAuthorize(ProjectRole.Admin, ProjectRole.Manager, ProjectRole.Member)]
         public async Task<IActionResult> DownloadAttachment(int id, int projectId)
@@ -148,20 +70,8 @@ namespace MvcProject.Controllers
         [ProjectAuthorize(ProjectRole.Admin, ProjectRole.Manager)]
         public async Task<IActionResult> Create(int projectId)
         {
-            var project = await _unitOfWork.Projects.GetByIdAsync(projectId);
-            if (project == null) return NotFound();
-
-            var members = await _unitOfWork.ProjectUsers.GetProjectMembersWithUsersAsync(projectId);
-
-            ProjectTaskCreateViewModel model = new ProjectTaskCreateViewModel
-            {
-                ProjectId = projectId,
-                UsersList = members.Select(m => new SelectListItem
-                {
-                    Value = m.UserId,
-                    Text = $"{m.User.FirstName} {m.User.LastName}"
-                })
-            };
+            var model = await _projectTaskService.GetCreateTaskViewModelAsync(projectId);
+            if (model == null) return NotFound();
 
             return View(model);
         }
@@ -171,9 +81,11 @@ namespace MvcProject.Controllers
         [ProjectAuthorize(ProjectRole.Admin, ProjectRole.Manager)]
         public async Task<IActionResult> CreateNewTask(int projectId, ProjectTaskCreateViewModel model)
         {
+            var actorId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrWhiteSpace(actorId)) return Challenge();
+
             if (ModelState.IsValid)
             {
-                // Validate attachments BEFORE saving the task to avoid orphaned records
                 if (model.Attachments != null && model.Attachments.Any())
                 {
                     foreach (var file in model.Attachments)
@@ -182,28 +94,14 @@ namespace MvcProject.Controllers
                         if (!TaskAttachmentConstants.AllowedExtensions.Contains(ext))
                         {
                             ModelState.AddModelError("Attachments", $"File type {ext} is not allowed. Allowed: {TaskAttachmentConstants.AllowedExtensionsDisplay}");
-                            var m = await _unitOfWork.ProjectUsers.GetProjectMembersWithUsersAsync(model.ProjectId);
-                            model.UsersList = m.Select(member => new SelectListItem { Value = member.UserId, Text = $"{member.User.FirstName} {member.User.LastName}" });
+                            var m = await _projectTaskService.GetCreateTaskViewModelAsync(model.ProjectId);
+                            model.UsersList = m?.UsersList ?? new List<SelectListItem>();
                             return View("Create", model);
                         }
                     }
                 }
 
-                var task = new ProjectTask
-                {
-                    Title = model.Title,
-                    Description = model.Description,
-                    Status = model.Status,
-                    Priority = model.Priority,
-                    Deadline = model.Deadline,
-                    ProjectId = model.ProjectId,
-                    AssigneeId = model.AssigneeId
-                };
-
-                await _unitOfWork.Tasks.AddAsync(task);
-                await _unitOfWork.SaveAsync();
-                
-                await LogActivityAsync(task.Id, AuditActionType.Create, "created this task");
+                var task = await _projectTaskService.CreateTaskAsync(model, actorId);
 
                 if (model.Attachments != null && model.Attachments.Any())
                 {
@@ -216,45 +114,11 @@ namespace MvcProject.Controllers
                     }
                 }
 
-                if (!string.IsNullOrEmpty(task.AssigneeId))
-                {
-                    var project = await _unitOfWork.Projects.GetByIdAsync(projectId);
-                    var actorId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                    if (task.AssigneeId != actorId)
-                    {
-                        var notif = new Notification
-                        {
-                            UserId = task.AssigneeId,
-                            SenderUserId = actorId,
-                            Type = NotificationType.TaskAssigned,
-                            Content = $"You have been assigned to task \"{task.Title}\" in {project?.Title}",
-                            RelatedEntityType = "ProjectTask",
-                            RelatedEntityId = task.Id,
-                            CreatedAt = DateTime.UtcNow
-                        };
-                        await _unitOfWork.Notifications.AddAsync(notif);
-                        await _unitOfWork.SaveAsync();
-
-                        var unreadCount = await _unitOfWork.Notifications.GetUnreadCountAsync(task.AssigneeId);
-                        await _notificationHub.Clients.Group($"user_{task.AssigneeId}").SendAsync("ReceiveNotification", new
-                        {
-                            notif.Id,
-                            notif.Content,
-                            Type = "TaskAssigned",
-                            RelatedEntityType = "ProjectTask",
-                            RelatedEntityId = task.Id,
-                            ProjectId = projectId,
-                            notif.CreatedAt,
-                            UnreadCount = unreadCount
-                        });
-                    }
-                }
-
                 return RedirectToAction("Details", "Projects", new { projectId = model.ProjectId });
             }
 
-            var members = await _unitOfWork.ProjectUsers.GetProjectMembersWithUsersAsync(model.ProjectId);
-            model.UsersList = members.Select(m => new SelectListItem { Value = m.UserId, Text = $"{m.User.FirstName} {m.User.LastName}" });
+            var fallbackModel = await _projectTaskService.GetCreateTaskViewModelAsync(model.ProjectId);
+            model.UsersList = fallbackModel?.UsersList ?? new List<SelectListItem>();
             return View("Create", model);
         }
 
@@ -263,9 +127,11 @@ namespace MvcProject.Controllers
         [ProjectAuthorize(ProjectRole.Admin, ProjectRole.Manager)]
         public async Task<IActionResult> AjaxCreate(int projectId, ProjectTaskCreateViewModel model)
         {
+            var actorId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrWhiteSpace(actorId)) return Challenge();
+
             if (ModelState.IsValid)
             {
-                // Validate attachments BEFORE saving the task to avoid orphaned records
                 if (model.Attachments != null && model.Attachments.Any())
                 {
                     foreach (var file in model.Attachments)
@@ -278,21 +144,7 @@ namespace MvcProject.Controllers
                     }
                 }
 
-                var task = new ProjectTask
-                {
-                    Title = model.Title,
-                    Description = model.Description,
-                    Status = model.Status,
-                    Priority = model.Priority,
-                    Deadline = model.Deadline,
-                    ProjectId = model.ProjectId,
-                    AssigneeId = model.AssigneeId
-                };
-
-                await _unitOfWork.Tasks.AddAsync(task);
-                await _unitOfWork.SaveAsync();
-                
-                await LogActivityAsync(task.Id, AuditActionType.Create, "created this task");
+                var task = await _projectTaskService.CreateTaskAsync(model, actorId);
 
                 if (model.Attachments != null && model.Attachments.Any())
                 {
@@ -305,40 +157,6 @@ namespace MvcProject.Controllers
                     }
                 }
 
-                if (!string.IsNullOrEmpty(task.AssigneeId))
-                {
-                    var project = await _unitOfWork.Projects.GetByIdAsync(projectId);
-                    var actorId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                    if (task.AssigneeId != actorId)
-                    {
-                        var notif = new Notification
-                        {
-                            UserId = task.AssigneeId,
-                            SenderUserId = actorId,
-                            Type = NotificationType.TaskAssigned,
-                            Content = $"You have been assigned to task \"{task.Title}\" in {project?.Title}",
-                            RelatedEntityType = "ProjectTask",
-                            RelatedEntityId = task.Id,
-                            CreatedAt = DateTime.UtcNow
-                        };
-                        await _unitOfWork.Notifications.AddAsync(notif);
-                        await _unitOfWork.SaveAsync();
-
-                        var unreadCount = await _unitOfWork.Notifications.GetUnreadCountAsync(task.AssigneeId);
-                        await _notificationHub.Clients.Group($"user_{task.AssigneeId}").SendAsync("ReceiveNotification", new
-                        {
-                            notif.Id,
-                            notif.Content,
-                            Type = "TaskAssigned",
-                            RelatedEntityType = "ProjectTask",
-                            RelatedEntityId = task.Id,
-                            ProjectId = projectId,
-                            notif.CreatedAt,
-                            UnreadCount = unreadCount
-                        });
-                    }
-                }
-
                 return Json(new { success = true });
             }
             return BadRequest(ModelState);
@@ -347,35 +165,8 @@ namespace MvcProject.Controllers
         [ProjectAuthorize(ProjectRole.Admin, ProjectRole.Manager)]
         public async Task<IActionResult> Edit(int id, int projectId)
         {
-            var task = await _unitOfWork.Tasks.GetByIdWithAttachmentsAsync(id);
-            if (task == null || task.ProjectId != projectId) return NotFound();
-
-            var members = await _unitOfWork.ProjectUsers.GetProjectMembersWithUsersAsync(projectId);
-
-            var model = new ProjectTaskEditViewModel
-            {
-                Id = task.Id,
-                Title = task.Title,
-                Description = task.Description,
-                Status = task.Status,
-                Priority = task.Priority,
-                Deadline = task.Deadline,
-                ProjectId = task.ProjectId,
-                AssigneeId = task.AssigneeId,
-                UsersList = members.Select(m => new SelectListItem
-                {
-                    Value = m.UserId,
-                    Text = $"{m.User.FirstName} {m.User.LastName}"
-                }),
-                ExistingAttachments = task.Attachments.Select(a => new AttachmentViewModel
-                {
-                    Id = a.Id,
-                    FileName = a.OriginalFileName,
-                    Size = a.Size,
-                    ContentType = a.ContentType,
-                    UploadedAt = a.UploadedAt
-                }).ToList()
-            };
+            var model = await _projectTaskService.GetEditTaskViewModelAsync(id, projectId);
+            if (model == null) return NotFound();
 
             return View(model);
         }
@@ -385,39 +176,11 @@ namespace MvcProject.Controllers
         [ProjectAuthorize(ProjectRole.Admin, ProjectRole.Manager)]
         public async Task<IActionResult> Edit(ProjectTaskEditViewModel model)
         {
+            var actorId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrWhiteSpace(actorId)) return Challenge();
+
             if (ModelState.IsValid)
             {
-                var task = await _unitOfWork.Tasks.GetByIdAsync(model.Id);
-                if (task == null || task.ProjectId != model.ProjectId) return NotFound();
-
-                // Track old assignee to avoid spamming notifications
-                var oldAssigneeId = task.AssigneeId;
-
-                var oldStatus = task.Status;
-                
-                task.Title = model.Title;
-                task.Description = model.Description;
-                task.Status = model.Status;
-                task.Priority = model.Priority;
-                task.Deadline = model.Deadline;
-                task.AssigneeId = model.AssigneeId;
-
-                _unitOfWork.Tasks.Update(task);
-                await _unitOfWork.SaveAsync();
-                
-                if (oldStatus != task.Status)
-                {
-                    await LogActivityAsync(task.Id, AuditActionType.StatusChange, "changed status", oldStatus.ToString(), task.Status.ToString());
-                }
-                else if (oldAssigneeId != task.AssigneeId)
-                {
-                    await LogActivityAsync(task.Id, AuditActionType.Assignment, "reassigned this task");
-                }
-                else
-                {
-                    await LogActivityAsync(task.Id, AuditActionType.Update, "updated task details");
-                }
-
                 if (model.NewAttachments != null && model.NewAttachments.Any())
                 {
                     foreach (var file in model.NewAttachments)
@@ -426,61 +189,32 @@ namespace MvcProject.Controllers
                         if (!TaskAttachmentConstants.AllowedExtensions.Contains(ext))
                         {
                             ModelState.AddModelError("NewAttachments", $"File type {ext} is not allowed. Allowed: {TaskAttachmentConstants.AllowedExtensionsDisplay}");
-                            var m = await _unitOfWork.ProjectUsers.GetProjectMembersWithUsersAsync(model.ProjectId);
-                            model.UsersList = m.Select(member => new SelectListItem { Value = member.UserId, Text = $"{member.User.FirstName} {member.User.LastName}" });
+                            var m = await _projectTaskService.GetEditTaskViewModelAsync(model.Id, model.ProjectId);
+                            model.UsersList = m?.UsersList ?? new List<SelectListItem>();
                             return View(model);
                         }
                     }
+                }
 
+                var updated = await _projectTaskService.UpdateTaskAsync(model, actorId);
+                if (!updated) return NotFound();
+
+                if (model.NewAttachments != null && model.NewAttachments.Any())
+                {
                     foreach (var file in model.NewAttachments)
                     {
                         if (file.Length > 0)
                         {
-                            await _attachmentService.UploadAsync(file, task.Id);
+                            await _attachmentService.UploadAsync(file, model.Id);
                         }
                     }
                 }
 
-                // Only send notification when the assignee actually changed
-                if (!string.IsNullOrEmpty(task.AssigneeId) && task.AssigneeId != oldAssigneeId)
-                {
-                    var project = await _unitOfWork.Projects.GetByIdAsync(model.ProjectId);
-                    var actorId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                    if (task.AssigneeId != actorId)
-                    {
-                        var notif = new Notification
-                        {
-                            UserId = task.AssigneeId,
-                            SenderUserId = actorId,
-                            Type = NotificationType.TaskAssigned,
-                            Content = $"Task \"{task.Title}\" in {project?.Title} has been updated and assigned to you",
-                            RelatedEntityType = "ProjectTask",
-                            RelatedEntityId = task.Id,
-                            CreatedAt = DateTime.UtcNow
-                        };
-                        await _unitOfWork.Notifications.AddAsync(notif);
-                        await _unitOfWork.SaveAsync();
-
-                        var unreadCount = await _unitOfWork.Notifications.GetUnreadCountAsync(task.AssigneeId);
-                        await _notificationHub.Clients.Group($"user_{task.AssigneeId}").SendAsync("ReceiveNotification", new
-                        {
-                            notif.Id,
-                            notif.Content,
-                            Type = "TaskAssigned",
-                            RelatedEntityType = "ProjectTask",
-                            RelatedEntityId = task.Id,
-                            ProjectId = model.ProjectId,
-                            notif.CreatedAt,
-                            UnreadCount = unreadCount
-                        });
-                    }
-                }
-
-                return RedirectToAction("Detail", new { id = task.Id, projectId = task.ProjectId });
+                return RedirectToAction("Detail", new { id = model.Id, projectId = model.ProjectId });
             }
 
-            var members = await _unitOfWork.ProjectUsers.GetProjectMembersWithUsersAsync(model.ProjectId);
-            model.UsersList = members.Select(m => new SelectListItem { Value = m.UserId, Text = $"{m.User.FirstName} {m.User.LastName}" });
+            var fallbackModel = await _projectTaskService.GetEditTaskViewModelAsync(model.Id, model.ProjectId);
+            model.UsersList = fallbackModel?.UsersList ?? new List<SelectListItem>();
             return View("Edit", model);
         }
 
@@ -489,18 +223,11 @@ namespace MvcProject.Controllers
         [ProjectAuthorize(ProjectRole.Admin, ProjectRole.Manager, ProjectRole.Member)]
         public async Task<IActionResult> UpdateStatus(int id, int projectId, Models.Enums.TaskStatus status)
         {
-            var task = await _unitOfWork.Tasks.GetByIdAsync(id);
-            if (task == null || task.ProjectId != projectId) return NotFound();
+            var actorId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrWhiteSpace(actorId)) return Challenge();
 
-            var oldStatus = task.Status;
-            task.Status = status;
-            _unitOfWork.Tasks.Update(task);
-            await _unitOfWork.SaveAsync();
-            
-            if (oldStatus != status)
-            {
-                await LogActivityAsync(task.Id, AuditActionType.StatusChange, "changed status", oldStatus.ToString(), status.ToString());
-            }
+            var result = await _projectTaskService.UpdateTaskStatusAsync(id, projectId, status, actorId);
+            if (!result) return NotFound();
 
             return RedirectToAction("Details", "Projects", new { projectId = projectId });
         }
@@ -514,23 +241,23 @@ namespace MvcProject.Controllers
             return RedirectToAction("Edit", new { id = taskId, projectId = projectId });
         }
 
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         [ProjectAuthorize(ProjectRole.Admin, ProjectRole.Manager)]
         public async Task<IActionResult> Delete(int id, int projectId)
         {
-            var task = await _unitOfWork.Tasks.GetByIdWithAttachmentsAsync(id);
-            if (task == null || task.ProjectId != projectId) return NotFound();
+            var model = await _projectTaskService.GetEditTaskViewModelAsync(id, projectId);
+            if (model == null) return NotFound();
 
-            // Delete attachments
-            foreach (var attachment in task.Attachments.ToList())
+            if (model.ExistingAttachments != null)
             {
-                await _attachmentService.DeleteAsync(attachment.Id);
+                foreach (var attachment in model.ExistingAttachments)
+                {
+                    await _attachmentService.DeleteAsync(attachment.Id);
+                }
             }
 
-            _unitOfWork.Tasks.Delete(task);
-            await _unitOfWork.SaveAsync();
+            await _projectTaskService.DeleteTaskAsync(id, projectId);
 
             return RedirectToAction("Details", "Projects", new { projectId = projectId });
         }
@@ -540,17 +267,18 @@ namespace MvcProject.Controllers
         [ProjectAuthorize(ProjectRole.Admin, ProjectRole.Manager)]
         public async Task<IActionResult> AjaxDelete(int id, int projectId)
         {
-            var task = await _unitOfWork.Tasks.GetByIdWithAttachmentsAsync(id);
-            if (task == null || task.ProjectId != projectId) return NotFound();
+            var model = await _projectTaskService.GetEditTaskViewModelAsync(id, projectId);
+            if (model == null) return NotFound();
 
-            // Delete attachments
-            foreach (var attachment in task.Attachments.ToList())
+            if (model.ExistingAttachments != null)
             {
-                await _attachmentService.DeleteAsync(attachment.Id);
+                foreach (var attachment in model.ExistingAttachments)
+                {
+                    await _attachmentService.DeleteAsync(attachment.Id);
+                }
             }
 
-            _unitOfWork.Tasks.Delete(task);
-            await _unitOfWork.SaveAsync();
+            await _projectTaskService.DeleteTaskAsync(id, projectId);
 
             return Json(new { success = true });
         }
@@ -560,66 +288,27 @@ namespace MvcProject.Controllers
         [ProjectAuthorize(ProjectRole.Admin, ProjectRole.Manager)]
         public async Task<IActionResult> DeleteAllAttachments(int taskId, int projectId)
         {
-            var task = await _unitOfWork.Tasks.GetByIdWithAttachmentsAsync(taskId);
-            if (task == null || task.ProjectId != projectId) return NotFound();
+            var model = await _projectTaskService.GetEditTaskViewModelAsync(taskId, projectId);
+            if (model == null) return NotFound();
 
-            foreach (var attachment in task.Attachments.ToList())
+            if (model.ExistingAttachments != null)
             {
-                await _attachmentService.DeleteAsync(attachment.Id);
+                foreach (var attachment in model.ExistingAttachments)
+                {
+                    await _attachmentService.DeleteAsync(attachment.Id);
+                }
             }
 
             return RedirectToAction("Edit", new { id = taskId, projectId = projectId });
         }
+        
         public async Task<IActionResult> AllTasks(string searchTerm)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrWhiteSpace(userId)) return Challenge();
 
-            var tasks = await _unitOfWork.Tasks.GetAllTasksInUserProjectsAsync(userId);
-
-            // Filtering
-            if (!string.IsNullOrWhiteSpace(searchTerm))
-            {
-                tasks = tasks.Where(t => 
-                    t.Project.Title.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) || 
-                    t.Status.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                    t.Title.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
-                ).ToList();
-            }
-
-            var today = DateTime.Today;
-            var model = new AllTasksViewModel
-            {
-                SearchTerm = searchTerm,
-                PresentTasks = tasks.Where(t => t.Deadline == null || t.Deadline.Value.Date >= today)
-                                    .OrderBy(t => t.Deadline ?? DateTime.MaxValue)
-                                    .ToList(),
-                PastTasks = tasks.Where(t => t.Deadline != null && t.Deadline.Value.Date < today)
-                                 .OrderByDescending(t => t.Deadline)
-                                 .ToList()
-            };
-
+            var model = await _projectTaskService.GetAllTasksViewModelAsync(userId, searchTerm);
             return View(model);
-        }
-
-
-        private async Task LogActivityAsync(int taskId, AuditActionType actionType, string description, string? oldValue = null, string? newValue = null)
-        {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(userId)) return;
-
-            var log = new AuditLog
-            {
-                TaskId = taskId,
-                ActionType = actionType,
-                UserId = userId,
-                Description = description,
-                OldValue = oldValue,
-                NewValue = newValue,
-                CreatedAt = DateTime.UtcNow
-            };
-            await _unitOfWork.AuditLogs.AddAsync(log);
-            await _unitOfWork.SaveAsync();
         }
     }
 }
