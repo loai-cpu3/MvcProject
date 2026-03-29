@@ -17,20 +17,20 @@
 
     <!-- Sidebar -->
     <aside class="sidebar-width bg-surface-light border-end border-border-light d-flex flex-column" id="sidebar" style="z-index: 1050;">
-        <div class="d-flex align-items-center px-4 border-bottom border-border-light" style="height: 64px;">
-            <div class="d-flex align-items-center gap-3 w-100">
-                <div class="rounded p-2 d-flex align-items-center justify-content-center" style="background-color: #6366f1;">
+        <div class="d-flex align-items-center justify-content-between px-4 border-bottom border-border-light flex-shrink-0" style="height: 72px;">
+            <a asp-controller="Home" asp-action="Index" class="d-flex align-items-center gap-3 text-decoration-none flex-grow-1 min-w-0">
+                <div class="rounded p-2 d-flex align-items-center justify-content-center flex-shrink-0" style="background-color: #6366f1;">
                     <span class="material-symbols-outlined text-white fs-5">view_kanban</span>
                 </div>
-                <div class="d-flex flex-column">
-                    <h1 class="font-display fw-bold mb-0 text-dark" style="font-size: 1rem; line-height: 1.2;">Velocity</h1>
-                    <span class="text-muted-light fw-medium" style="font-size: 0.75rem;">Product Team</span>
+                <div class="d-flex flex-column min-w-0">
+                    <h1 class="font-display fw-bold mb-0 text-dark text-truncate" style="font-size: 1rem; line-height: 1.2;">Velocity</h1>
+                    <span class="text-muted-light fw-medium text-truncate" style="font-size: 0.75rem;">Product Team</span>
                 </div>
-                <!-- Mobile close button -->
-                <button class="btn btn-link text-muted-light p-1 ms-auto d-md-none border-0 shadow-none text-decoration-none" id="sidebar-close">
-                    <span class="material-symbols-outlined">close</span>
-                </button>
-            </div>
+            </a>
+            <!-- Mobile close button -->
+            <button type="button" class="btn btn-link text-muted-light p-1 ms-2 d-md-none border-0 shadow-none text-decoration-none flex-shrink-0" id="sidebar-close">
+                <span class="material-symbols-outlined">close</span>
+            </button>
         </div>
 
         <nav class="d-flex flex-column flex-grow-1 py-4 px-3 gap-1 overflow-auto">
@@ -64,17 +64,19 @@
     <div class="d-flex flex-column flex-grow-1 w-100 h-100 overflow-hidden">
 
         <!-- Top Navbar -->
-        <header class="d-flex align-items-center justify-content-between px-3 px-sm-4 bg-surface-light border-bottom border-border-light sticky-top" style="height: 64px; z-index: 1030;">
+        <header class="d-flex align-items-center justify-content-between px-3 px-sm-4 bg-surface-light border-bottom border-border-light sticky-top flex-shrink-0" style="height: 72px; z-index: 1030;">
             <div class="d-flex align-items-center gap-3">
                 <!-- Mobile hamburger -->
                 <button class="btn btn-link text-muted-light d-md-none p-1 text-decoration-none border-0 shadow-none" id="sidebar-toggle" aria-label="Open menu">
                     <span class="material-symbols-outlined">menu</span>
                 </button>
                 <!-- Cmd+K trigger -->
-                <button class="d-none d-sm-flex align-items-center gap-2 bg-light border border-border-light rounded-3 px-3 py-1 text-muted-light shadow-none cursor-pointer" id="cmd-k-trigger" style="font-size: 0.85rem; outline: none;">
-                    <span class="material-symbols-outlined" style="font-size: 18px;">search</span>
-                    <span>Search...</span>
-                    <kbd class="ms-3" style="background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 4px; padding: 1px 6px; font-size: 0.7rem; color: #475569;">⌘K</kbd>
+                <button class="d-none d-sm-flex align-items-center justify-content-between gap-2 bg-light border border-border-light rounded-3 px-3 py-2 text-muted-light shadow-sm cursor-pointer" id="cmd-k-trigger" style="font-size: 0.85rem; outline: none; min-width: 260px;">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">search</span>
+                        <span>Search...</span>
+                    </div>
+                    <kbd style="background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 4px; padding: 2px 6px; font-size: 0.7rem; color: #475569;">⌘K</kbd>
                 </button>
             </div>
 

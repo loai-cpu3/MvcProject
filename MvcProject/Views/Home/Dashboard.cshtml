@@ -1,5 +1,6 @@
 @using Microsoft.AspNetCore.Identity
 @using MvcProject.ViewModels.Home
+@using MvcProject.Extensions
 @model DashboardViewModel
 @{
     ViewData["Title"] = "Dashboard";
@@ -170,22 +171,24 @@
                                     </div>
                                     
                                     <!-- Activity Content -->
-                                    <div class="d-flex flex-column mt-1">
-                                        <p class="mb-1 text-dark" style="font-size: 0.9rem; line-height: 1.4;">
-                                            <span class="fw-bold">@activity.UserName</span> @activity.Description
-                                            <a asp-controller="ProjectTask" asp-action="Detail" asp-route-id="@activity.TaskId" asp-route-projectId="@activity.ProjectId" class="fw-bold text-primary text-decoration-none">@activity.TaskTitle</a>
-                                        </p>
-                                        
+                                    <div class="d-flex flex-column mt-1 w-100">
                                         @if (activity.ActionType == "StatusChange" && !string.IsNullOrEmpty(activity.OldValue) && !string.IsNullOrEmpty(activity.NewValue))
                                         {
-                                            <div class="d-flex align-items-center gap-2 mb-2 mt-1" style="font-size: 0.75rem;">
-                                                <span class="badge bg-light text-muted-light border px-2 py-1">@activity.OldValue</span>
-                                                <span class="material-symbols-outlined text-muted-light" style="font-size: 12px;">arrow_forward</span>
-                                                <span class="badge bg-white text-dark border border-primary border-opacity-25 shadow-sm px-2 py-1">@activity.NewValue</span>
-                                            </div>
+                                            <p class="mb-1 text-dark" style="font-size: 0.9rem; line-height: 1.4;">
+                                                <span class="fw-bold">@activity.UserName</span> changed task status from '@activity.OldValue' to '@activity.NewValue'
+                                            </p>
+                                        }
+                                        else
+                                        {
+                                            <p class="mb-1 text-dark" style="font-size: 0.9rem; line-height: 1.4;">
+                                                <span class="fw-bold">@activity.UserName</span> @activity.Description
+                                            </p>
                                         }
                                         
-                                        <span class="text-muted-light fw-medium mt-1" style="font-size: 0.75rem;">@activity.CreatedAt.ToLocalTime().ToString("MMM dd, h:mm tt") &bull; @activity.ProjectTitle</span>
+                                        <div class="text-muted-light mt-1" style="font-size: 0.8rem; line-height: 1.4;">
+                                            Project: @activity.ProjectTitle<br/>
+                                            @activity.CreatedAt.ToRelativeTime()
+                                        </div>
                                     </div>
                                 </div>
                             }

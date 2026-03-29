@@ -70,6 +70,7 @@ namespace MvcProject.ViewModels.ProjectTask
         public string AssigneeName { get; set; } = "Unassigned";
         public string? AssigneePhotoUrl { get; set; }
         public bool CanEditDelete { get; set; }
+        public bool CanChangeStatus { get; set; }
         public List<AttachmentViewModel> Attachments { get; set; } = new List<AttachmentViewModel>();
         
         // Added for requirements compatibility

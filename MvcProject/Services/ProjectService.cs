@@ -42,7 +42,10 @@ namespace MvcProject.Services
                         ProjectId = project.Id,
                         Title = project.Title,
                         Description = project.Description,
-                        CompletionPercentage = completionPercentage
+                        CompletionPercentage = completionPercentage,
+                        OwnerName = project.CreatedBy != null
+                            ? $"{project.CreatedBy.FirstName} {project.CreatedBy.LastName}".Trim()
+                            : "Unknown"
                     };
                 }).ToList()
             };

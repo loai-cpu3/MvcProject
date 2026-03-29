@@ -12,5 +12,6 @@ namespace MvcProject.ViewModels.Projects
         public string Title { get; set; } = string.Empty;
         public string? Description { get; set; }
         public int CompletionPercentage { get; set; }
+        public string OwnerName { get; set; } = string.Empty;
     }
 }
