@@ -74,6 +74,11 @@ namespace MvcProject.Controllers
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userId == null) return Unauthorized();
 
+            // Verify the notification belongs to the current user
+            var notification = await _unitOfWork.Notifications.GetByIdAsync(id);
+            if (notification == null) return NotFound();
+            if (notification.UserId != userId) return Forbid();
+
             await _unitOfWork.Notifications.MarkAsReadAsync(id);
             await _unitOfWork.SaveAsync();
 

@@ -127,7 +127,9 @@ namespace MvcProject.Services
                 Members = project.Members.Select(m => new ProjectMemberViewModel
                 {
                     UserId = m.UserId,
-                    FullName = $"{m.User.FirstName} {m.User.LastName}"
+                    FullName = $"{m.User.FirstName} {m.User.LastName}",
+                    ProfilePictureUrl = m.User.ProfilePictureUrl,
+                    FirstName = m.User.FirstName
                 }).ToList(),
                 EditProject = new EditProjectViewModel
                 {
@@ -358,19 +360,6 @@ namespace MvcProject.Services
                 UserId = userId,
                 Role = role
             });
-            await _unitOfWork.SaveAsync();
-
-            // Create notification for the added user
-            var notif = new Notification
-            {
-                UserId = userId,
-                Type = NotificationType.ProjectMemberAdded,
-                Content = $"You have been added to \"{project.Title}\" as {role}",
-                RelatedEntityType = "Project",
-                RelatedEntityId = projectId,
-                CreatedAt = DateTime.UtcNow
-            };
-            await _unitOfWork.Notifications.AddAsync(notif);
             await _unitOfWork.SaveAsync();
 
             return true;

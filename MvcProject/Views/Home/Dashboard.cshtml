@@ -7,24 +7,7 @@
     var today = DateOnly.FromDateTime(DateTime.UtcNow);
 }
 
-<style>
-    /* Dashboard-specific overrides: force text to black and icons to the desired indigo shade */
-    .dashboard-root {
-        color: #000 !important;
-    }
-    .dashboard-root .material-symbols-outlined,
-    .dashboard-root .material-symbols-outlined * {
-        color: #6366f1 !important;
-        -webkit-text-fill-color: #6366f1 !important;
-    }
-    /* Override utility color classes used on icons/badges to ensure consistent icon color */
-    .dashboard-root .text-primary,
-    .dashboard-root .text-primary.opacity-75 {
-        color: #6366f1 !important;
-    }
-</style>
-
-<div class="mx-auto d-flex flex-column gap-4 pb-5 dashboard-root" style="max-width: 1280px;">
+<div class="mx-auto d-flex flex-column gap-4 pb-5" style="max-width: 1280px;">
     <!-- Header -->
     <div>
         @inject UserManager<MvcProject.Models.Domain.ApplicationUser> UserManager
@@ -47,76 +30,57 @@
     <!-- Stats Row -->
     <div class="row g-4">
         <!-- Stat Card 1 -->
-        <div class="col-12 col-sm-6 col-lg-3">
+        <div class="col-12 col-sm-6 col-lg-4">
             <div class="bg-surface-light rounded-4 p-4 shadow-soft border border-border-light d-flex flex-column justify-content-between h-100" style="min-height: 150px;">
                 <div class="d-flex align-items-center justify-content-between mb-3">
-                    <span class="small fw-bold text-muted-light text-uppercase tracking-wide" style="letter-spacing: 0.05em;">Active Projects</span>
+                    <span class="small fw-bold text-muted-light text-uppercase tracking-wider">Active Projects</span>
                     <span class="material-symbols-outlined text-primary opacity-75 fs-4">folder</span>
                 </div>
                 <div class="d-flex align-items-baseline gap-2">
-                    <span class="font-display fw-bold text-primary mb-0" style="font-size: 2.75rem; line-height: 1;">@dashboard.TotalProjects</span>
+                    <span class="font-display fw-bold text-dark mb-0" style="font-size: 2.75rem; line-height: 1;">@dashboard.TotalProjects</span>
                 </div>
             </div>
         </div>
-        
+
         <!-- Stat Card 2 -->
-        <div class="col-12 col-sm-6 col-lg-3">
+        <div class="col-12 col-sm-6 col-lg-4">
             <div class="bg-surface-light rounded-4 p-4 shadow-soft border border-border-light d-flex flex-column justify-content-between h-100" style="min-height: 150px;">
                 <div class="d-flex align-items-center justify-content-between mb-3">
-                    <span class="small fw-bold text-muted-light text-uppercase tracking-wide" style="letter-spacing: 0.05em;">Pending Tasks</span>
+                    <span class="small fw-bold text-muted-light text-uppercase tracking-wider">Pending Tasks</span>
                     <span class="material-symbols-outlined text-primary opacity-75 fs-4">assignment</span>
                 </div>
                 <div class="d-flex align-items-baseline gap-2">
-                    <span class="font-display fw-bold text-primary mb-0" style="font-size: 2.75rem; line-height: 1;">@dashboard.TotalPendingTasks</span>
+                    <span class="font-display fw-bold text-dark mb-0" style="font-size: 2.75rem; line-height: 1;">@dashboard.TotalPendingTasks</span>
                     <span class="small fw-bold text-muted-light">Open items</span>
                 </div>
             </div>
         </div>
-        
-        <!-- Stat Card 3 -->
-        @* <div class="col-12 col-sm-6 col-lg-3">
+
+        <!-- Stat Card 3 - Completion Rate -->
+        <div class="col-12 col-sm-6 col-lg-4">
             <div class="bg-surface-light rounded-4 p-4 shadow-soft border border-border-light d-flex flex-column justify-content-between h-100" style="min-height: 150px;">
                 <div class="d-flex align-items-center justify-content-between mb-3">
-                    <span class="small fw-bold text-muted-light text-uppercase tracking-wide" style="letter-spacing: 0.05em;">Team Online</span>
-                    <span class="material-symbols-outlined text-primary opacity-75 fs-4">group</span>
-                </div>
-                <div class="d-flex align-items-center justify-content-between">
-                    <span class="font-display fw-bold text-dark mb-0" style="font-size: 2.75rem; line-height: 1;">8</span>
-                    <div class="d-flex align-items-center">
-                        <div class="rounded-circle border border-2 border-white ms-n2" style="width: 32px; height: 32px; margin-left: 0; background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDLoBimi3eGNFNJxn77oK5yaWPUHjwCC7D8LgVRY4v3WxrkW1FsDBmiqD7DMaBRqHih3zVmC2TdWPf8WmokCd5pski9yI_Mf4Mu3S33KA4yqF2bvNHQrSBpRPQQQzR9dR8FP4bZx9SSiU_NXSYnIJxlK4MkpnEEgEQUffMwkHxFEAp8xAn-r0_8e46IY2uKAQJlHy5Slw8l2H0Db5yUJY5UpAa0F_yl7_1RATwK4zTo8t3QnyBqEV_zRHyOZcLfQfRB2u_B_ofIBZY0'); background-size: cover; background-position: center;"></div>
-                        <div class="rounded-circle border border-2 border-white" style="width: 32px; height: 32px; margin-left: -10px; background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuChqweYvq4vDfTxexQlv5oesVy27JirNf3uHXiUspw-_WV8RmdiFogAzYq5FgIabCQeO5v6rb-xyIUgGbJQnEAP3oIMrvBA3kyoSu1JV0oX00_lW8-SexY2WlSixF2uZb0b7g4WHmiAMBVeA29DguTEcYZL8x9u1FACzleHsb2Qvezru-3VeAP4pPcd6PX85J2gPvh1Fb_GUF_gRiSmFHkf700naOi4g8vxbhssdEk_vk7IRax3-Gdh49GKKH89M0xvUpMuWZBsLXDb'); background-size: cover; background-position: center;"></div>
-                        <div class="rounded-circle border border-2 border-white" style="width: 32px; height: 32px; margin-left: -10px; background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuA1ezAkC_FBrZAw5K3bI3X6PChcbRWaKj3tHbkZhJ3npHkCqN8icHFtTb5AUzBEEdX4i6_WVrsD2YCGIYyYQolzBAXJ4yI-3Q0JfSuETzZmbA1NNLoIdcz_vf0_Uhf0fGB9f6jbD87J-UzhUaxHsAJl3DQxsijeTUyH8VVhj_YOI0883ujPYrGuq8t-uPcc8RSbJxGWZQd_gpZuWhRjxCdR1se00bjMsoGyO44pUnf21rtOgnKv977OWrWSuQ0_zmqmF4y_yT4tJ3jX'); background-size: cover; background-position: center;"></div>
-                        <div class="bg-light rounded-circle border border-2 border-white d-flex align-items-center justify-content-center text-muted-light fw-bold" style="width: 32px; height: 32px; margin-left: -10px; font-size: 10px; z-index: 10;">+5</div>
-                    </div>
-                </div>
-            </div>
-        </div> *@
-        
-        <!-- Stat Card 4 -->
-        <div class="col-12 col-sm-6 col-lg-3">
-            <div class="bg-surface-light rounded-4 p-4 shadow-soft border border-border-light d-flex flex-column justify-content-between h-100" style="min-height: 150px;">
-                <div class="d-flex align-items-center justify-content-between mb-3">
-                    <span class="small fw-bold text-muted-light text-uppercase tracking-wide" style="letter-spacing: 0.05em;">Completion Rate</span>
+                    <span class="small fw-bold text-muted-light text-uppercase tracking-wider">Completion Rate</span>
                     <span class="material-symbols-outlined text-primary opacity-75 fs-4">trending_up</span>
                 </div>
                 <div class="d-flex align-items-baseline gap-2">
-                    <span class="font-display fw-bold text-primary mb-0" style="font-size: 2.75rem; line-height: 1;">@dashboard.CompletionRate.ToString("0.#")%</span>
+                    <span class="font-display fw-bold text-dark mb-0" style="font-size: 2.75rem; line-height: 1;">@dashboard.CompletionRate.ToString("0.#")%</span>
                     <span class="small fw-bold text-muted-light">This week</span>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Main Grid: Tasks & Activity -->
-    <div class="row g-4 mt-1">
-        <!-- My Tasks List -->
-        <div class="col-12 col-lg-8">
-            <div class="bg-surface-light rounded-4 shadow-soft border border-border-light d-flex flex-column" style="min-height: 500px;">
+    <!-- Tasks and Activity Row -->
+    <div class="row g-4">
+        <!-- My Tasks (Left Column) -->
+        <div class="col-12 col-xl-7 col-xxl-8">
+            <div class="bg-surface-light rounded-4 shadow-soft border border-border-light d-flex flex-column h-100">
                 <div class="px-4 py-3 border-bottom border-border-light d-flex align-items-center justify-content-between">
                     <h3 class="font-display fw-bold fs-5 text-dark mb-0">My Tasks</h3>
                     <a asp-controller="ProjectTask" asp-action="MyTasks" class="btn btn-link text-primary fw-bold text-decoration-none shadow-none small">View All</a>
                 </div>
-                <div class="p-3 d-flex flex-column gap-2 overflow-auto">
+                <div class="p-3 d-flex flex-column gap-2 overflow-auto" style="min-height: 200px; max-height: 500px;">
                     @if (dashboard.RecentTasks.Any())
                     {
                         @foreach (var task in dashboard.RecentTasks)
@@ -136,10 +100,11 @@
                                 _ => "border-secondary"
                             };
 
-                            <div class="d-flex align-items-center justify-content-between p-3 rounded-3 border-start border-4 @borderClass shadow-sm bg-surface-light" style="cursor: pointer;">
+                            <a asp-controller="ProjectTask" asp-action="Detail" asp-route-id="@task.Id" asp-route-projectId="@task.ProjectId"
+                               class="d-flex align-items-center justify-content-between p-3 rounded-3 border-start border-4 @borderClass shadow-sm bg-surface-light text-decoration-none task-row" style="cursor: pointer;">
                                 <div class="d-flex align-items-center gap-3 overflow-hidden w-100">
-                                    <div class="rounded-circle border d-flex align-items-center justify-content-center text-white flex-shrink-0" style="width: 24px; height: 24px;">
-                                        <span class="material-symbols-outlined" style="font-size: 16px;">check</span>
+                                    <div class="rounded-circle border d-flex align-items-center justify-content-center flex-shrink-0" style="width: 24px; height: 24px; border-color: var(--bs-primary);">
+                                        <span class="material-symbols-outlined text-primary" style="font-size: 16px;">check</span>
                                     </div>
                                     <div class="d-flex flex-column min-w-0 flex-grow-1">
                                         <p class="fw-bold text-dark mb-0 text-truncate" style="font-size: 0.95rem;">@task.Title</p>
@@ -149,71 +114,91 @@
                                 <div class="d-flex align-items-center gap-3 ps-3 flex-shrink-0">
                                     <span class="small fw-bold text-muted-light text-uppercase tracking-wider">@dueText</span>
                                 </div>
-                            </div>
+                            </a>
                         }
                     }
                     else
                     {
-                        <div class="p-4 text-center text-muted-light fw-medium">
-                            No tasks available.
+                        <div class="p-5 text-center">
+                            <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center mb-3" style="width: 56px; height: 56px;">
+                                <span class="material-symbols-outlined text-muted-light" style="font-size: 28px;">task_alt</span>
+                            </div>
+                            <p class="text-muted-light small mb-2">No tasks assigned to you yet.</p>
+                            <a asp-controller="Projects" asp-action="Index" class="btn btn-sm btn-primary rounded-pill px-4 shadow-sm">Go to Projects</a>
                         </div>
                     }
                 </div>
             </div>
         </div>
 
-        <!-- Recent Activity Feed -->
-        <div class="col-12 col-lg-4">
-            <div class="bg-surface-light rounded-4 shadow-soft border border-border-light d-flex flex-column h-100" style="min-height: 500px;">
+        <!-- Recent Activity Feed (Right Column) -->
+        <div class="col-12 col-xl-5 col-xxl-4">
+            <div class="bg-surface-light rounded-4 shadow-soft border border-border-light d-flex flex-column h-100">
                 <div class="px-4 py-3 border-bottom border-border-light">
                     <h3 class="font-display fw-bold fs-5 text-dark mb-0">Recent Activity</h3>
                 </div>
-                <div class="flex-grow-1 p-4 position-relative overflow-auto">
-                    <!-- Vertical line -->
-                    <div class="position-absolute bg-light border-start border-2 h-100" style="left: 38px; top: 32px; z-index: 0;"></div>
-                    
-                    <div class="d-flex flex-column gap-4 position-relative z-1">
-                        <!-- Activity Item 1 -->
-                        <div class="d-flex gap-3">
-                            <div class="rounded-circle border border-3 border-white shadow-sm flex-shrink-0" style="width: 40px; height: 40px; background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCxZhx0VfylFdDCyEsXOKEaU_oYVuulg8c9U_l9jbaBUB-aB4GUUaoW3a8WzKnjb0FTThTulkddXe6ztToO9jt5MsgpaO2XQkbqIbzEN5r-9h1NegghQ2o9TjLxm_7HK570VNv8SGBGvcdrI5xeknY_o6OtkCe882VlmKb_UL_cvu-7BfBGtZLqbN0u_LXAwwjwZDke2liPGbkkOy-la4eh_eh3NHON46VpXCnVCzRbayY-n9sthhpzjc-YZWSm1AQaCYKsy5xuOZ7Z'); background-size: cover; background-position: center; position: relative; z-index: 2;"></div>
-                            <div class="d-flex flex-column">
-                                <p class="small text-dark mb-1" style="line-height: 1.5;">
-                                    <span class="fw-bold">Sarah Jenkins</span> completed task 
-                                    <span class="fw-semibold text-primary">Update User Flow Diagrams</span>
-                                </p>
-                                <span class="text-uppercase fw-bold text-muted-light" style="font-size: 11px;">2 hours ago</span>
-                            </div>
-                        </div>
+                <div class="p-4 d-flex flex-column gap-4 overflow-auto" style="min-height: 200px; max-height: 500px;">
+                    @if (dashboard.RecentActivities.Any())
+                    {
+                        <div class="position-relative ms-2">
+                            <!-- Timeline continuous line -->
+                            <div class="position-absolute border-start border-border-light" style="top: 16px; bottom: 0; left: 16px; z-index: 0;"></div>
+                            
+                            @foreach (var activity in dashboard.RecentActivities)
+                            {
+                                var icon = activity.ActionType switch {
+                                    "Create" => "add_task",
+                                    "Update" => "edit",
+                                    "StatusChange" => "swap_horiz",
+                                    "Assignment" => "person_add",
+                                    "Delete" => "delete",
+                                    _ => "notifications"
+                                };
+                                var colorClass = activity.ActionType switch {
+                                    "Create" => "bg-success text-white",
+                                    "Update" => "bg-primary text-white",
+                                    "StatusChange" => "bg-warning text-dark",
+                                    "Assignment" => "bg-info text-white",
+                                    "Delete" => "bg-danger text-white",
+                                    _ => "bg-secondary text-white"
+                                };
 
-                        <!-- Activity Item 2 -->
-                        <div class="d-flex gap-3">
-                            <div class="rounded-circle border border-3 border-white shadow-sm flex-shrink-0" style="width: 40px; height: 40px; background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCIMuouwa44LWuuM89G-5WGtQSLaX47d029QcwPqB2z1spJ94ngtkxmuP38wDuJSDjmiEcg66VCyeTKK989EadEvxk2HCLog3-J41D2u9W72d--f05caE5w_WilC45wfUS7KQm68GC5faUz1-0kdRnlHxe2WusrbjGSwrMuyotAjv1KecTnr8mBEW53m30CzptAcHkRTdPPjA2sXroynWG9fnJaYkqmlRcIKlOtZmKnOwr81zsF8Ld7RfW6Qd6tKJbiys_mwbRXWtpR'); background-size: cover; background-position: center; position: relative; z-index: 2;"></div>
-                            <div class="d-flex flex-column">
-                                <p class="small text-dark mb-1" style="line-height: 1.5;">
-                                    <span class="fw-bold">Michael Chen</span> added a comment to 
-                                    <span class="fw-semibold text-primary">API Documentation</span>
-                                </p>
-                                <div class="mt-2 p-3 bg-light rounded-3 small text-secondary fst-italic border-start border-3 border-primary">
-                                    "I've updated the endpoint structures, please review when you have a moment."
+                                <div class="d-flex align-items-start gap-3 mb-4 position-relative" style="z-index: 1;">
+                                    <!-- Activity Icon Badge -->
+                                    <div class="rounded-circle @colorClass d-flex align-items-center justify-content-center flex-shrink-0 shadow-sm" style="width: 32px; height: 32px; border: 4px solid var(--velocity-surface-light);">
+                                        <span class="material-symbols-outlined" style="font-size: 14px;">@icon</span>
+                                    </div>
+                                    
+                                    <!-- Activity Content -->
+                                    <div class="d-flex flex-column mt-1">
+                                        <p class="mb-1 text-dark" style="font-size: 0.9rem; line-height: 1.4;">
+                                            <span class="fw-bold">@activity.UserName</span> @activity.Description
+                                            <a asp-controller="ProjectTask" asp-action="Detail" asp-route-id="@activity.TaskId" asp-route-projectId="@activity.ProjectId" class="fw-bold text-primary text-decoration-none">@activity.TaskTitle</a>
+                                        </p>
+                                        
+                                        @if (activity.ActionType == "StatusChange" && !string.IsNullOrEmpty(activity.OldValue) && !string.IsNullOrEmpty(activity.NewValue))
+                                        {
+                                            <div class="d-flex align-items-center gap-2 mb-2 mt-1" style="font-size: 0.75rem;">
+                                                <span class="badge bg-light text-muted-light border px-2 py-1">@activity.OldValue</span>
+                                                <span class="material-symbols-outlined text-muted-light" style="font-size: 12px;">arrow_forward</span>
+                                                <span class="badge bg-white text-dark border border-primary border-opacity-25 shadow-sm px-2 py-1">@activity.NewValue</span>
+                                            </div>
+                                        }
+                                        
+                                        <span class="text-muted-light fw-medium mt-1" style="font-size: 0.75rem;">@activity.CreatedAt.ToLocalTime().ToString("MMM dd, h:mm tt") &bull; @activity.ProjectTitle</span>
+                                    </div>
                                 </div>
-                                <span class="text-uppercase fw-bold text-muted-light mt-2" style="font-size: 11px;">4 hours ago</span>
-                            </div>
+                            }
                         </div>
-
-                        <!-- Activity Item 3 -->
-                        <div class="d-flex gap-3">
-                            <div class="rounded-circle bg-primary bg-opacity-10 text-primary border border-3 border-white shadow-sm d-flex align-items-center justify-content-center flex-shrink-0" style="width: 40px; height: 40px; position: relative; z-index: 2;">
-                                <span class="material-symbols-outlined fs-6 fw-bold">rocket_launch</span>
-                            </div>
-                            <div class="d-flex flex-column">
-                                <p class="small text-dark mb-1" style="line-height: 1.5;">
-                                    <span class="fw-bold">Website Redesign</span> project moved to 
-                                    <span class="text-success fw-bold">Testing</span>
-                                </p>
-                                <span class="text-uppercase fw-bold text-muted-light" style="font-size: 11px;">Yesterday</span>
-                            </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-5">
+                            <span class="material-symbols-outlined text-muted-light opacity-50 mb-3" style="font-size: 48px;">history</span>
+                            <p class="text-muted-light small mb-0 fw-medium">No recent activity found.</p>
+                            <p class="text-muted-light small opacity-75">Events will appear here soon.</p>
                         </div>
-                    </div>
+                    }
                 </div>
             </div>
         </div>

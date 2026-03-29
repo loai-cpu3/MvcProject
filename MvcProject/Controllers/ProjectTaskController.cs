@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.SignalR;
@@ -13,6 +14,7 @@ using System.Security.Claims;
 
 namespace MvcProject.Controllers
 {
+    [Authorize]
     public class ProjectTaskController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
@@ -171,6 +173,22 @@ namespace MvcProject.Controllers
         {
             if (ModelState.IsValid)
             {
+                // Validate attachments BEFORE saving the task to avoid orphaned records
+                if (model.Attachments != null && model.Attachments.Any())
+                {
+                    foreach (var file in model.Attachments)
+                    {
+                        var ext = Path.GetExtension(file.FileName).ToLower();
+                        if (!TaskAttachmentConstants.AllowedExtensions.Contains(ext))
+                        {
+                            ModelState.AddModelError("Attachments", $"File type {ext} is not allowed. Allowed: {TaskAttachmentConstants.AllowedExtensionsDisplay}");
+                            var m = await _unitOfWork.ProjectUsers.GetProjectMembersWithUsersAsync(model.ProjectId);
+                            model.UsersList = m.Select(member => new SelectListItem { Value = member.UserId, Text = $"{member.User.FirstName} {member.User.LastName}" });
+                            return View("Create", model);
+                        }
+                    }
+                }
+
                 var task = new ProjectTask
                 {
                     Title = model.Title,
@@ -184,21 +202,11 @@ namespace MvcProject.Controllers
 
                 await _unitOfWork.Tasks.AddAsync(task);
                 await _unitOfWork.SaveAsync();
+                
+                await LogActivityAsync(task.Id, AuditActionType.Create, "created this task");
 
                 if (model.Attachments != null && model.Attachments.Any())
                 {
-                    foreach (var file in model.Attachments)
-                    {
-                        var ext = Path.GetExtension(file.FileName).ToLower();
-                        if (!TaskAttachmentConstants.AllowedExtensions.Contains(ext))
-                        {
-                            ModelState.AddModelError("Attachments", $"File type {ext} is not allowed. Allowed: {TaskAttachmentConstants.AllowedExtensionsDisplay}");
-                            var m = await _unitOfWork.ProjectUsers.GetProjectMembersWithUsersAsync(model.ProjectId);
-                            model.UsersList = m.Select(member => new SelectListItem { Value = member.UserId, Text = $"{member.User.FirstName} {member.User.LastName}" });
-                            return View(model);
-                        }
-                    }
-
                     foreach (var file in model.Attachments)
                     {
                         if (file.Length > 0)
@@ -251,11 +259,25 @@ namespace MvcProject.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         [ProjectAuthorize(ProjectRole.Admin, ProjectRole.Manager)]
         public async Task<IActionResult> AjaxCreate(int projectId, ProjectTaskCreateViewModel model)
         {
             if (ModelState.IsValid)
             {
+                // Validate attachments BEFORE saving the task to avoid orphaned records
+                if (model.Attachments != null && model.Attachments.Any())
+                {
+                    foreach (var file in model.Attachments)
+                    {
+                        var ext = Path.GetExtension(file.FileName).ToLower();
+                        if (!TaskAttachmentConstants.AllowedExtensions.Contains(ext))
+                        {
+                            return BadRequest($"File type {ext} is not allowed.");
+                        }
+                    }
+                }
+
                 var task = new ProjectTask
                 {
                     Title = model.Title,
@@ -269,18 +291,11 @@ namespace MvcProject.Controllers
 
                 await _unitOfWork.Tasks.AddAsync(task);
                 await _unitOfWork.SaveAsync();
+                
+                await LogActivityAsync(task.Id, AuditActionType.Create, "created this task");
 
                 if (model.Attachments != null && model.Attachments.Any())
                 {
-                    foreach (var file in model.Attachments)
-                    {
-                        var ext = Path.GetExtension(file.FileName).ToLower();
-                        if (!TaskAttachmentConstants.AllowedExtensions.Contains(ext))
-                        {
-                            return BadRequest($"File type {ext} is not allowed.");
-                        }
-                    }
-
                     foreach (var file in model.Attachments)
                     {
                         if (file.Length > 0)
@@ -375,6 +390,11 @@ namespace MvcProject.Controllers
                 var task = await _unitOfWork.Tasks.GetByIdAsync(model.Id);
                 if (task == null || task.ProjectId != model.ProjectId) return NotFound();
 
+                // Track old assignee to avoid spamming notifications
+                var oldAssigneeId = task.AssigneeId;
+
+                var oldStatus = task.Status;
+                
                 task.Title = model.Title;
                 task.Description = model.Description;
                 task.Status = model.Status;
@@ -384,6 +404,19 @@ namespace MvcProject.Controllers
 
                 _unitOfWork.Tasks.Update(task);
                 await _unitOfWork.SaveAsync();
+                
+                if (oldStatus != task.Status)
+                {
+                    await LogActivityAsync(task.Id, AuditActionType.StatusChange, "changed status", oldStatus.ToString(), task.Status.ToString());
+                }
+                else if (oldAssigneeId != task.AssigneeId)
+                {
+                    await LogActivityAsync(task.Id, AuditActionType.Assignment, "reassigned this task");
+                }
+                else
+                {
+                    await LogActivityAsync(task.Id, AuditActionType.Update, "updated task details");
+                }
 
                 if (model.NewAttachments != null && model.NewAttachments.Any())
                 {
@@ -408,10 +441,8 @@ namespace MvcProject.Controllers
                     }
                 }
 
-                // If assignee changed, we could notify them, but let's just trigger a notification if there's someone assigned
-                // Alternatively, detect if assignee changed by keeping track of old assignee.
-                // For simplicity as requested: when assigned, notify them. We'll send it simply if an assignee exists.
-                if (!string.IsNullOrEmpty(task.AssigneeId))
+                // Only send notification when the assignee actually changed
+                if (!string.IsNullOrEmpty(task.AssigneeId) && task.AssigneeId != oldAssigneeId)
                 {
                     var project = await _unitOfWork.Projects.GetByIdAsync(model.ProjectId);
                     var actorId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -461,9 +492,15 @@ namespace MvcProject.Controllers
             var task = await _unitOfWork.Tasks.GetByIdAsync(id);
             if (task == null || task.ProjectId != projectId) return NotFound();
 
+            var oldStatus = task.Status;
             task.Status = status;
             _unitOfWork.Tasks.Update(task);
             await _unitOfWork.SaveAsync();
+            
+            if (oldStatus != status)
+            {
+                await LogActivityAsync(task.Id, AuditActionType.StatusChange, "changed status", oldStatus.ToString(), status.ToString());
+            }
 
             return RedirectToAction("Details", "Projects", new { projectId = projectId });
         }
@@ -476,6 +513,7 @@ namespace MvcProject.Controllers
             await _attachmentService.DeleteAsync(id);
             return RedirectToAction("Edit", new { id = taskId, projectId = projectId });
         }
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -498,11 +536,12 @@ namespace MvcProject.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         [ProjectAuthorize(ProjectRole.Admin, ProjectRole.Manager)]
         public async Task<IActionResult> AjaxDelete(int id, int projectId)
         {
             var task = await _unitOfWork.Tasks.GetByIdWithAttachmentsAsync(id);
-            if (task == null) return NotFound();
+            if (task == null || task.ProjectId != projectId) return NotFound();
 
             // Delete attachments
             foreach (var attachment in task.Attachments.ToList())
@@ -517,6 +556,7 @@ namespace MvcProject.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         [ProjectAuthorize(ProjectRole.Admin, ProjectRole.Manager)]
         public async Task<IActionResult> DeleteAllAttachments(int taskId, int projectId)
         {
@@ -562,5 +602,24 @@ namespace MvcProject.Controllers
             return View(model);
         }
 
+
+        private async Task LogActivityAsync(int taskId, AuditActionType actionType, string description, string? oldValue = null, string? newValue = null)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId)) return;
+
+            var log = new AuditLog
+            {
+                TaskId = taskId,
+                ActionType = actionType,
+                UserId = userId,
+                Description = description,
+                OldValue = oldValue,
+                NewValue = newValue,
+                CreatedAt = DateTime.UtcNow
+            };
+            await _unitOfWork.AuditLogs.AddAsync(log);
+            await _unitOfWork.SaveAsync();
+        }
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace MvcProject.ViewModels.Home
+namespace MvcProject.ViewModels.Home
 {
     public class DashboardViewModel
     {
@@ -7,6 +7,7 @@
         public int TotalProjects { get; set; }
         
         public List<DashboardTaskViewModel> RecentTasks { get; set; } = new List<DashboardTaskViewModel>();
+        public List<DashboardActivityViewModel> RecentActivities { get; set; } = new List<DashboardActivityViewModel>();
 
     }
 }

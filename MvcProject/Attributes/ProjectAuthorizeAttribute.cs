@@ -13,8 +13,8 @@ namespace MvcProject.Attributes
 
     }
 
-    public class ProjectAuthorizeFilter : IActionFilter { 
-         
+    public class ProjectAuthorizeFilter : IAsyncActionFilter
+    {
         private readonly IAuthorizationService _authorizationService;
         private readonly ProjectRole[] _targetRoles;
 
@@ -24,12 +24,7 @@ namespace MvcProject.Attributes
             _targetRoles = targetRoles;
         }
 
-        public void OnActionExecuted(ActionExecutedContext context)
-        {
-            
-        }
-
-        public void OnActionExecuting(ActionExecutingContext context)
+        public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
             int? projectId = null;
 
@@ -78,28 +73,24 @@ namespace MvcProject.Attributes
                 return;
             }
 
-            //string policyName = $"RequireProject{_targetRole}";
-
             AuthorizationResult result = null;
             foreach (var role in _targetRoles.Distinct())
             {
                 var policyName = $"RequireProject{role}";
-                result =  _authorizationService.AuthorizeAsync(context.HttpContext.User, projectId.Value, policyName).Result;
+                result = await _authorizationService.AuthorizeAsync(context.HttpContext.User, projectId.Value, policyName);
 
                 if (result.Succeeded)
-                { 
+                {
+                    await next();
                     return;
                 }
             }
 
-           
             if (result == null || !result.Succeeded)
             {
                 context.Result = new ForbidResult();
             }
         }
-
-       
     }
 
 }

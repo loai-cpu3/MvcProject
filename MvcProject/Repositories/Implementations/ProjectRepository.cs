@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 
 namespace MvcProject.Repositories.Implementations
 {
@@ -29,6 +29,8 @@ namespace MvcProject.Repositories.Implementations
                 .AsNoTracking()
                 .Include(p => p.Tasks)
                 .ThenInclude(t => t.Assignee)
+                .Include(p => p.Members)
+                .ThenInclude(m => m.User)
                 .FirstOrDefaultAsync(p => p.Id == projectId);
         }
     }

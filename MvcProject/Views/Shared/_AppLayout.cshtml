@@ -5,25 +5,34 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Velocity Dashboard</title>
+    <link rel="icon" href="~/favicon.ico" type="image/x-icon" />
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
 <body class="d-flex flex-row vh-100 overflow-hidden">
 
-    
-    <aside class="sidebar-width bg-surface-light border-end border-border-light d-flex flex-column z-index-20">
+    <!-- Mobile Backdrop -->
+    <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar-width bg-surface-light border-end border-border-light d-flex flex-column" id="sidebar" style="z-index: 1050;">
         <div class="d-flex align-items-center px-4 border-bottom border-border-light" style="height: 64px;">
             <div class="d-flex align-items-center gap-3 w-100">
                 <div class="rounded p-2 d-flex align-items-center justify-content-center" style="background-color: #6366f1;">
-                    <span class="material-symbols-outlined text-primary fs-5">view_kanban</span>
+                    <span class="material-symbols-outlined text-white fs-5">view_kanban</span>
                 </div>
                 <div class="d-flex flex-column">
                     <h1 class="font-display fw-bold mb-0 text-dark" style="font-size: 1rem; line-height: 1.2;">Velocity</h1>
                     <span class="text-muted-light fw-medium" style="font-size: 0.75rem;">Product Team</span>
                 </div>
+                <!-- Mobile close button -->
+                <button class="btn btn-link text-muted-light p-1 ms-auto d-md-none border-0 shadow-none text-decoration-none" id="sidebar-close">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
             </div>
         </div>
-        
+
         <nav class="d-flex flex-column flex-grow-1 py-4 px-3 gap-1 overflow-auto">
             <a class="nav-link-custom d-flex align-items-center gap-3 px-3 py-2 rounded font-display fw-semibold text-decoration-none shadow-none @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Home" ? "active" : "")" asp-controller="Home" asp-action="Dashboard">
                 <span class="material-symbols-outlined fs-5">dashboard</span>
@@ -53,36 +62,28 @@
 
     <!-- Main Content -->
     <div class="d-flex flex-column flex-grow-1 w-100 h-100 overflow-hidden">
-        
+
         <!-- Top Navbar -->
-        <header class="d-flex align-items-center justify-content-between px-3 px-sm-4 bg-surface-light border-bottom border-border-light sticky-top z-index-10" style="height: 64px;">
+        <header class="d-flex align-items-center justify-content-between px-3 px-sm-4 bg-surface-light border-bottom border-border-light sticky-top" style="height: 64px; z-index: 1030;">
             <div class="d-flex align-items-center gap-3">
-                <button class="btn btn-link text-muted-light d-md-none p-1 text-decoration-none border-0 shadow-none">
+                <!-- Mobile hamburger -->
+                <button class="btn btn-link text-muted-light d-md-none p-1 text-decoration-none border-0 shadow-none" id="sidebar-toggle" aria-label="Open menu">
                     <span class="material-symbols-outlined">menu</span>
                 </button>
-                @* <div class="position-relative d-none d-sm-flex" style="width: 250px;">
-                    <span class="material-symbols-outlined position-absolute top-50 translate-middle-y text-muted-light fs-5" style="left: 12px;">search</span>
-                    <input type="text" class="form-control bg-light border-0 rounded-3 shadow-none text-dark" style="padding-left: 40px; font-size: 0.875rem;" placeholder="Search everywhere..." />
-                </div> *@
+                <!-- Cmd+K trigger -->
+                <button class="d-none d-sm-flex align-items-center gap-2 bg-light border border-border-light rounded-3 px-3 py-1 text-muted-light shadow-none cursor-pointer" id="cmd-k-trigger" style="font-size: 0.85rem; outline: none;">
+                    <span class="material-symbols-outlined" style="font-size: 18px;">search</span>
+                    <span>Search...</span>
+                    <kbd class="ms-3" style="background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 4px; padding: 1px 6px; font-size: 0.7rem; color: #475569;">⌘K</kbd>
+                </button>
             </div>
 
-            <div class="d-flex align-items-center gap-2 gap-sm-3">
-                @* <button class="btn btn-link p-2 text-muted-light position-relative rounded-circle d-flex align-items-center justify-content-center text-decoration-none border-0 shadow-none hover-bg-light">
-                     <span class="material-symbols-outlined">notifications</span> 
-                    <span class="position-absolute rounded-circle bg-danger border border-white" style="width: 8px; height: 8px; top: 6px; right: 6px;"></span>
-                </button> *@
-                @* <div class="ms-1 border border-2 border-white shadow-sm overflow-hidden" style="width: 32px; height: 32px; border-radius: 50%; cursor: pointer;">
-                    <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuBfanUbcrhevPueAU9SDuQ2k-054rYQd_P0AQg_N81Iv-G5sSgoZVyABcYvPM6hsbxwh2oxfU7DwnCkDlAjmkQ7U0bY2cxXmyTFZBpxOtRRvAlnsDaijhIjPzDKbYcZVXgv-MnNd7IiS6YC5z5ijuxF-twMZfroLXJ-KP2un4YRyN0WnOCuQOwXaQnIThJvkVspYsfHCbhLDauR1sGtMeKcM8fDYb6Mxh_ifn_jCEwtrWjxzDt-kGtuGqMEm6k1eRV41xx1eIHsW6Jb" alt="User profile" style="width: 100%; height: 100%; object-fit: cover;" />
-                </div> *@
-            </div>
-            @if (@User.Identity.IsAuthenticated)
+            @if (User.Identity != null && User.Identity.IsAuthenticated)
             {
-
-
                 <div class="d-flex align-items-center gap-2 gap-sm-3">
                     <!-- Notification Bell Dropdown -->
                     <div class="dropdown" id="notification-dropdown">
-                        <button class="btn btn-link p-2 text-muted-light position-relative rounded-circle d-flex align-items-center justify-content-center text-decoration-none border-0 shadow-none hover-bg-light"
+                        <button class="btn btn-link p-2 text-muted-light position-relative rounded-circle d-flex align-items-center justify-content-center text-decoration-none border-0 shadow-none"
                                 data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false" id="notification-bell">
                             <span class="material-symbols-outlined">notifications</span>
                             <span class="position-absolute rounded-pill bg-danger text-white d-flex align-items-center justify-content-center"
@@ -115,22 +116,18 @@
                              style="width: 32px; height: 32px; border-radius: 50%; cursor: pointer;"
                              data-bs-toggle="dropdown"
                              aria-expanded="false">
-
                             @if (!string.IsNullOrEmpty(currentUser?.ProfilePictureUrl))
                             {
-                        
                                 <img src="@currentUser.ProfilePictureUrl" alt="Profile"
                                      style="width: 100%; height: 100%; object-fit: cover;" />
                             }
                             else
                             {
-                               
                                 <div class="w-100 h-100 d-flex align-items-center justify-content-center text-white fw-bold"
                                      style="background-color: #6366f1; font-size: 0.8rem;">
                                     @currentUser?.FirstName?.Substring(0, 1).ToUpper()
                                 </div>
                             }
-
                         </div>
 
                         <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2">
@@ -153,20 +150,19 @@
                             </li>
                         </ul>
                     </div>
-                
                 </div>
             }
             else
             {
                 <div class="d-flex align-items-center gap-2">
                     <a asp-controller="Account" asp-action="Login"
-                           class="btn btn-outline-secondary rounded-pill px-3 py-1"
-                           style="font-size: 0.875rem;">
+                       class="btn btn-outline-secondary rounded-pill px-3 py-1"
+                       style="font-size: 0.875rem;">
                         Login
                     </a>
                     <a asp-controller="Account" asp-action="Register"
-                           class="btn btn-primary rounded-pill px-3 py-1"
-                           style="font-size: 0.875rem; background-color: #6366f1; border-color: #6366f1;">
+                       class="btn rounded-pill px-3 py-1 text-white"
+                       style="font-size: 0.875rem; background-color: #6366f1; border-color: #6366f1;">
                         Register
                     </a>
                 </div>
@@ -179,31 +175,131 @@
         </main>
     </div>
 
-    <style>
-        .notif-item {
-            transition: background-color 0.2s ease;
-            cursor: pointer;
-            border-bottom: 1px solid #f0f0f0;
-        }
-        .notif-item:hover {
-            background-color: #f8f8ff;
-        }
-        .notif-item:last-child {
-            border-bottom: none;
-        }
-        .notif-new {
-            animation: notifSlideIn 0.3s ease;
-        }
-        @@keyframes notifSlideIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-    </style>
+    <!-- Command Palette -->
+    <div class="cmd-palette-backdrop" id="cmd-palette-backdrop"></div>
+    <div class="cmd-palette" id="cmd-palette">
+        <input type="text" class="cmd-palette-input" id="cmd-palette-input" placeholder="Type a command or search..." autocomplete="off" />
+        <div class="cmd-palette-results" id="cmd-palette-results"></div>
+        <div class="cmd-palette-footer">
+            <kbd>↑↓</kbd> <span>Navigate</span>
+            <kbd>↵</kbd> <span>Select</span>
+            <kbd>Esc</kbd> <span>Close</span>
+        </div>
+    </div>
 
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/lib/microsoft-signalr/dist/browser/signalr.min.js"></script>
 
-    @if (User.Identity.IsAuthenticated)
+    <!-- Mobile Sidebar Toggle -->
+    <script>
+        (function () {
+            const sidebar = document.getElementById('sidebar');
+            const backdrop = document.getElementById('sidebar-backdrop');
+            const toggleBtn = document.getElementById('sidebar-toggle');
+            const closeBtn = document.getElementById('sidebar-close');
+
+            function openSidebar() {
+                sidebar.classList.add('sidebar-open');
+                backdrop.classList.add('active');
+            }
+            function closeSidebar() {
+                sidebar.classList.remove('sidebar-open');
+                backdrop.classList.remove('active');
+            }
+
+            if (toggleBtn) toggleBtn.addEventListener('click', openSidebar);
+            if (closeBtn) closeBtn.addEventListener('click', closeSidebar);
+            if (backdrop) backdrop.addEventListener('click', closeSidebar);
+        })();
+    </script>
+
+    <!-- Command Palette -->
+    <script>
+        (function () {
+            const palette = document.getElementById('cmd-palette');
+            const paletteBackdrop = document.getElementById('cmd-palette-backdrop');
+            const paletteInput = document.getElementById('cmd-palette-input');
+            const paletteResults = document.getElementById('cmd-palette-results');
+            const trigger = document.getElementById('cmd-k-trigger');
+
+            const commands = [
+                { label: 'Go to Dashboard', icon: 'dashboard', url: '@Url.Action("Dashboard", "Home")' },
+                { label: 'Go to Projects', icon: 'folder_open', url: '@Url.Action("Index", "Projects")' },
+                { label: 'Go to Tasks', icon: 'task_alt', url: '@Url.Action("AllTasks", "ProjectTask")' },
+                { label: 'Go to Team', icon: 'group', url: '@Url.Action("Index", "Team")' },
+                { label: 'Account Settings', icon: 'settings', url: '@Url.Action("Settings", "Account")' },
+                { label: 'Create New Project', icon: 'add_circle', url: '@Url.Action("Index", "Projects")' },
+            ];
+
+            let selectedIndex = 0;
+            let filteredCommands = [...commands];
+
+            function open() {
+                palette.classList.add('active');
+                paletteBackdrop.classList.add('active');
+                paletteInput.value = '';
+                filter('');
+                paletteInput.focus();
+            }
+            function close() {
+                palette.classList.remove('active');
+                paletteBackdrop.classList.remove('active');
+            }
+
+            function filter(query) {
+                const q = query.toLowerCase().trim();
+                filteredCommands = q ? commands.filter(c => c.label.toLowerCase().includes(q)) : [...commands];
+                selectedIndex = 0;
+                render();
+            }
+
+            function render() {
+                if (filteredCommands.length === 0) {
+                    paletteResults.innerHTML = '<div class="p-4 text-center text-muted-light small">No results found.</div>';
+                    return;
+                }
+                paletteResults.innerHTML = filteredCommands.map((cmd, i) =>
+                    `<a href="${cmd.url}" class="cmd-palette-item${i === selectedIndex ? ' selected' : ''}">
+                        <span class="material-symbols-outlined">${cmd.icon}</span>
+                        <span class="fw-medium small">${cmd.label}</span>
+                    </a>`
+                ).join('');
+            }
+
+            function navigate(dir) {
+                selectedIndex = (selectedIndex + dir + filteredCommands.length) % filteredCommands.length;
+                render();
+            }
+
+            function selectCurrent() {
+                if (filteredCommands[selectedIndex]) {
+                    window.location.href = filteredCommands[selectedIndex].url;
+                }
+            }
+
+            // Events
+            if (trigger) trigger.addEventListener('click', open);
+            paletteBackdrop.addEventListener('click', close);
+
+            paletteInput.addEventListener('input', (e) => filter(e.target.value));
+            paletteInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') { close(); e.preventDefault(); }
+                if (e.key === 'ArrowDown') { navigate(1); e.preventDefault(); }
+                if (e.key === 'ArrowUp') { navigate(-1); e.preventDefault(); }
+                if (e.key === 'Enter') { selectCurrent(); e.preventDefault(); }
+            });
+
+            // Global Cmd+K / Ctrl+K
+            document.addEventListener('keydown', (e) => {
+                if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                    e.preventDefault();
+                    palette.classList.contains('active') ? close() : open();
+                }
+            });
+        })();
+    </script>
+
+    @if (User.Identity != null && User.Identity.IsAuthenticated)
     {
         <script>
             (function () {
@@ -278,7 +374,6 @@
                     </a>`;
                 }
 
-                // Load unread count on page load
                 async function loadCount() {
                     try {
                         const res = await fetch('/api/Notification/count');
@@ -288,7 +383,6 @@
                     } catch (e) { console.warn('Notification count error:', e); }
                 }
 
-                // Load notifications when dropdown opens
                 async function loadNotifications() {
                     try {
                         const res = await fetch('/api/Notification');
@@ -307,12 +401,8 @@
                     } catch (e) { console.warn('Notification load error:', e); }
                 }
 
-                // Open dropdown → load notifications
-                bell.addEventListener('click', () => {
-                    loadNotifications();
-                });
+                bell.addEventListener('click', () => { loadNotifications(); });
 
-                // Mark all as read
                 markAllBtn.addEventListener('click', async (e) => {
                     e.stopPropagation();
                     try {
@@ -324,7 +414,6 @@
                     } catch (e) { console.warn('Mark all read error:', e); }
                 });
 
-                // Click a notification → mark as read
                 list.addEventListener('click', async (e) => {
                     const item = e.target.closest('.notif-item');
                     if (!item) return;
@@ -334,7 +423,6 @@
                     }
                 });
 
-                // SignalR
                 async function initNotificationHub() {
                     if (typeof signalR === 'undefined') return;
 
@@ -344,15 +432,12 @@
                         .build();
 
                     conn.on('ReceiveNotification', (notif) => {
-                        // Update badge
                         if (notif.unreadCount !== undefined) {
                             updateBadge(notif.unreadCount);
                         } else {
                             const current = parseInt(badge.textContent) || 0;
                             updateBadge(current + 1);
                         }
-
-                        // Prepend to list if open
                         emptyMsg.style.display = 'none';
                         list.insertAdjacentHTML('afterbegin', createNotifHtml(notif, true));
                     });
@@ -374,4 +459,3 @@
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
-

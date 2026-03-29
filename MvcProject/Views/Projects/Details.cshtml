@@ -18,9 +18,35 @@
         
         <div class="d-flex align-items-center gap-2 align-self-start">
             <div class="d-none d-sm-flex align-items-center me-2">
-                <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuAx4DjjP-gqLBNa_JyURjDJdEaWBCnmTVrk76upE7cD3pRhNHMdSLWKkH60D5Erd0vToZddqm88_BIl1cYR4HbbdWA6f2HaOAGC70mXape7LJmx_yNiBVQkhjX8-uLQpAsmNgSoRFUKOm0hGjTd633nvrqpKDo6H-PZzuzMljkXIVOZwZunhclSz8z2KI21XHfSnejud2O9M0P_yCFszN0LFq_opAqj8LQuy2SAFCxFtyhIF7S7mmi9ZF0uOtC6TXLheEgodEBV7v2j" alt="Team member" class="rounded-circle border border-2 border-white object-fit-cover" style="width: 32px; height: 32px; z-index: 3;">
-                <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuCU_4K8R15USDca_tYDCPrOylUfjUhpDzSxOdwqdhCw-GSEjFTof9E0ADecoAvM90ktMwrmZQLjTrORgHIWHHnZ6Lxi4nVy_Kzk8jwxVwI9WTy27byfKKhe5snFSHf9xBGAx-N_VDp8bmoDj41GI_eINdpnOQVowaQ26nn6XmaF3ccm25-W-V2EJ1CtVGQJigX1fdADGPrADwZnActTpLC9PZbxNN6DfN3qqL0YBhXkRj1qjVwbbrBShh4wLSrWl0-BZryJvwf-Jpmw" alt="Team member" class="rounded-circle border border-2 border-white object-fit-cover" style="width: 32px; height: 32px; margin-left: -8px; z-index: 2;">
-                <div class="rounded-circle border border-2 border-white bg-light d-flex align-items-center justify-content-center text-muted fw-medium" style="width: 32px; height: 32px; margin-left: -8px; font-size: 12px; z-index: 1;">+3</div>
+                @{
+                    var displayMembers = Model.Members.Take(3).ToList();
+                    var remaining = Model.Members.Count - displayMembers.Count;
+                }
+                @for (var mi = 0; mi < displayMembers.Count; mi++)
+                {
+                    var member = displayMembers[mi];
+                    var zIndex = displayMembers.Count - mi;
+                    var ml = mi > 0 ? "margin-left: -8px;" : "";
+                    @if (!string.IsNullOrEmpty(member.ProfilePictureUrl))
+                    {
+                        <img src="@member.ProfilePictureUrl" alt="@member.FullName" title="@member.FullName"
+                             class="rounded-circle border border-2 border-white object-fit-cover"
+                             style="width: 32px; height: 32px; @ml z-index: @zIndex;" />
+                    }
+                    else
+                    {
+                        <div class="rounded-circle border border-2 border-white d-flex align-items-center justify-content-center text-white fw-bold"
+                             style="width: 32px; height: 32px; @ml z-index: @zIndex; background-color: #6366f1; font-size: 12px;"
+                             title="@member.FullName">
+                            @member.FirstName.Substring(0, 1).ToUpper()
+                        </div>
+                    }
+                }
+                @if (remaining > 0)
+                {
+                    <div class="rounded-circle border border-2 border-white bg-light d-flex align-items-center justify-content-center text-muted fw-medium"
+                         style="width: 32px; height: 32px; margin-left: -8px; font-size: 12px; z-index: 0;">+@remaining</div>
+                }
             </div>
             @if (Model.IsCurrentUserAdmin)
             {

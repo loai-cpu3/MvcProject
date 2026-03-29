@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using MvcProject.Attributes;
 using MvcProject.Hubs;
+using MvcProject.Models.Domain;
+using MvcProject.Models.Enums;
 using MvcProject.Repositories.Interfaces;
 using MvcProject.Services.Interfaces;
 using MvcProject.ViewModels.Projects;
@@ -182,13 +184,29 @@ namespace MvcProject.Controllers
         {
             await _projectService.AddUserToProjectAsync(projectId, userId, role);
 
-            // Push real-time notification to the added user
-            var unreadCount = await _unitOfWork.Notifications.GetUnreadCountAsync(userId);
+            // Create DB notification + push real-time notification to the added user
             var project = await _unitOfWork.Projects.GetByIdAsync(projectId);
+            var actorId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var notif = new Notification
+            {
+                UserId = userId,
+                SenderUserId = actorId,
+                Type = NotificationType.ProjectMemberAdded,
+                Content = $"You have been added to \"{project?.Title}\" as {role}",
+                RelatedEntityType = "Project",
+                RelatedEntityId = projectId,
+                CreatedAt = DateTime.UtcNow
+            };
+            await _unitOfWork.Notifications.AddAsync(notif);
+            await _unitOfWork.SaveAsync();
+
+            var unreadCount = await _unitOfWork.Notifications.GetUnreadCountAsync(userId);
 
             await _notificationHub.Clients.Group($"user_{userId}").SendAsync("ReceiveNotification", new
             {
-                Content = $"You have been added to \"{project?.Title}\" as {role}",
+                notif.Id,
+                Content = notif.Content,
                 Type = "ProjectMemberAdded",
                 RelatedEntityType = "Project",
                 RelatedEntityId = projectId,

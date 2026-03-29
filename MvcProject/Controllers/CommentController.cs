@@ -38,7 +38,7 @@ namespace MvcProject.Controllers
                 c.Content,
                 c.TaskId,
                 UserId = c.UserId,
-                AuthorName = c.User?.UserName ?? "Unknown",
+                AuthorName = c.User != null ? $"{c.User.FirstName} {c.User.LastName}" : "Unknown",
                 CreatedAt = c.CreatedAt
             });
             return Ok(result);
@@ -70,6 +70,17 @@ namespace MvcProject.Controllers
             await _unitOfWork.Comments.AddAsync(comment);
             await _unitOfWork.SaveAsync();
 
+            var auditLog = new AuditLog
+            {
+                TaskId = task.Id,
+                ActionType = AuditActionType.Update,
+                UserId = userId,
+                Description = "added a comment",
+                CreatedAt = System.DateTime.UtcNow
+            };
+            await _unitOfWork.AuditLogs.AddAsync(auditLog);
+            await _unitOfWork.SaveAsync();
+
             // Fetch to ensure User navigation is populated for the notification
             var createdComments = await _unitOfWork.Comments.GetCommentsByTaskIdAsync(dto.TaskId);
             var createdComment = createdComments.FirstOrDefault(c => c.Id == comment.Id);
@@ -80,47 +91,73 @@ namespace MvcProject.Controllers
                 comment.Id,
                 comment.Content,
                 comment.TaskId,
-                AuthorName = createdComment?.User?.UserName ?? "Unknown",
+                AuthorName = createdComment?.User != null ? $"{createdComment.User.FirstName} {createdComment.User.LastName}" : "Unknown",
                 CreatedAt = comment.CreatedAt
             });
 
-            // Create notification for the task assignee (if not the commenter)
-            if (!string.IsNullOrEmpty(task.AssigneeId) && task.AssigneeId != userId)
+            // Notify all participants (assignee + anyone who commented) except the current commenter
+            var participantIds = createdComments.Select(c => c.UserId).Distinct().ToList();
+            if (!string.IsNullOrEmpty(task.AssigneeId))
+            {
+                participantIds.Add(task.AssigneeId);
+            }
+
+            var usersToNotify = participantIds.Where(id => id != userId).Distinct().ToList();
+
+            if (usersToNotify.Any())
             {
                 var senderUser = await _unitOfWork.Users.GetByIdAsync(userId);
                 var senderName = senderUser != null ? $"{senderUser.FirstName} {senderUser.LastName}" : "Someone";
 
-                var notification = new Notification
+                foreach (var targetUserId in usersToNotify)
                 {
-                    UserId = task.AssigneeId,
-                    SenderUserId = userId,
-                    Type = NotificationType.CommentAdded,
-                    Content = $"{senderName} commented on \"{task.Title}\"",
-                    RelatedEntityType = "ProjectTask",
-                    RelatedEntityId = task.Id,
-                    CreatedAt = DateTime.UtcNow
-                };
+                    var notification = new Notification
+                    {
+                        UserId = targetUserId,
+                        SenderUserId = userId,
+                        Type = NotificationType.CommentAdded,
+                        Content = $"{senderName} commented on \"{task.Title}\"",
+                        RelatedEntityType = "ProjectTask",
+                        RelatedEntityId = task.Id,
+                        CreatedAt = DateTime.UtcNow
+                    };
 
-                await _unitOfWork.Notifications.AddAsync(notification);
+                    await _unitOfWork.Notifications.AddAsync(notification);
+                }
+                
                 await _unitOfWork.SaveAsync();
 
-                var unreadCount = await _unitOfWork.Notifications.GetUnreadCountAsync(task.AssigneeId);
-
-                await _notificationHub.Clients.Group($"user_{task.AssigneeId}").SendAsync("ReceiveNotification", new
+                // Send SignalR real-time updates for each notified user
+                foreach (var targetUserId in usersToNotify)
                 {
-                    notification.Id,
-                    notification.Content,
-                    Type = notification.Type.ToString(),
-                    notification.RelatedEntityType,
-                    notification.RelatedEntityId,
-                    ProjectId = task.ProjectId,
-                    SenderName = senderName,
-                    notification.CreatedAt,
-                    UnreadCount = unreadCount
-                });
+                    var unreadCount = await _unitOfWork.Notifications.GetUnreadCountAsync(targetUserId);
+
+                    // We need to fetch the newly created notification's ID, but since we just saved them, 
+                    // we can't easily map them back individually inside the loop (they all fired at once).
+                    // So we will grab the last inserted notification for this user on this task.
+                    var latestNotif = await _unitOfWork.Notifications.GetAllAsync();
+                    var userNotif = latestNotif.OrderByDescending(n => n.Id)
+                        .FirstOrDefault(n => n.UserId == targetUserId && n.RelatedEntityId == task.Id && n.Type == NotificationType.CommentAdded);
+
+                    if (userNotif != null)
+                    {
+                        await _notificationHub.Clients.Group($"user_{targetUserId}").SendAsync("ReceiveNotification", new
+                        {
+                            userNotif.Id,
+                            userNotif.Content,
+                            Type = userNotif.Type.ToString(),
+                            userNotif.RelatedEntityType,
+                            userNotif.RelatedEntityId,
+                            ProjectId = task.ProjectId,
+                            SenderName = senderName,
+                            userNotif.CreatedAt,
+                            UnreadCount = unreadCount
+                        });
+                    }
+                }
             }
 
-            return Ok(new { comment.Id, comment.Content, comment.TaskId, AuthorName = createdComment?.User?.UserName ?? "Unknown", CreatedAt = comment.CreatedAt });
+            return Ok(new { comment.Id, comment.Content, comment.TaskId, AuthorName = createdComment?.User != null ? $"{createdComment.User.FirstName} {createdComment.User.LastName}" : "Unknown", CreatedAt = comment.CreatedAt });
         }
 
         public class UpdateCommentDto

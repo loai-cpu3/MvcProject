@@ -1,4 +1,4 @@
-﻿@model MvcProject.ViewModels.ApplicationUserRegisterVM
+@model MvcProject.ViewModels.ApplicationUserRegisterVM
 
 @{
     ViewData["Title"] = "Register";
@@ -98,14 +98,14 @@
                 <!-- Confirm Password -->
                 <div>
                     <div class="input-auth-field rounded-3 d-flex align-items-center px-3 py-2">
-                        <input asp-for="ConfirmPassowrd"
+                        <input asp-for="ConfirmPassword"
                                class="form-control bg-transparent border-0 shadow-none p-0 text-dark"
                                placeholder="Confirm Password" />
-                        <button type="button" onclick="togglePassword('ConfirmPassowrd')" class="btn btn-link text-muted p-0 ms-2 text-decoration-none shadow-none">
-                            <i class="fa-solid fa-eye-slash" id="ConfirmPassowrd-icon"></i>
+                        <button type="button" onclick="togglePassword('ConfirmPassword')" class="btn btn-link text-muted p-0 ms-2 text-decoration-none shadow-none">
+                            <i class="fa-solid fa-eye-slash" id="ConfirmPassword-icon"></i>
                         </button>
                     </div>
-                    <span asp-validation-for="ConfirmPassowrd" class="text-danger" style="font-size: 0.75rem;"></span>
+                    <span asp-validation-for="ConfirmPassword" class="text-danger" style="font-size: 0.75rem;"></span>
                 </div>
 
                 <!-- General Errors -->

@@ -1,4 +1,4 @@
-﻿using MvcProject.Services.Interfaces;
+using MvcProject.Services.Interfaces;
 using MvcProject.ViewModels.Home;
 
 namespace MvcProject.Services
@@ -28,6 +28,8 @@ namespace MvcProject.Services
             var totalPendingTasks = await _unitOfWork.Tasks.GetTotalPendingTasksCountAsync(userId);
             var recentTasks = await _unitOfWork.Tasks.GetRecentTasksAsync(userId, 3);
 
+            var recentActivities = await _unitOfWork.AuditLogs.GetRecentProjectActivitiesAsync(userId, 10);
+
             return new DashboardViewModel()
             {
                 CompletionRate = completionRates.Count == 0 ? 0 : Math.Round(completionRates.Average(), 2),
@@ -37,10 +39,29 @@ namespace MvcProject.Services
                     .Select(task => new DashboardTaskViewModel
                     {
                         Id = task.Id,
+                        ProjectId = task.ProjectId,
                         Title = task.Title,
                         ProjectName = task.Project.Title,
                         Status = task.Status,
                         DueDate = DateOnly.FromDateTime(task.Deadline ?? task.CreatedAt)
+                    })
+                    .ToList(),
+                RecentActivities = recentActivities
+                    .Select(a => new DashboardActivityViewModel
+                    {
+                        Id = a.Id,
+                        ActionType = a.ActionType.ToString(),
+                        Description = a.Description,
+                        UserName = a.User != null ? $"{a.User.FirstName} {a.User.LastName}" : "System",
+                        UserInitials = a.User != null ? a.User.FirstName.Substring(0, 1).ToUpper() : "S",
+                        UserAvatarUrl = a.User?.ProfilePictureUrl,
+                        TaskTitle = a.Task?.Title ?? "Unknown Task",
+                        TaskId = a.TaskId,
+                        ProjectId = a.Task?.ProjectId ?? 0,
+                        ProjectTitle = a.Task?.Project?.Title ?? "Unknown Project",
+                        OldValue = a.OldValue,
+                        NewValue = a.NewValue,
+                        CreatedAt = a.CreatedAt
                     })
                     .ToList()
             };

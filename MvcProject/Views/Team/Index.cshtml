@@ -1,165 +1,103 @@
+@model MvcProject.Controllers.TeamIndexViewModel
+
 @{
-    ViewData["Title"] = "Team Management";
+    ViewData["Title"] = "Team";
 }
 
 <div class="mx-auto pb-5 d-flex flex-column gap-4" style="max-width: 1200px;">
-    <!-- Title and Filters -->
+    <!-- Title -->
     <div class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3">
         <div>
-            <h2 class="font-display fw-bold fs-4 text-dark mb-1">Team Management</h2>
-            <p class="text-muted-light small mb-0">Manage your team members, workspace permissions, and invites.</p>
+            <h2 class="font-display fw-bold fs-4 text-dark mb-1">Team</h2>
+            <p class="text-muted-light small mb-0">People you work with across all your projects.</p>
         </div>
         <div class="d-flex align-items-center gap-2">
-            <div class="d-flex bg-surface-light p-1 rounded-3 border border-border-light shadow-soft">
-                <button class="btn btn-sm btn-light bg-light rounded text-primary fw-bold border-0 shadow-none px-3" style="font-size: 0.75rem;">All Members</button>
-                <button class="btn btn-sm btn-link text-muted-light fw-semibold text-decoration-none shadow-none px-3 hover-text-dark" style="font-size: 0.75rem;">Design</button>
-                <button class="btn btn-sm btn-link text-muted-light fw-semibold text-decoration-none shadow-none px-3 hover-text-dark" style="font-size: 0.75rem;">Engineering</button>
-            </div>
+            <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill fw-bold px-3 py-2" style="font-size: 0.8rem;">
+                <span class="material-symbols-outlined align-middle me-1" style="font-size: 16px;">group</span>
+                @Model.Members.Count member@(Model.Members.Count != 1 ? "s" : "")
+            </span>
         </div>
     </div>
 
-    <!-- Member Grid -->
-    <div class="row g-4">
-        <!-- Member Card 1 -->
-        <div class="col-12 col-md-6 col-lg-3">
-            <div class="bg-surface-light p-4 rounded-4 border border-border-light shadow-soft position-relative text-center hover-shadow transition-all w-100">
-                <button class="btn btn-link position-absolute top-0 end-0 p-3 text-muted-light hover-text-dark shadow-none text-decoration-none">
-                    <span class="material-symbols-outlined fs-5">more_vert</span>
-                </button>
-                <div class="position-relative mx-auto mt-2 mb-3" style="width: 80px; height: 80px;">
-                    <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuCMgMaTH0VO4C6HfIGsy5FLZKasoNS4z4odAf3ZKhoLnes0BwvEP7Byna_8a9EDkwZ8mXyHrY14aLDo09u_apMBAK1enukzDcaKDcb1fwRDe35GWLkXeJkkBhUb3SOw4YM5d7lAuFZJff1lJlJyCj36HSvr9I6vNYq_pW-iwUgg3rwwW_JS3ioeze4W3UKhPjR9K-60gnBuvUkXekRNKeqiXlCNhWqVPoKf3JJM_-bZLO5vL-x-SwmRgxuHN_7dboS5NmKkKb4OH1jE" alt="Jordan Smith" class="w-100 h-100 rounded-circle border border-4 border-light shadow-inner object-fit-cover">
-                    <span class="position-absolute bottom-0 end-0 rounded-circle border border-2 border-white" style="width: 16px; height: 16px; background-color: var(--velocity-accent); margin-bottom: 4px; margin-right: 4px;" title="Active"></span>
-                </div>
-                <h3 class="font-display fw-bold text-dark fs-6 mb-1">Jordan Smith</h3>
-                <p class="text-primary fw-semibold mb-0" style="font-size: 0.75rem;">Senior Product Designer</p>
-                <div class="mt-4 d-flex align-items-center justify-content-between text-uppercase tracking-wider fw-bold" style="font-size: 10px;">
-                    <span class="bg-light text-muted-light px-2 py-1 rounded">Design</span>
-                    <span class="d-flex align-items-center gap-1" style="color: var(--velocity-accent);">Active</span>
-                </div>
-            </div>
+    @if (Model.Members.Count == 0)
+    {
+        <div class="bg-surface-light rounded-4 border border-border-light shadow-soft p-5 text-center">
+            <span class="material-symbols-outlined d-block mb-3 text-muted-light" style="font-size: 64px; opacity: 0.3;">group_off</span>
+            <h4 class="font-display fw-bold text-dark mb-2">No team members yet</h4>
+            <p class="text-muted-light small mb-3">Join or create a project to start collaborating with others.</p>
+            <a asp-controller="Projects" asp-action="Index" class="btn rounded-pill text-white fw-medium px-4 py-2" style="background-color: #6366f1;">
+                Go to Projects
+            </a>
         </div>
+    }
+    else
+    {
+        <!-- Member Grid -->
+        <div class="row g-4">
+            @foreach (var member in Model.Members)
+            {
+                var isCurrentUser = member.UserId == Model.CurrentUserId;
+                var roleBadgeClass = member.Role switch
+                {
+                    ProjectRole.Admin => "bg-danger bg-opacity-10 text-danger",
+                    ProjectRole.Manager => "bg-warning bg-opacity-10 text-warning",
+                    _ => "bg-primary bg-opacity-10 text-primary"
+                };
+                var roleIcon = member.Role switch
+                {
+                    ProjectRole.Admin => "shield_person",
+                    ProjectRole.Manager => "manage_accounts",
+                    _ => "person"
+                };
 
-        <!-- Member Card 2 -->
-        <div class="col-12 col-md-6 col-lg-3">
-            <div class="bg-surface-light p-4 rounded-4 border border-border-light shadow-soft position-relative text-center hover-shadow transition-all w-100">
-                <button class="btn btn-link position-absolute top-0 end-0 p-3 text-muted-light hover-text-dark shadow-none text-decoration-none">
-                    <span class="material-symbols-outlined fs-5">more_vert</span>
-                </button>
-                <div class="position-relative mx-auto mt-2 mb-3" style="width: 80px; height: 80px;">
-                    <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuBI7gkpqCLx5Uy3JRXA9ctlbZsDRX82KZBrUmopJXAK4hPi2bTr_Rk4CnIRH_v1u1OHyO-sQLhLxpmFMOkLMt7F7Kb7tyJITtD_Y54jQG42tztH-LNEHBNmj2a5_BpBVgjSWuloI01QRgm-UBA6mbJe1hp62M0AQho3KD6mPSdXmjHNFsFt0Z0L_4lInBjwSogwPSftI5s_4b9tXZN4CwIONWrITDF33xl0cM34GhlU7i33RV-0b-dJ795EOj5-HXvLMnJzGyg9C72k" alt="Sarah Chen" class="w-100 h-100 rounded-circle border border-4 border-light shadow-inner object-fit-cover">
-                    <span class="position-absolute bottom-0 end-0 rounded-circle border border-2 border-white bg-warning" style="width: 16px; height: 16px; margin-bottom: 4px; margin-right: 4px;" title="Away"></span>
-                </div>
-                <h3 class="font-display fw-bold text-dark fs-6 mb-1">Sarah Chen</h3>
-                <p class="text-primary fw-semibold mb-0" style="font-size: 0.75rem;">Backend Engineer</p>
-                <div class="mt-4 d-flex align-items-center justify-content-between text-uppercase tracking-wider fw-bold" style="font-size: 10px;">
-                    <span class="bg-light text-muted-light px-2 py-1 rounded">Engineering</span>
-                    <span class="text-warning d-flex align-items-center gap-1">Away</span>
-                </div>
-            </div>
-        </div>
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="bg-surface-light p-4 rounded-4 border border-border-light shadow-soft position-relative text-center hover-shadow transition-all w-100 h-100 d-flex flex-column">
+                        @if (isCurrentUser)
+                        {
+                            <span class="position-absolute top-0 start-0 m-3 badge bg-primary bg-opacity-10 text-primary rounded-pill fw-bold" style="font-size: 9px;">You</span>
+                        }
 
-        <!-- Member Card 3 -->
-        <div class="col-12 col-md-6 col-lg-3">
-            <div class="bg-surface-light p-4 rounded-4 border border-border-light shadow-soft position-relative text-center hover-shadow transition-all w-100">
-                <button class="btn btn-link position-absolute top-0 end-0 p-3 text-muted-light hover-text-dark shadow-none text-decoration-none">
-                    <span class="material-symbols-outlined fs-5">more_vert</span>
-                </button>
-                <div class="position-relative mx-auto mt-2 mb-3" style="width: 80px; height: 80px;">
-                    <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuAaRsY1CDSdywncv-CUruFJ_Ie-qyalyD2EcsnsmLqATpkKAh3DDdpM19w69kwChGD4GA0NtsyEVHhPBi96D8-hiCxkxdduu5eTUUzqNDMmyVcI6f9y9j9gYbyatzNj3n1otg6bkd6xDmFhK0qR53-x9tDshqPRAGL3HRlpTlwfj3hSEbfI7WL8v5EbzNUC7KHNPiTnCuddHtCNy9Rzc0u3D3x1WjJVTVgiXVu5jpd_E3EitmMdatPbkwdx7HgH4t0m-QABZhwV56AH" alt="Marcus Vane" class="w-100 h-100 rounded-circle border border-4 border-light shadow-inner object-fit-cover">
-                    <span class="position-absolute bottom-0 end-0 rounded-circle border border-2 border-white bg-secondary" style="width: 16px; height: 16px; margin-bottom: 4px; margin-right: 4px;" title="Offline"></span>
-                </div>
-                <h3 class="font-display fw-bold text-dark fs-6 mb-1">Marcus Vane</h3>
-                <p class="text-primary fw-semibold mb-0" style="font-size: 0.75rem;">Growth Lead</p>
-                <div class="mt-4 d-flex align-items-center justify-content-between text-uppercase tracking-wider fw-bold" style="font-size: 10px;">
-                    <span class="bg-light text-muted-light px-2 py-1 rounded">Marketing</span>
-                    <span class="text-secondary d-flex align-items-center gap-1">Offline</span>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Member Card 4 -->
-        <div class="col-12 col-md-6 col-lg-3">
-            <div class="bg-surface-light p-4 rounded-4 border border-border-light shadow-soft position-relative text-center hover-shadow transition-all w-100">
-                <button class="btn btn-link position-absolute top-0 end-0 p-3 text-muted-light hover-text-dark shadow-none text-decoration-none">
-                    <span class="material-symbols-outlined fs-5">more_vert</span>
-                </button>
-                <div class="position-relative mx-auto mt-2 mb-3" style="width: 80px; height: 80px;">
-                    <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuABoc_hXTqOqDkJSAnfwyNfwGUoRKIY8Nwk8s5BJMtRIhXN5KpnYrNOntZQC0AAsNfv6EKKcHvHe5pLetX765g7mNp2Lnatd3RAVGIOk5wHc4ucgcuEw45Zik4-9jF8_m_WdK5QTZLQDfcg1ql3V4Rq-NaaT1j9SQZPJd3std-xiuLO_ouLApm7CSVwnoc8_krgA_t5qC_Q7bhSy744ZW3a4yD8wfayuNp0j8M29UI4DwJD7dAQhRDR8lHS176vPpy4e2eQ2BjH89J1" alt="Elena Rodriguez" class="w-100 h-100 rounded-circle border border-4 border-light shadow-inner object-fit-cover">
-                    <span class="position-absolute bottom-0 end-0 rounded-circle border border-2 border-white" style="width: 16px; height: 16px; background-color: var(--velocity-accent); margin-bottom: 4px; margin-right: 4px;" title="Active"></span>
-                </div>
-                <h3 class="font-display fw-bold text-dark fs-6 mb-1">Elena Rodriguez</h3>
-                <p class="text-primary fw-semibold mb-0" style="font-size: 0.75rem;">QA Automation</p>
-                <div class="mt-4 d-flex align-items-center justify-content-between text-uppercase tracking-wider fw-bold" style="font-size: 10px;">
-                    <span class="bg-light text-muted-light px-2 py-1 rounded">Engineering</span>
-                    <span class="d-flex align-items-center gap-1" style="color: var(--velocity-accent);">Active</span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Pending Invitations -->
-    <div class="d-flex flex-column gap-3 mt-2">
-        <div class="d-flex align-items-center gap-2">
-            <span class="material-symbols-outlined text-primary fs-5">schedule_send</span>
-            <h3 class="font-display fw-bold text-dark fs-5 mb-0">Pending Invitations</h3>
-            <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill fw-bold" style="font-size: 10px;">2</span>
-        </div>
-
-        <div class="bg-surface-light rounded-4 border border-border-light overflow-hidden shadow-soft">
-            <div class="table-responsive">
-                <table class="table table-borderless table-hover mb-0 align-middle">
-                    <thead class="bg-light">
-                        <tr>
-                            <th scope="col" class="px-4 py-3 text-muted-light fw-bold text-uppercase tracking-wider" style="font-size: 10px;">Email Address</th>
-                            <th scope="col" class="px-4 py-3 text-muted-light fw-bold text-uppercase tracking-wider" style="font-size: 10px;">Role</th>
-                            <th scope="col" class="px-4 py-3 text-muted-light fw-bold text-uppercase tracking-wider" style="font-size: 10px;">Sent Date</th>
-                            <th scope="col" class="px-4 py-3 text-end text-muted-light fw-bold text-uppercase tracking-wider" style="font-size: 10px;">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody class="border-top-0">
-                        <tr class="border-bottom border-border-light">
-                            <td class="px-4 py-3">
-                                <div class="d-flex align-items-center gap-3">
-                                    <div class="rounded-circle bg-light d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
-                                        <span class="material-symbols-outlined text-muted-light" style="font-size: 16px;">mail</span>
-                                    </div>
-                                    <span class="small fw-medium">leo.k@company.com</span>
+                        <div class="position-relative mx-auto mt-2 mb-3" style="width: 80px; height: 80px;">
+                            @if (!string.IsNullOrEmpty(member.AvatarUrl))
+                            {
+                                <img src="@member.AvatarUrl" alt="@member.FullName"
+                                     class="w-100 h-100 rounded-circle border border-4 border-light shadow-inner object-fit-cover">
+                            }
+                            else
+                            {
+                                var initials = member.FullName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                                var initialsText = initials.Length >= 2
+                                    ? $"{initials[0][0]}{initials[^1][0]}".ToUpper()
+                                    : (initials.Length == 1 ? initials[0][0].ToString().ToUpper() : "?");
+                                <div class="w-100 h-100 rounded-circle border border-4 border-light shadow-inner d-flex align-items-center justify-content-center text-white fw-bold"
+                                     style="background: linear-gradient(135deg, #6366f1, #8b5cf6); font-size: 1.5rem;">
+                                    @initialsText
                                 </div>
-                            </td>
-                            <td class="px-4 py-3">
-                                <span class="badge bg-primary bg-opacity-10 text-primary rounded fw-bold" style="font-size: 10px;">Editor</span>
-                            </td>
-                            <td class="px-4 py-3">
-                                <span class="small text-muted-light fw-medium">Oct 12, 2023</span>
-                            </td>
-                            <td class="px-4 py-3 text-end">
-                                <button class="btn btn-link p-0 text-primary fw-bold text-decoration-none hover-underline small me-3">Resend</button>
-                                <button class="btn btn-link p-0 text-danger fw-bold text-decoration-none hover-underline small">Revoke</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="px-4 py-3">
-                                <div class="d-flex align-items-center gap-3">
-                                    <div class="rounded-circle bg-light d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
-                                        <span class="material-symbols-outlined text-muted-light" style="font-size: 16px;">mail</span>
-                                    </div>
-                                    <span class="small fw-medium">amanda.w@agency.net</span>
-                                </div>
-                            </td>
-                            <td class="px-4 py-3">
-                                <span class="badge bg-primary bg-opacity-10 text-primary rounded fw-bold" style="font-size: 10px;">Viewer</span>
-                            </td>
-                            <td class="px-4 py-3">
-                                <span class="small text-muted-light fw-medium">Oct 14, 2023</span>
-                            </td>
-                            <td class="px-4 py-3 text-end">
-                                <button class="btn btn-link p-0 text-primary fw-bold text-decoration-none hover-underline small me-3">Resend</button>
-                                <button class="btn btn-link p-0 text-danger fw-bold text-decoration-none hover-underline small">Revoke</button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+                            }
+                        </div>
+
+                        <h3 class="font-display fw-bold text-dark fs-6 mb-1">@member.FullName</h3>
+                        <p class="text-muted-light mb-3" style="font-size: 0.75rem;">@member.Email</p>
+
+                        <div class="mt-auto d-flex flex-column gap-2">
+                            <div class="d-flex align-items-center justify-content-center gap-1">
+                                <span class="material-symbols-outlined" style="font-size: 14px;">@roleIcon</span>
+                                <span class="badge @roleBadgeClass rounded-pill fw-bold" style="font-size: 10px;">@member.Role</span>
+                            </div>
+                            <div class="d-flex flex-wrap justify-content-center gap-1" style="max-height: 48px; overflow: hidden;">
+                                @foreach (var projectName in member.ProjectNames.Take(3))
+                                {
+                                    <span class="badge bg-light text-muted-light rounded fw-medium" style="font-size: 9px;">@projectName</span>
+                                }
+                                @if (member.ProjectNames.Count > 3)
+                                {
+                                    <span class="badge bg-light text-muted-light rounded fw-medium" style="font-size: 9px;">+@(member.ProjectNames.Count - 3) more</span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
         </div>
-    </div>
+    }
 </div>

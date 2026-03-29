@@ -1,8 +1,9 @@
-﻿namespace MvcProject.ViewModels.Home
+namespace MvcProject.ViewModels.Home
 {
     public class DashboardTaskViewModel
     {
         public int Id { get; set; }
+        public int ProjectId { get; set; }
 
         public string Title { get; set; }
         public string ProjectName { get; set; }

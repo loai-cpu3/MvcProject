@@ -55,7 +55,9 @@ namespace MvcProject.Repositories.Implementations
             return await _dbSet
                 .AsNoTracking()
                 .Include(t => t.Project)
-                .Where(t => t.Status != TaskStatus.Done && (t.AssigneeId == userId || t.AssigneeId == null))
+                .Where(t => t.Status != TaskStatus.Done &&
+                    t.AssigneeId == userId &&
+                    t.Project.Members.Any(m => m.UserId == userId))
                 .OrderBy(t => t.Deadline ?? DateTime.MaxValue)
                 .ThenByDescending(t => t.CreatedAt)
                 .Take(count)
