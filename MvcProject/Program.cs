@@ -1,14 +1,9 @@
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MvcProject.Authorization.Handlers;
 using MvcProject.Authorization.Requirements;
-using MvcProject.Data;
 using MvcProject.Hubs;
-using MvcProject.Models.Domain;
-using MvcProject.Repositories.Implementations;
-using MvcProject.Repositories.Interfaces;
 using MvcProject.Services;
 using MvcProject.Services.Interfaces;
 
@@ -20,22 +15,14 @@ namespace MvcProject
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
+
             builder.Services.AddControllersWithViews();
             builder.Services.AddSignalR();
              
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-            //builder.Services
-            //    .AddIdentity<ApplicationUser, IdentityRole>()
-            //    .AddEntityFrameworkStores<ApplicationDbContext>()
-            //    .AddDefaultTokenProviders();
 
-       //     builder.Services.AddDataProtection()
-       ////  .PersistKeysToFileSystem(new DirectoryInfo(@"C:\Keys")) // any folder on your machine
-       //   .SetApplicationName("Velocity");
-          
             builder.Services
                .AddIdentity<ApplicationUser, IdentityRole>()
                .AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
@@ -46,6 +33,7 @@ namespace MvcProject
                 options.SlidingExpiration = true;
                 options.Cookie.IsEssential = true;
                 options.Cookie.HttpOnly = true;
+                options.Cookie.SameSite = SameSiteMode.Lax;
             });
 
 
@@ -80,12 +68,7 @@ namespace MvcProject
        });
 
 
-            builder.Services.ConfigureApplicationCookie(options =>
-            {
-                options.Cookie.SameSite = SameSiteMode.Lax;
-            });
 
-            //
             builder.Services.Configure<EmailSettings>(
                builder.Configuration.GetSection("EmailSettings"));
 
@@ -96,15 +79,15 @@ namespace MvcProject
 
             var app = builder.Build();
 
-            
+
             if (!app.Environment.IsDevelopment())
             {
                 app.UseExceptionHandler("/Home/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
 
             app.UseHttpsRedirection();
+            app.UseStaticFiles();
             app.UseRouting();
             
             app.UseAuthentication();

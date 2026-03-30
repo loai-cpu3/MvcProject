@@ -6,11 +6,11 @@ namespace MvcProject.Models.Domain
     public class Project : BaseEntity
     {
         [Required, MaxLength(300)]
-        public string Title { get; set; }
+        public string Title { get; set; } = null!;
         public string? Description { get; set; }
 
         [Required]
-        public string CreatedById { get; set; }
+        public string CreatedById { get; set; } = null!;
 
 
         public ICollection<ProjectTask> Tasks { get; set; } = new List<ProjectTask>();
@@ -19,6 +19,6 @@ namespace MvcProject.Models.Domain
 
 
         [ForeignKey("CreatedById")]
-        public ApplicationUser CreatedBy { get; set; }
+        public ApplicationUser CreatedBy { get; set; } = null!;
     }
 }

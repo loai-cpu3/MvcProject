@@ -25,17 +25,6 @@ namespace MvcProject.ViewModels.ProjectTask
         public List<TaskAttachmentViewModel> Attachments { get; set; } = new List<TaskAttachmentViewModel>();
     }
 
-    //public class TaskCommentViewModel
-    //{
-    //    public int Id { get; set; }
-    //    public string AuthorName { get; set; } = string.Empty;
-    //    public string AuthorAvatarUrl { get; set; } = string.Empty;
-    //    public DateTime CreatedAt { get; set; }
-    //    public string Content { get; set; } = string.Empty;
-    //    public int Likes { get; set; }
-    //    public List<TaskCommentViewModel> Replies { get; set; } = new List<TaskCommentViewModel>();
-    //}
-
     public class TaskAttachmentViewModel
     {
         public int Id { get; set; }

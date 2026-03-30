@@ -47,7 +47,7 @@ namespace MvcProject.Controllers
         public class CreateCommentDto
         {
             public int TaskId { get; set; }
-            public string Content { get; set; }
+            public string Content { get; set; } = string.Empty;
         }
 
         [HttpPost]
@@ -81,11 +81,9 @@ namespace MvcProject.Controllers
             await _unitOfWork.AuditLogs.AddAsync(auditLog);
             await _unitOfWork.SaveAsync();
 
-            // Fetch to ensure User navigation is populated for the notification
             var createdComments = await _unitOfWork.Comments.GetCommentsByTaskIdAsync(dto.TaskId);
             var createdComment = createdComments.FirstOrDefault(c => c.Id == comment.Id);
 
-            // Notify via SignalR group using TaskId
             await _commentHub.Clients.Group(dto.TaskId.ToString()).SendAsync("ReceiveComment", new
             {
                 comment.Id,
@@ -95,7 +93,6 @@ namespace MvcProject.Controllers
                 CreatedAt = comment.CreatedAt
             });
 
-            // Notify all participants (assignee + anyone who commented) except the current commenter
             var participantIds = createdComments.Select(c => c.UserId).Distinct().ToList();
             if (!string.IsNullOrEmpty(task.AssigneeId))
             {
@@ -127,14 +124,9 @@ namespace MvcProject.Controllers
                 
                 await _unitOfWork.SaveAsync();
 
-                // Send SignalR real-time updates for each notified user
                 foreach (var targetUserId in usersToNotify)
                 {
                     var unreadCount = await _unitOfWork.Notifications.GetUnreadCountAsync(targetUserId);
-
-                    // We need to fetch the newly created notification's ID, but since we just saved them, 
-                    // we can't easily map them back individually inside the loop (they all fired at once).
-                    // So we will grab the last inserted notification for this user on this task.
                     var latestNotif = await _unitOfWork.Notifications.GetAllAsync();
                     var userNotif = latestNotif.OrderByDescending(n => n.Id)
                         .FirstOrDefault(n => n.UserId == targetUserId && n.RelatedEntityId == task.Id && n.Type == NotificationType.CommentAdded);
@@ -162,7 +154,7 @@ namespace MvcProject.Controllers
 
         public class UpdateCommentDto
         {
-            public string Content { get; set; }
+            public string Content { get; set; } = string.Empty;
         }
 
         [HttpPut("{id}")]
@@ -173,14 +165,13 @@ namespace MvcProject.Controllers
 
             var comment = await _unitOfWork.Comments.GetByIdAsync(id);
             if (comment == null) return NotFound();
-            if (comment.UserId != userId) return Forbid(); // Only author can edit
+            if (comment.UserId != userId) return Forbid();
 
             comment.Content = dto.Content;
 
             _unitOfWork.Comments.Update(comment);
             await _unitOfWork.SaveAsync();
 
-            // Notify via SignalR
             await _commentHub.Clients.Group(comment.TaskId.ToString()).SendAsync("UpdateComment", new
             {
                 comment.Id,
@@ -198,14 +189,13 @@ namespace MvcProject.Controllers
 
             var comment = await _unitOfWork.Comments.GetByIdAsync(id);
             if (comment == null) return NotFound();
-            if (comment.UserId != userId) return Forbid(); // Only author can delete
+            if (comment.UserId != userId) return Forbid();
 
             var taskId = comment.TaskId;
 
             _unitOfWork.Comments.Delete(comment);
             await _unitOfWork.SaveAsync();
 
-            // Notify via SignalR
             await _commentHub.Clients.Group(taskId.ToString()).SendAsync("DeleteComment", new
             {
                 Id = id

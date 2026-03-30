@@ -294,7 +294,7 @@ namespace MvcProject.Services
             };
 
             await _auditLogRepository.AddAsync(log);
-            await _unitOfWork.SaveAsync(); // Saves via unit of work even if we pass via AuditLogRepository explicitly to satisfy injection requirement
+            await _unitOfWork.SaveAsync();
         }
 
         private async Task NotifyAssignmentAsync(ProjectTask task, string actorId, bool isUpdate = false)
@@ -306,7 +306,7 @@ namespace MvcProject.Services
 
             var notif = new Notification
             {
-                UserId = task.AssigneeId,
+                UserId = task.AssigneeId!,
                 SenderUserId = actorId,
                 Type = NotificationType.TaskAssigned,
                 Content = content,
@@ -318,7 +318,7 @@ namespace MvcProject.Services
             await _unitOfWork.Notifications.AddAsync(notif);
             await _unitOfWork.SaveAsync();
 
-            var unreadCount = await _unitOfWork.Notifications.GetUnreadCountAsync(task.AssigneeId);
+            var unreadCount = await _unitOfWork.Notifications.GetUnreadCountAsync(task.AssigneeId!);
             await _notificationHub.Clients.Group($"user_{task.AssigneeId}").SendAsync("ReceiveNotification", new
             {
                 notif.Id,

@@ -6,16 +6,16 @@ namespace MvcProject.Models.Domain
     public class TaskComment : BaseEntity
     {
         [Required]
-        public string Content { get; set; }
+        public string Content { get; set; } = null!;
         [Required]
         public int TaskId { get; set; }
         [Required]
-        public string UserId { get; set; }
+        public string UserId { get; set; } = null!;
  
 
         [ForeignKey("TaskId")]
-        public ProjectTask Task { get; set; }
+        public ProjectTask Task { get; set; } = null!;
         [ForeignKey("UserId")]
-        public ApplicationUser User { get; set; }
+        public ApplicationUser User { get; set; } = null!;
     }
 }

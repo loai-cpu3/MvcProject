@@ -4,13 +4,13 @@ namespace MvcProject.Repositories.Implementations
     {
         private readonly ApplicationDbContext _context;
 
-        private IProjectRepository _projects;
-        private ITaskRepository _tasks;
-        private ICommentRepository _comments;
-        private IAuditLogRepository _auditLogs;
-        private IProjectUserRepository _projectUsers;
-        private INotificationRepository _notifications;
-        private IApplicationUserRepository _users;
+        private IProjectRepository? _projects;
+        private ITaskRepository? _tasks;
+        private ICommentRepository? _comments;
+        private IAuditLogRepository? _auditLogs;
+        private IProjectUserRepository? _projectUsers;
+        private INotificationRepository? _notifications;
+        private IApplicationUserRepository? _users;
 
         public UnitOfWork(ApplicationDbContext context)
         {

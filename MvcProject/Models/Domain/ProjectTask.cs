@@ -6,7 +6,7 @@ namespace MvcProject.Models.Domain
     public class ProjectTask : BaseEntity
     {
         [Required, MaxLength(300)]
-        public string Title { get; set; }
+        public string Title { get; set; } = null!;
         public string? Description { get; set; }
         [Required]
         public Enums.TaskStatus Status { get; set; }
@@ -23,7 +23,7 @@ namespace MvcProject.Models.Domain
 
 
         [ForeignKey("ProjectId")]
-        public Project Project { get; set; }
+        public Project Project { get; set; } = null!;
         [ForeignKey("AssigneeId")]
         public ApplicationUser? Assignee { get; set; }
     }

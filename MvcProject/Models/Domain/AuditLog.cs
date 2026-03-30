@@ -17,8 +17,8 @@ namespace MvcProject.Models.Domain
 
 
         [ForeignKey("UserId")]
-        public ApplicationUser User { get; set; }
+        public ApplicationUser User { get; set; } = null!;
         [ForeignKey("TaskId")]
-        public ProjectTask Task { get; set; }
+        public ProjectTask Task { get; set; } = null!;
     }
 }

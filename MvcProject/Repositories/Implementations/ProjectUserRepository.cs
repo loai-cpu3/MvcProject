@@ -1,3 +1,6 @@
+using Microsoft.EntityFrameworkCore;
+
+
 namespace MvcProject.Repositories.Implementations
 {
     public class ProjectUserRepository: Repository<ProjectUser>, IProjectUserRepository

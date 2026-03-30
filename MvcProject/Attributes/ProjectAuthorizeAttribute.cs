@@ -28,22 +28,18 @@ namespace MvcProject.Attributes
         {
             int? projectId = null;
 
-            // 1. Try ActionArguments (matches action method parameter names)
             if (context.ActionArguments.TryGetValue("projectId", out var arg) && arg is int pId)
             {
                 projectId = pId;
             }
-            // 2. Try Route Data
-            else if (context.RouteData.Values.TryGetValue("projectId", out var routeObj) && int.TryParse(routeObj.ToString(), out var rId))
+            else if (context.RouteData.Values.TryGetValue("projectId", out var routeObj) && int.TryParse(routeObj?.ToString(), out var rId))
             {
                 projectId = rId;
             }
-            // 3. Try Query string
             else if (context.HttpContext.Request.Query.TryGetValue("projectId", out var qIdStr) && int.TryParse(qIdStr, out var qId))
             {
                 projectId = qId;
             }
-            // 4. Try Form data
             else if (context.HttpContext.Request.HasFormContentType && context.HttpContext.Request.Form.TryGetValue("projectId", out var fIdStr) && int.TryParse(fIdStr, out var fId))
             {
                 projectId = fId;
@@ -52,7 +48,6 @@ namespace MvcProject.Attributes
             {
                 projectId = fId2;
             }
-            // 5. Try to find ProjectId property in any model argument
             else
             {
                 foreach (var argument in context.ActionArguments.Values)
@@ -61,7 +56,7 @@ namespace MvcProject.Attributes
                     var prop = argument.GetType().GetProperty("ProjectId");
                     if (prop != null && prop.PropertyType == typeof(int))
                     {
-                        projectId = (int)prop.GetValue(argument);
+                        projectId = (int)prop.GetValue(argument)!;
                         break;
                     }
                 }
@@ -73,7 +68,7 @@ namespace MvcProject.Attributes
                 return;
             }
 
-            AuthorizationResult result = null;
+            AuthorizationResult? result = null;
             foreach (var role in _targetRoles.Distinct())
             {
                 var policyName = $"RequireProject{role}";
